@@ -5,13 +5,16 @@ digraph pyservice {
     edge [arrowsize=0.5,fontname=Arial,fontsize=9];
 
     // Nodes
-    CollectionTools [ label="<top>      Collection tools |\
-                             <create>       - create_collection(uri) |\
-                             <exists>       - is_collection_exists(uri) |\
-                             <list>         - collection_list(uri) |\
-                             <delete>       - delete_collection(uri)"];
     
-    Collection  [ label="<top>          class Collection() |\
+    kvlite          [label="<top>       kvlite library"];
+    
+    CollectionUtils [ label="<top>      Collection utils |\
+                             <open>         open(uri) |\
+                             <is_exists>    is_exists(uri) |\
+                             <list>         list(uri) |\
+                             <remove>       remove(uri)"];
+    
+    Collection      [ label="<top>          class Collection() |\
                          <init>             - __init__(uri) |\
                          <get_uuid>         - get_uuid() |\
                          <pack>             - pack(v) |\
@@ -47,7 +50,8 @@ digraph pyservice {
                          
     // Links
     
-    CollectionTools:top -> Collection:top;
+    kvlite:top -> CollectionUtils:top;
+    CollectionUtils:open -> Collection:top;
     Collection:top -> MysqlCollection:top;
     Collection:top -> SqliteCollection:top;
 }
