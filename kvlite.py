@@ -67,6 +67,8 @@ class ValueUnpackError(Exception): pass
 # exception raised in case of connection error
 class ConnectionError(Exception): pass
 
+SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
+
 
 # -----------------------------------------------------------------
 # KVLite utils
@@ -79,45 +81,16 @@ def open(uri):
     in case of successful opening or creation new collection 
     return Collection object
     '''
-    raise NotImplementedError('kvlite.open()')
-
-
-def parse_uri(uri):
-    ''' parse URI 
-    
-    return driver, user, password, host, port, database, table
-    '''
-    # TODO add support different scheme of databases
-    result = {}
-    m = re.search(r'(?P<drv>\w+)://(?P<usr>.+):(?P<pwd>.+)@(?P<host>.+?):?(?P<port>\d*)\/(?P<db>.+)\.(?P<coll>.+)', uri, re.I)
-    try:
-        result = dict(m.groupdict())
-    except AttributeError,e:
-        raise WrongURIException(e)
-        
-    if result['port'] <> '':
-        result['port'] = int(result['port'])
+    backend, rest_uri = uri.split('://')
+    if backend in SUPPORTED_BACKENDS:
+        if backend == 'mysql':
+            return MysqlCollection(uri)
+        elif backend == 'sqlite':
+            return SqliteCollection(uri)
+        else:
+            raise NotImplementedError()
     else:
-        result['port'] = 3306
-    return result
-
-def create_collection(URI):
-    ''' create collection '''
-    params = parse_uri(URI) 
-    try:
-        conn = MySQLdb.connect(host=params['host'], port = params['port'], 
-                            user=params['usr'], passwd=params['pwd'], db=params['db'])
-    except MySQLdb.OperationalError,err:
-        raise ConnectionError(err)
-    cursor = conn.cursor()
-    SQL_CREATE_TABLE = '''CREATE TABLE IF NOT EXISTS %s (
-                            __rowid__ INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                            k BINARY(20) NOT NULL, 
-                            v MEDIUMBLOB,
-                            UNIQUE KEY (k) ) ENGINE=InnoDB;'''
-
-    cursor.execute(SQL_CREATE_TABLE % params['coll'])
-    conn.commit()
+        raise RuntimeError('Unknown backend: {}'.format(backend))
 
 def is_collection_exists(URI):
     ''' check if collection exists '''
@@ -155,11 +128,54 @@ def delete_collection(URI):
         conn.commit()
 
 # -----------------------------------------------------------------
-# Collections class
+# MysqlCollection class
 # -----------------------------------------------------------------
 
 class MysqlConnection(object):
     ''' Mysql Connection '''
+
+    def __init__(self, uri):
+        
+        params = parse_uri(URI) 
+        
+        
+        raise NotImplementedError('MysqlCollection is not implemented yet')
+
+    @staticmethod
+    def _parse_uri(uri):
+        ''' parse URI 
+        
+        return driver, user, password, host, port, database, table
+        '''
+        result = {}
+        m = re.search(r'(?P<drv>\w+)://(?P<usr>.+):(?P<pwd>.+)@(?P<host>.+?):?(?P<port>\d*)\/(?P<db>.+)\.(?P<coll>.+)', uri, re.I)
+        try:
+            result = dict(m.groupdict())
+        except AttributeError,e:
+            raise WrongURIException(e)
+            
+        if result['port'] <> '':
+            result['port'] = int(result['port'])
+        else:
+            result['port'] = 3306
+        return result
+
+    def _create(self, params):
+        ''' create collection '''
+        try:
+            conn = MySQLdb.connect(host=params['host'], port = params['port'], 
+                                user=params['usr'], passwd=params['pwd'], db=params['db'])
+        except MySQLdb.OperationalError,err:
+            raise ConnectionError(err)
+        cursor = conn.cursor()
+        SQL_CREATE_TABLE = '''CREATE TABLE IF NOT EXISTS %s (
+                                __rowid__ INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                                k BINARY(20) NOT NULL, 
+                                v MEDIUMBLOB,
+                                UNIQUE KEY (k) ) ENGINE=InnoDB;'''
+
+        cursor.execute(SQL_CREATE_TABLE % params['coll'])
+        conn.commit()
 
     def get_uuid(self):
         """ return id based on uuid """
@@ -265,8 +281,14 @@ class MysqlConnection(object):
         self.__conn.close()
 
 
+# -----------------------------------------------------------------
+# SqliteCollection class
+# -----------------------------------------------------------------
 class SqliteCollection(object):
-    pass    
+    ''' Sqlite Collection'''
+    
+    def __init__(self, uri):
+        raise NotImplementedError('SqliteCollection is not implemented yet')
 
 class Collection(object):
     ''' 
