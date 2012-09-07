@@ -69,8 +69,19 @@ class ConnectionError(Exception): pass
 
 
 # -----------------------------------------------------------------
-# KVLite tools
+# KVLite utils
 # -----------------------------------------------------------------
+def open(uri):
+    ''' 
+    open collection by URI, 
+    if collection does not exist kvlite will try to create it
+    
+    in case of successful opening or creation new collection 
+    return Collection object
+    '''
+    raise NotImplementedError('kvlite.open()')
+
+
 def parse_uri(uri):
     ''' parse URI 
     
