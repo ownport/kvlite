@@ -14,21 +14,9 @@ digraph pyservice {
                              <list>         list(uri) |\
                              <remove>       remove(uri)"];
     
-    Collection      [ label="<top>          class Collection() |\
-                         <init>             - __init__(uri) |\
-                         <get_uuid>         - get_uuid() |\
-                         <pack>             - pack(v) |\
-                         <unpack>           - unpack(v) |\
-                         <get>              - get(k) |\
-                         <put>              - put(k, v) |\
-                         <delete>           - delete(k) |\
-                         <keys>             - keys() |\
-                         <count>            - count() |\
-                         <commit>           - commit() |\
-                         <close>            - close()"];
-
     MysqlCollection [label="<top>       class MysqlCollection() |\
                          <init>             - __init__(uri) |\
+                         <create>           - _create(params) |\
                          <get_uuid>         - get_uuid() |\
                          <get>              - get(k) |\
                          <put>              - put(k, v) |\
@@ -51,7 +39,6 @@ digraph pyservice {
     // Links
     
     kvlite:top -> CollectionUtils:top;
-    CollectionUtils:open -> Collection:top;
-    Collection:top -> MysqlCollection:top;
-    Collection:top -> SqliteCollection:top;
+    CollectionUtils:open -> MysqlCollection:top;
+    CollectionUtils:open -> SqliteCollection:top;
 }
