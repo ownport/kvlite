@@ -18,6 +18,9 @@ test-all:
 	make test-unittest
 	make test-doctest
 
+graph:
+	@ dot -T png docs/kvlite.gv -o docs/kvlite.png && eog docs/kvlite.png
+
 todo:
 	@ echo 
 	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite.py
