@@ -67,6 +67,7 @@ class ValueUnpackError(Exception): pass
 # exception raised in case of connection error
 class ConnectionError(Exception): pass
 
+
 # -----------------------------------------------------------------
 # KVLite tools
 # -----------------------------------------------------------------
@@ -147,31 +148,7 @@ def delete_collection(URI):
 # -----------------------------------------------------------------
 
 class MysqlConnection(object):
-    pass
-
-class SqliteCollection(object):
-    pass    
-
-class Collection(object):
-    ''' 
-    kvlite2 collection
-
-    A collection is a group of documents stored in kvlite2, 
-    and can be thought of as roughly the equivalent of a 
-    table in a relational database.
-
-    '''
-    def __init__(self, db_uri):
-        '''
-        db_uri - URI to databases, 
-        URI format: driver://username:passwd@host[:port]/database.collection
-        '''
-        params = parse_uri(db_uri)
-        self.__conn = MySQLdb.connect(host=params['host'], port = params['port'], 
-                        user=params['usr'], passwd=params['pwd'], db=params['db'])
-        self.__collection = params['coll']
-        self.__cursor = self.__conn.cursor()
-        self.__uuids = []
+    ''' Mysql Connection '''
 
     def get_uuid(self):
         """ return id based on uuid """
@@ -184,18 +161,6 @@ class Collection(object):
                 u = ("%040s" % ''.join(u)).replace(' ','0')
                 self.__uuids.append(u)
         return self.__uuids.pop()
-
-    def pack(self, v):
-        ''' pack value 
-        
-        Note: before pack the value it's better to encode it by base64
-        '''
-        return zlib.compress(json_encode(v))
-
-    def unpack(self, v):
-        ''' unpack value 
-        '''
-        return json_decode(zlib.decompress(v))
 
     def __get_many(self):
         ''' return all docs '''
@@ -288,6 +253,42 @@ class Collection(object):
         ''' close connection to database '''
         self.__conn.close()
 
+
+class SqliteCollection(object):
+    pass    
+
+class Collection(object):
+    ''' 
+    kvlite2 collection
+
+    A collection is a group of documents stored in kvlite2, 
+    and can be thought of as roughly the equivalent of a 
+    table in a relational database.
+
+    '''
+    def __init__(self, db_uri):
+        '''
+        db_uri - URI to databases, 
+        URI format: driver://username:passwd@host[:port]/database.collection
+        '''
+        params = parse_uri(db_uri)
+        self.__conn = MySQLdb.connect(host=params['host'], port = params['port'], 
+                        user=params['usr'], passwd=params['pwd'], db=params['db'])
+        self.__collection = params['coll']
+        self.__cursor = self.__conn.cursor()
+        self.__uuids = []
+
+    def pack(self, v):
+        ''' pack value 
+        
+        Note: before pack the value it's better to encode it by base64
+        '''
+        return zlib.compress(json_encode(v))
+
+    def unpack(self, v):
+        ''' unpack value 
+        '''
+        return json_decode(zlib.decompress(v))
 
                     
 # -----------------------------------------------------------------
