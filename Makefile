@@ -19,5 +19,8 @@ test-all:
 	make test-doctest
 
 todo:
-	@ grep '# TODO' kvlite.py
+	@ echo 
+	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite.py
+	@ echo 
+	
 	
