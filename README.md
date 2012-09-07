@@ -7,8 +7,6 @@ A collection is a group of documents stored in kvlite,  and can be thought of as
 ## Collection Utils
 
  - open(uri)
- - is_exists(uri)
- - list(uri)
  - remove(uri)
 
 ## Collection
