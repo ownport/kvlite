@@ -1,0 +1,19 @@
+digraph pyservice {
+
+    graph [ rankdir = "LR" ];
+    node [shape=record,fontname=Arial,fontsize=9];
+    edge [arrowsize=0.5,fontname=Arial,fontsize=9];
+
+    // Nodes
+    Connection  [ label="<top>      class Connection() |\
+                         <get_uuid>     - get_uuid() |\
+                         <pack>         - pack(v) |\
+                         <unpack>       - unpack(v) |\
+                         <get>          - get(k) |\
+                         <put>          - put(k, v) |\
+                         <delete>       - delete(k) |\
+                         <keys>         - keys() |\
+                         <count>        - count() |\
+                         <commit>       - commit() |\
+                         <close>        - close()"];
+}
