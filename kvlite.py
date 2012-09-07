@@ -75,6 +75,7 @@ def parse_uri(uri):
     
     return driver, user, password, host, port, database, table
     '''
+    # TODO add support different scheme of databases
     result = {}
     m = re.search(r'(?P<drv>\w+)://(?P<usr>.+):(?P<pwd>.+)@(?P<host>.+?):?(?P<port>\d*)\/(?P<db>.+)\.(?P<coll>.+)', uri, re.I)
     try:
