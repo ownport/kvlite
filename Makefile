@@ -4,7 +4,7 @@ test-unittest:
 	@ echo '***************************'
 	@ echo '*       Unittests         *'
 	@ echo '***************************'
-	python tests/test_kvlite_utils.py
+	python tests/test_utils.py
 	python tests/test_selectdb.py
 
 test-doctest:
