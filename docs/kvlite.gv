@@ -5,15 +5,49 @@ digraph pyservice {
     edge [arrowsize=0.5,fontname=Arial,fontsize=9];
 
     // Nodes
-    Connection  [ label="<top>      class Connection() |\
-                         <get_uuid>     - get_uuid() |\
-                         <pack>         - pack(v) |\
-                         <unpack>       - unpack(v) |\
-                         <get>          - get(k) |\
-                         <put>          - put(k, v) |\
-                         <delete>       - delete(k) |\
-                         <keys>         - keys() |\
-                         <count>        - count() |\
-                         <commit>       - commit() |\
-                         <close>        - close()"];
+    CollectionTools [ label="<top>      Collection tools |\
+                             <create>       - create_collection(uri) |\
+                             <exists>       - is_collection_exists(uri) |\
+                             <list>         - collection_list(uri) |\
+                             <delete>       - delete_collection(uri)"];
+    
+    Collection  [ label="<top>          class Collection() |\
+                         <init>             - __init__(uri) |\
+                         <get_uuid>         - get_uuid() |\
+                         <pack>             - pack(v) |\
+                         <unpack>           - unpack(v) |\
+                         <get>              - get(k) |\
+                         <put>              - put(k, v) |\
+                         <delete>           - delete(k) |\
+                         <keys>             - keys() |\
+                         <count>            - count() |\
+                         <commit>           - commit() |\
+                         <close>            - close()"];
+
+    MysqlCollection [label="<top>       class MysqlCollection() |\
+                         <init>             - __init__(uri) |\
+                         <get_uuid>         - get_uuid() |\
+                         <get>              - get(k) |\
+                         <put>              - put(k, v) |\
+                         <delete>           - delete(k) |\
+                         <keys>             - keys() |\
+                         <count>            - count() |\
+                         <commit>           - commit() |\
+                         <close>            - close()"];
+
+    SqliteCollection [label="<top>      class SqliteCollection() |\
+                         <init>             - __init__(uri) |\
+                         <get>              - get(k) |\
+                         <put>              - put(k, v) |\
+                         <delete>           - delete(k) |\
+                         <keys>             - keys() |\
+                         <count>            - count() |\
+                         <commit>           - commit() |\
+                         <close>            - close()"];
+                         
+    // Links
+    
+    CollectionTools:top -> Collection:top;
+    Collection:top -> MysqlCollection:top;
+    Collection:top -> SqliteCollection:top;
 }
