@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 #   Simple key-value datastore
+
 #   - support only mysql database
 #   - console support added
 #
@@ -9,6 +10,7 @@
 #   kvlite2 tutorial http://code.google.com/p/kvlite/wiki/kvlite2
 #
 #   TODO autocommit for put()
+#   TODO synchronise documents between few datastores
 #
 #
 __author__ = 'Andrey Usov <http://devel.ownport.net>'
@@ -48,6 +50,8 @@ except ImportError:
     print >> sys.stderr, 'Error! MySQLdb package is not installed, please install python-mysqldb'
     sys.exit()
 
+# TODO add deferent serialization on user choice (pickle & json)
+# TODO add support user specific serializators
 from json import loads as json_decode
 from json import dumps as json_encode
 
@@ -138,8 +142,15 @@ def delete_collection(URI):
         conn.commit()
 
 # -----------------------------------------------------------------
-# Collection class
+# Collections class
 # -----------------------------------------------------------------
+
+class MysqlConnection(object):
+    pass
+
+class SqliteCollection(object):
+    pass    
+
 class Collection(object):
     ''' 
     kvlite2 collection
@@ -163,6 +174,7 @@ class Collection(object):
 
     def get_uuid(self):
         """ return id based on uuid """
+        # TODO add generation UUID in case of use sqlite database
         if not self.__uuids:
             self.__cursor.execute('SELECT %s;' % ','.join(['uuid()' for _ in range(100)]))
             for uuid in self.__cursor.fetchone():
