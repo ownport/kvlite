@@ -44,6 +44,8 @@ import zlib
 import pprint
 import binascii
 
+__all__ = ['open', 'remove',]
+
 try:
     import MySQLdb
 except ImportError:
@@ -54,18 +56,6 @@ except ImportError:
 # TODO add support user specific serializators
 from json import loads as json_decode
 from json import dumps as json_encode
-
-# TODO describe this Exception
-class WronKeyValue(Exception): pass
-
-# in case when URI for connection defined incorrectly this exception is raised
-class WrongURIException(Exception): pass
-
-# in case value cannot be unpacked
-class ValueUnpackError(Exception): pass
-
-# exception raised in case of connection error
-class ConnectionError(Exception): pass
 
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
@@ -81,65 +71,62 @@ def open(uri):
     in case of successful opening or creation new collection 
     return Collection object
     '''
+    manager = CollectionManager(uri)
+    
+
+def remove(uri):
+    '''
+    remove collection by URI
+    ''' 
     backend, rest_uri = uri.split('://')
     if backend in SUPPORTED_BACKENDS:
         if backend == 'mysql':
-            return MysqlCollection(uri)
+            MysqlCollection(uri).remove()
         elif backend == 'sqlite':
-            return SqliteCollection(uri)
+            SqliteCollection(uri).remove()
         else:
-            raise NotImplementedError()
+            raise NotImplementedError('unknown backend: {}'.format(uri))
     else:
         raise RuntimeError('Unknown backend: {}'.format(backend))
 
-def is_collection_exists(URI):
-    ''' check if collection exists '''
-    params = parse_uri(URI) 
-    try:
-        conn = MySQLdb.connect(host=params['host'], port = params['port'], 
-                            user=params['usr'], passwd=params['pwd'], db=params['db'])
-    except MySQLdb.OperationalError,err:
-        raise ConnectionError(err)
-    cursor = conn.cursor()
-    cursor.execute('SHOW TABLES;')
-    for r in cursor.fetchall():
-        if r[0] == params['coll']:
-            return True
-    return False
-
-def collection_names(URI):
-    ''' return list of collection names'''
-    params = parse_uri(URI) 
-    conn = MySQLdb.connect(host=params['host'], port = params['port'], 
-                        user=params['usr'], passwd=params['pwd'], db=params['db'])
-    cursor = conn.cursor()
-    cursor.execute('SHOW TABLES;')
-    return cursor.fetchall()
-    
-    
-def delete_collection(URI):
-    ''' delete collection '''
-    if is_collection_exists(URI):
-        params = parse_uri(URI) 
-        conn = MySQLdb.connect(host=params['host'], port = params['port'], 
-                            user=params['usr'], passwd=params['pwd'], db=params['db'])
-        cursor = conn.cursor()
-        cursor.execute('DROP TABLE %s;' % params['coll'])
-        conn.commit()
 
 # -----------------------------------------------------------------
-# MysqlCollection class
+# CollectionManager class
 # -----------------------------------------------------------------
+class CollectionManager(object):
+    ''' Collection Manager'''
+    
+    def __init__(self, uri):
+        backend, rest_uri = uri.split('://')
+        if backend in SUPPORTED_BACKENDS:
+            if backend == 'mysql':
+                return MysqlCollection(uri)
+            elif backend == 'sqlite':
+                return SqliteCollection(uri)
+            else:
+                raise NotImplementedError()
+        else:
+            raise RuntimeError('Unknown backend: {}'.format(backend))
+        
 
-class MysqlConnection(object):
-    ''' Mysql Connection '''
-
+# -----------------------------------------------------------------
+# MysqlCollectionManager class
+# -----------------------------------------------------------------
+class MysqlCollectionManager(object):
+    ''' MysqlCollectionManager '''
+    
     def __init__(self, uri):
         
-        params = parse_uri(URI) 
-        
-        
-        raise NotImplementedError('MysqlCollection is not implemented yet')
+        params = self._parse_uri(uri) 
+        self.__collection = params['collection']
+        try:
+            self.__conn = MySQLdb.connect(
+                                host=params['host'], port = params['port'], 
+                                user=params['username'], passwd=params['password'], 
+                                db=params['db'])
+        except MySQLdb.OperationalError,err:
+            raise RuntimeError(err)
+        self.__cursor = self.__conn.cursor()
 
     @staticmethod
     def _parse_uri(uri):
@@ -148,11 +135,11 @@ class MysqlConnection(object):
         return driver, user, password, host, port, database, table
         '''
         result = {}
-        m = re.search(r'(?P<drv>\w+)://(?P<usr>.+):(?P<pwd>.+)@(?P<host>.+?):?(?P<port>\d*)\/(?P<db>.+)\.(?P<coll>.+)', uri, re.I)
+        m = re.search(r'(?P<backend>\w+)://(?P<username>.+):(?P<password>.+)@(?P<host>.+?):?(?P<port>\d*)\/(?P<db>.+)\.(?P<collection>.+)', uri, re.I)
         try:
             result = dict(m.groupdict())
-        except AttributeError,e:
-            raise WrongURIException(e)
+        except AttributeError, e:
+            raise RuntimeError(e)
             
         if result['port'] <> '':
             result['port'] = int(result['port'])
@@ -160,22 +147,56 @@ class MysqlConnection(object):
             result['port'] = 3306
         return result
 
-    def _create(self, params):
+    def create(self, name):
         ''' create collection '''
-        try:
-            conn = MySQLdb.connect(host=params['host'], port = params['port'], 
-                                user=params['usr'], passwd=params['pwd'], db=params['db'])
-        except MySQLdb.OperationalError,err:
-            raise ConnectionError(err)
-        cursor = conn.cursor()
+
         SQL_CREATE_TABLE = '''CREATE TABLE IF NOT EXISTS %s (
                                 __rowid__ INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                 k BINARY(20) NOT NULL, 
                                 v MEDIUMBLOB,
                                 UNIQUE KEY (k) ) ENGINE=InnoDB;'''
 
-        cursor.execute(SQL_CREATE_TABLE % params['coll'])
-        conn.commit()
+        self.__cursor.execute(SQL_CREATE_TABLE % name)
+        self.__conn.commit()
+
+    @property
+    def collection(self):
+        ''' return collection name from uri'''
+        return self.__collection
+    
+    def collections(self):
+        ''' return collection list'''
+        self.__cursor.execute('SHOW TABLES;')
+        return [i[0] for i in self.__cursor.fetchall()]
+    
+
+    def remove(self, name):
+        ''' remove collection '''
+        if name in self.collections():
+            self.__cursor.execute('DROP TABLE %s;' % name)
+            self.__conn.commit()
+        else:
+            raise RuntimeError('No collection with name: {}'.format(name))
+
+    def close(self):
+        ''' close connection to database '''
+        self.__conn.close()
+
+# -----------------------------------------------------------------
+# MysqlCollection class
+# -----------------------------------------------------------------
+class MysqlCollection(object):
+    ''' Mysql Connection '''
+
+    def __init__(self, uri):
+        
+        params = self._parse_uri(uri) 
+        try:
+            self.__conn = MySQLdb.connect(host=params['host'], port = params['port'], 
+                                user=params['usr'], passwd=params['pwd'], db=params['db'])
+        except MySQLdb.OperationalError,err:
+            raise RuntimeError(err)
+        self.__cursor = self.__conn.cursor()
 
     def get_uuid(self):
         """ return id based on uuid """
