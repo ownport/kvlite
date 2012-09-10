@@ -8,11 +8,28 @@ digraph pyservice {
     
     kvlite          [label="<top>       kvlite library"];
     
-    CollectionUtils [ label="<top>      Collection utils |\
-                             <open>         open(uri) |\
-                             <is_exists>    is_exists(uri) |\
-                             <list>         list(uri) |\
-                             <remove>       remove(uri)"];
+    CollectionUtils [label="<top>       Collection utils |\
+                            <open>          open(uri) |\
+                            <remove>        remove(uri)"];
+    
+    CollectionManager[label="<top>      class CollectionManager() |\
+                             <init>         - __init__(uri) |\
+                             <create>       - create(name) |\
+                             <get_collection> - get_collection(name) |\
+                             <collections>  - collections() |\
+                             <remove>       - remove(name) |\
+                             <close>        - close()"];
+    
+    MysqlCollectionManager [
+                    label="<top>        class MysqlCollectionManager() |\
+                           <parse_uri>      - _parse_uri() |\
+                           <create>         - create() |\
+                           <remove>         - remove() |\
+                           <close>          - close()"];
+                           
+    SqliteCollectionManager [
+                    label="<top>        class SqliteCollectionManager() |\
+                           <close>          - close()"];
     
     MysqlCollection [label="<top>       class MysqlCollection() |\
                          <init>             - __init__(uri) |\
@@ -39,6 +56,9 @@ digraph pyservice {
     // Links
     
     kvlite:top -> CollectionUtils:top;
-    CollectionUtils:open -> MysqlCollection:top;
-    CollectionUtils:open -> SqliteCollection:top;
+    CollectionUtils:top -> CollectionManager:top;
+    CollectionManager:top -> MysqlCollectionManager:top;
+    CollectionManager:top -> SqliteCollectionManager:top;
+    MysqlCollectionManager:top -> MysqlCollection:top;
+    SqliteCollectionManager:top -> SqliteCollection:top;
 }
