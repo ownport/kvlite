@@ -1,16 +1,16 @@
-import kvlite
 import unittest
 
-from kvlite import MysqlCollection
-from kvlite import MysqlCollectionManager
+import kvlite 
+from kvlite import SqliteCollection
+from kvlite import SqliteCollectionManager
 
-class KvliteMysqlTests(unittest.TestCase):
+class KvliteSqliteTests(unittest.TestCase):
 
     def setUp(self):
-        URI = 'mysql://kvlite_test:eixaaghiequ6ZeiBahn0@localhost/kvlite_test'
+        URI = 'sqlite://tests/db/testdb.sqlite'
 
         self.collection_name = 'kvlite_test'
-        self.manager = MysqlCollectionManager(URI)
+        self.manager = SqliteCollectionManager(URI)
         
         if self.collection_name not in self.manager.collections():
             self.manager.create(self.collection_name)
@@ -24,11 +24,6 @@ class KvliteMysqlTests(unittest.TestCase):
             self.manager.remove(self.collection_name)
         self.collection.close()
     
-    def test_mysql_get_uuid(self):
-        
-        uuids = [self.collection.get_uuid() for i in range(1000)]
-        self.assertEqual(len(set(uuids)), 1000)
-
     def test_put_get_delete_count_one(self):
         
         k = self.collection.get_uuid()
@@ -58,7 +53,6 @@ class KvliteMysqlTests(unittest.TestCase):
         for k in ks:
             self.collection.delete(k)
         self.assertEqual(self.collection.count, 0)
-        
 
         
 if __name__ == '__main__':

@@ -24,7 +24,7 @@ collection = kvlite.open('sqlite://memory:collection_name')
 ```
 If `dbfile` is specified, it may be a relative path or an absolute path. Paths should be specified in the system dependent style. 
 ```
->>> kvlite.open('sqlite://testdb:test_collection')
+>>> kvlite.open('sqlite://testdb.sqlite:test_collection')
 >>> kvlite.open('sqlite://home/projects/kvlite/testdb.sqlite:test_collection')
 ```
 If the database file doesn't already exist, it will be created together with new collection. 
