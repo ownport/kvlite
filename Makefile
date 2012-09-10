@@ -4,8 +4,10 @@ test-unittest:
 	@ echo '***************************'
 	@ echo '*       Unittests         *'
 	@ echo '***************************'
+	python tests/test_mysql_collection.py
+	python tests/test_mysql_collection_manager.py
+	python tests/test_collection_manager.py
 	python tests/test_utils.py
-	python tests/test_selectdb.py
 
 test-doctest:
 	@ echo '***************************'

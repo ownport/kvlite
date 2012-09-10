@@ -1,15 +1,14 @@
 import kvlite
 import unittest
 
+from kvlite import get_uuid
+
 class KvliteUtilsTests(unittest.TestCase):
 
-    def test_kvlite_open(self):
-        print kvlite.open('sqlite://memory:test')                
-        print kvlite.open('sqlite://tests/db/test.sqlite:test')                
-        print kvlite.open('mysql://kvlite_test:eixaaghiequ6ZeiBahn0@localhost/kvlite_test.test_collection')                
+    def test_get_uuid(self):
         
-    def test_parse_uri_sqlite(self):
-        pass
+        uuids = get_uuid(1000)
+        self.assertEqual(len(set(uuids)), 1000)
 
         
 if __name__ == '__main__':
