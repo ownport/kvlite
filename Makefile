@@ -5,7 +5,9 @@ test-unittest:
 	@ echo '*       Unittests         *'
 	@ echo '***************************'
 	python tests/test_mysql_collection.py
+	python tests/test_sqlite_collection.py
 	python tests/test_mysql_collection_manager.py
+	python tests/test_sqlite_collection_manager.py
 	python tests/test_collection_manager.py
 	python tests/test_utils.py
 
@@ -28,5 +30,14 @@ todo:
 	@ echo 
 	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite.py
 	@ echo 
-	
+
+coverage:
+	@ python-coverage -x tests/test_mysql_collection.py
+	@ python-coverage -x tests/test_sqlite_collection.py
+	@ python-coverage -x tests/test_mysql_collection_manager.py
+	@ python-coverage -x tests/test_sqlite_collection_manager.py
+	@ python-coverage -x tests/test_collection_manager.py
+	@ python-coverage -x tests/test_utils.py
+	@ python-coverage -r
+	@ rm .coverage
 	
