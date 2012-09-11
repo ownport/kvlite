@@ -40,6 +40,7 @@ POSSIBILITY OF SUCH DAMAGE."""
 import os
 import cmd
 import sys
+import json
 import zlib
 import uuid
 import pprint
@@ -53,7 +54,6 @@ try:
 except ImportError:
     print >> sys.stderr, 'Error! MySQLdb package is not installed, please install python-mysqldb'
     sys.exit()
-
 
 try:
     import cPickle as pickle
@@ -109,12 +109,12 @@ class CompressedJsonSerializer(object):
     @staticmethod
     def dumps(v):
         ''' dumps value '''
-        return zlib.compress(json_encode(v))
+        return zlib.compress(json.dumps(v))
 
     @staticmethod
     def loads(v):
         ''' loads value  '''
-        return json_decode(zlib.decompress(v))
+        return json.loads(zlib.decompress(v))
 
 # -----------------------------------------------------------------
 # SERIALIZERS 
@@ -185,14 +185,15 @@ class CollectionManager(object):
     ''' Collection Manager'''
     
     def __init__(self, uri):
+    
+        self.backend_manager = None
+        
         backend, rest_uri = uri.split('://')
         if backend in SUPPORTED_BACKENDS:
             if backend == 'mysql':
                 self.backend_manager = MysqlCollectionManager(uri)
             elif backend == 'sqlite':
                 self.backend_manager = SqliteCollectionManager(uri)
-            else:
-                raise NotImplementedError()
         else:
             raise RuntimeError('Unknown backend: {}'.format(backend))
 
