@@ -58,12 +58,29 @@ class KvliteMysqlCollectionManagerTests(unittest.TestCase):
         manager.close()
 
     def test_manager_get_collection(self):
+
         URI = 'mysql://kvlite_test:eixaaghiequ6ZeiBahn0@localhost/kvlite_test'
         collection = 'kvlite_test'
 
         manager = MysqlCollectionManager(URI)
         self.assertEqual(manager.collection_class.__name__, 'MysqlCollection')
         
+    def test_incorrect_uri_wrong_password(self):
+
+        URI = 'mysql://kvlite_test:no_password@localhost/kvlite_test'
+        collection = 'kvlite_test'
+
+        self.assertRaises(RuntimeError, MysqlCollectionManager, (URI))
+
+    def test_incorrect_uri_wrong_collection_in_remove(self):
+
+        URI = 'mysql://kvlite_test:eixaaghiequ6ZeiBahn0@localhost/kvlite_test'
+        collection_name = 'unknown_collection'
+
+        manager = MysqlCollectionManager(URI)
+        self.assertRaises(RuntimeError, manager.remove, (collection_name))
+    
+
         
 if __name__ == '__main__':
     unittest.main()        

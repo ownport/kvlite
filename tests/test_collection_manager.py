@@ -39,7 +39,11 @@ class KvliteCollectionManagerTests(unittest.TestCase):
 
         manager.remove(collection_name)
         self.assertNotIn(collection_name, manager.collections())
-        
+
+    def test_unsupported_backend(self):
+    
+        URI = 'backend://database'
+        self.assertRaises(RuntimeError, CollectionManager, (URI))        
         
         
 if __name__ == '__main__':
