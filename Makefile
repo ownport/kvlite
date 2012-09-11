@@ -4,6 +4,7 @@ test-unittest:
 	@ echo '***************************'
 	@ echo '*       Unittests         *'
 	@ echo '***************************'
+	python tests/test_serializers.py
 	python tests/test_mysql_collection.py
 	python tests/test_sqlite_collection.py
 	python tests/test_mysql_collection_manager.py
@@ -32,12 +33,13 @@ todo:
 	@ echo 
 
 coverage:
+	@ python-coverage -e
+	@ python-coverage -x tests/test_serializers.py
 	@ python-coverage -x tests/test_mysql_collection.py
 	@ python-coverage -x tests/test_sqlite_collection.py
 	@ python-coverage -x tests/test_mysql_collection_manager.py
 	@ python-coverage -x tests/test_sqlite_collection_manager.py
 	@ python-coverage -x tests/test_collection_manager.py
 	@ python-coverage -x tests/test_utils.py
-	@ python-coverage -r
-	@ rm .coverage
+	@ python-coverage -rm kvlite.py
 	
