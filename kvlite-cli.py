@@ -5,7 +5,7 @@
 #
 #
 __author__ = 'Andrey Usov <http://devel.ownport.net>'
-__version__ = '0.1.1'
+__version__ = '0.2'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -30,6 +30,11 @@ POSSIBILITY OF SUCH DAMAGE."""
 
 import cmd
 import kvlite
+import pprint
+
+# TODO check remove <collection>
+# TODO add autocomplition for command parameters
+# TODO add filter command
 
 # -----------------------------------------------------------------
 # Console class
@@ -43,7 +48,7 @@ class Console(cmd.Cmd):
         self.__history_size = 20
         self.__history = list()
         self.__kvlite_colls = dict()
-        self.__current_coll_name = 'kvlite'
+        self.__current_coll_name = None
         self.__current_coll = None
 
     def emptyline(self):
@@ -102,8 +107,9 @@ class Console(cmd.Cmd):
         return True
 
     def do_import(self, filename):
-        '''   import <filename>\timport collection configuration from JSON file'''
+        '''   import <filename>\t\timport collection configuration from JSON file'''
         import os
+        import json
         
         if not filename:
             print getattr(self, 'do_import').__doc__
@@ -111,44 +117,47 @@ class Console(cmd.Cmd):
         filename = filename.rstrip().lstrip()
         
         if os.path.isfile(filename):
-            for k, v in json_decode(open(filename).read()).items():
+            for k, v in json.loads(open(filename).read()).items():
                 self.__kvlite_colls[k] = v
             print 'Import completed'
         else:
             print 'Error! File %s does not exists' % filename
 
     def do_export(self, filename):
-        '''   export <filename>\texport collection configurations to JSON file'''
+        '''   export <filename>\t\texport collection configurations to JSON file'''
+        import json
+        
         # TODO check if file exists. If yes, import about it
         if not filename:
             print getattr(self, 'do_import').__doc__
             return
         filename = filename.rstrip().lstrip()
         json_file = open(filename, 'w')
-        json_file.write(json_encode(self.__kvlite_colls))
+        json_file.write(json.dumps(self.__kvlite_colls))
         json_file.close()
         print 'Export completed to file: %s' % filename
 
     def do_show(self, line):
-        '''   show collections\tlist of available collections (defined in settings.py)'''
-        if line == 'collections':
+        '''   show collections <details>\tlist of available collections (defined in settings.py)'''
+        if line.startswith('collections'):
+            # TODO add handling 'collections details'
             for coll in self.__kvlite_colls:
                 print '   %s' % coll
         else:
             print 'Unknown argument: %s' % line
     
     def do_use(self, collection_name):
-        '''   use <collection>\tuse the collection as the default (current) collection'''
+        '''   use <collection_name>\tuse the collection as the default (current) collection'''
         if collection_name in self.__kvlite_colls:
             self.prompt = '%s>' % collection_name
             self.__current_coll_name = collection_name
-            self.__current_coll = Collection(self.__kvlite_colls[self.__current_coll_name])
+            self.__current_coll = kvlite.open(self.__kvlite_colls[self.__current_coll_name])
             return
         else:
             print 'Error! Unknown collection: %s' % collection_name
 
     def do_create(self, line):
-        '''   create <name> <uri>\tcreate new collection (if not exists)'''
+        '''   create <name> <uri>\t\tcreate new collection (if not exists)'''
         try:
             name, uri = [i for i in line.split(' ') if i <> '']
         except ValueError:
@@ -156,44 +165,46 @@ class Console(cmd.Cmd):
             return
             
         if name in self.__kvlite_colls:
-            print 'Warning! Collection name already defined: %s, %s' % (name, self.__kvlite_colls[name]) 
-            print 'If needed please change collection name'
+            print 'Warning! Collection name already defined in the list: %s, %s' % (name, self.__kvlite_colls[name]) 
+            print "If it's needed please change collection name"
             return
         try:
-            if is_collection_exists(uri):
+            manager = kvlite.CollectionManager(uri)
+            params = manager.parse_uri(uri)
+            if params['collection'] in manager.collections():
                 self.__kvlite_colls[name] = uri
                 print 'Connection exists, the reference added to collection list'
                 return
             else:
-                create_collection(uri)
+                manager.create(params['collection'])
                 self.__kvlite_colls[name] = uri
                 print 'Collection created and added to collection list'
                 return
-        except WrongURIException:
-            print 'Error! Incorrect URI'
+        except Exception, err:
+            print 'Error! Incorrect URI: %s' % uri
             return
         except ConnectionError, err:
             print 'Connection Error! Please check URI, %s' % str(err)
             return
 
     def do_remove(self, name):
-        '''   remove <collection>\tremove collection'''
+        '''   remove <collection_name>\tremove collection'''
         if name not in self.__kvlite_colls:
-            print 'Error! Collection name does not exist: %s' % name
+            print 'Error! Collection name does not exist in the list: %s' % name
             return
         try:
-            if is_collection_exists(self.__kvlite_colls[name]):
-                delete_collection(self.__kvlite_colls[name])
+            uri = self.__kvlite_colls[name]
+            manager = kvlite.CollectionManager(uri)
+            params = manager.parse_uri(uri)
+            if params['collection'] in manager.collections():
+                manager.remove(params['collection'])
                 del self.__kvlite_colls[name]
                 print 'Collection %s deleted' % name
                 return
             else:
                 print 'Error! Collection does not exist, %s' % self.__kvlite_colls[name]
-        except WrongURIException:
-            print 'Error! Incorrect URI'
-            return
-        except ConnectionError, err:
-            print 'Connection Error! Please check URI, %s' % str(err)
+        except Exception, err:
+            print 'Error! %s' % err
             return
 
     def do_hash(self, line):
@@ -228,7 +239,7 @@ class Console(cmd.Cmd):
     def do_count(self, args):
         '''   count\t\tshow the amount of entries in collection '''        
         if self.__current_coll:
-            print self.__current_coll.count()
+            print self.__current_coll.count
 
     def do_get(self, key):
         '''   get <key>\t\tshow collection entry by key'''    
@@ -247,16 +258,11 @@ class Console(cmd.Cmd):
     
     def do_put(self, line):
         '''   put <key> <value>\tstore entry to collection'''
+        # TODO check different type of values
         try:
             k,v = [i for i in line.split(' ',1) if i <> '']
         except ValueError:
             print getattr(self, 'do_put').__doc__
-            return
-
-        try:    
-            v = json_decode(v)
-        except ValueError, err:
-            print 'Value decoding error!', err
             return
 
         if self.__current_coll:
