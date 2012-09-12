@@ -20,6 +20,20 @@ test-doctest:
 	python -m doctest tests/mysql.md
 	python -m doctest tests/sqlite.md
 
+test-unittest-with-coverage:
+	@ python-coverage -e
+	@ python-coverage -x tests/test_serializers.py
+	@ python-coverage -x tests/test_mysql_collection.py
+	@ python-coverage -x tests/test_sqlite_collection.py
+	@ python-coverage -x tests/test_mysql_collection_manager.py
+	@ python-coverage -x tests/test_sqlite_collection_manager.py
+	@ python-coverage -x tests/test_collection_manager.py
+	@ python-coverage -x tests/test_utils.py
+	@ python-coverage -rm kvlite.py
+
+test-performance:
+	@ echo 'Performance tests'
+
 test-all:
 	make test-unittest
 	make test-doctest
@@ -38,14 +52,4 @@ todo:
 	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite-cli.py
 	@ echo 
 
-coverage:
-	@ python-coverage -e
-	@ python-coverage -x tests/test_serializers.py
-	@ python-coverage -x tests/test_mysql_collection.py
-	@ python-coverage -x tests/test_sqlite_collection.py
-	@ python-coverage -x tests/test_mysql_collection_manager.py
-	@ python-coverage -x tests/test_sqlite_collection_manager.py
-	@ python-coverage -x tests/test_collection_manager.py
-	@ python-coverage -x tests/test_utils.py
-	@ python-coverage -rm kvlite.py
 	
