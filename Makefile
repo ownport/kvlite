@@ -29,7 +29,13 @@ graph:
 
 todo:
 	@ echo 
+	@ echo "*** TODOs for kvlite.py ***"
+	@ echo 
 	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite.py
+	@ echo 
+	@ echo "*** TODOs for kvlite-cli.py ***"
+	@ echo 
+	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite-cli.py
 	@ echo 
 
 coverage:
