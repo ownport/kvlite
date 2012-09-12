@@ -79,7 +79,8 @@ class KvliteMysqlCollectionManagerTests(unittest.TestCase):
 
         manager = MysqlCollectionManager(URI)
         self.assertRaises(RuntimeError, manager.remove, (collection_name))
-    
+
+            
 
         
 if __name__ == '__main__':

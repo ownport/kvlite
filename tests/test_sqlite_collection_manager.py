@@ -63,6 +63,13 @@ class KvliteSqliteCollectionManagerTests(unittest.TestCase):
 
         manager.close()
     
+    def test_incorrect_uri_wrong_collection_in_remove(self):
+
+        URI = 'sqlite://memory'
+        collection_name = 'unknown_collection'
+
+        manager = SqliteCollectionManager(URI)
+        self.assertRaises(RuntimeError, manager.remove, (collection_name))
         
 if __name__ == '__main__':
     unittest.main()        

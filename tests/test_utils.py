@@ -9,6 +9,7 @@ class KvliteUtilsTests(unittest.TestCase):
         self.assertEqual(len(set(uuids)), 1000)
 
     def test_sqlite_open(self):
+        
         collection = kvlite.open('sqlite://tests/db/testdb.sqlite:kvlite_test')
         collection.put('a',1)
         self.assertEqual(collection.count,1)
@@ -19,7 +20,8 @@ class KvliteUtilsTests(unittest.TestCase):
         collection.close()
     
     def test_sqlite_remove(self):
-        pass
+        
+        kvlite.remove('sqlite://tests/db/testdb.sqlite:kvlite_test')
 
     def test_mysql_open(self):
         pass
