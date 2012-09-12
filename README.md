@@ -2,12 +2,13 @@
 
 kvlite is small library for storing documents in SQL databases. At the moment supported MySQL and SQLite. A document can be string, list/tuple or dictionary. But of course it possible to define own serialization to store data in kvlite database.
 
-A collection is a group of documents stored in kvlite,  and can be thought of as roughly the equivalent of a  table in a relational database.
+A collection is a group of documents stored in kvlite, and it can be thought of as roughly the equivalent of a  table in a relational database.
 
 ## Collection Utils
 
  - open(uri)
  - remove(uri)
+ - get_uuid()
 
 ## Collection
 
