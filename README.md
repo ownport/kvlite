@@ -6,16 +6,45 @@ A collection is a group of documents stored in kvlite, and it can be thought of 
 
 ## Collection Utils
 
- - open(uri)
- - remove(uri)
- - get_uuid()
+ - open(uri)        - open collection
+ - remove(uri)      - remove collection
+ - get_uuid(amount) - get list of uuid 
+ 
+To get started just open() function is needed.
+
+URI format is:
+
+ - for mysql: `mysql://username:password@hostname:port/database.collection_name`
+ - for sqlite: `sqlite://path-to-sqlite-file:collection_name` or `sqlite://memory:collection_name`
+ 
+In case when sqlite is in use two variants of collection is possible: in file and in memory.
+
+The function open(uri) returns MysqlCollection or SqliteCollection object
 
 ## Collection
 
-## MySQL Collection
+MysqlCollection and SqliteCollection have the same methods:
 
-## SQLite Collection
+ - get_uuid()   - in case of mysql use, this function will be working faster than for sqlite
+ - get(k)       - if k(key) is not defined, the function get() returns the list of all documents in collection. Otherwise key/value pair is returned for defined k(key)
+ - put(k,v)     - put key/value to storage. The key has limitation - only 40 bytes length. The value can be string, list or tuple, dictionary
+ - delete(k)    - delete key/value pair
+ - keys()       - returns the list of all keys in collection
+ - count()      - returns the amount of documents in collection
+ - commit()     - as kvlite based on transactional databases, commit() is used for commitment changes in collection
+ - close()      - close connection to database
 
+## CollectionManager
+
+Sometimes it will needed to manage collections: create, check if exists, remove. For these operations you can use CollectionManager. This class has the next methods:
+
+ - parse_uri(uri)   - depends on type of database, the function parse_uri() can returns deferent result based on which backend is used
+ - create(name)     - create collection
+ - connection       - returns refernce to database collection
+ - collection_class - returns class MysqlCollection or SqliteCollection depend on backend parameter in URI
+ - collections()    - returns the list of collections in database
+ - remove(name)     - remove collection
+ - close()          - close connection to database
 
 ### Links
  * [What are the performance characteristics of sqlite with very large database files?](http://stackoverflow.com/questions/784173/what-are-the-performance-characteristics-of-sqlite-with-very-large-database-file)
