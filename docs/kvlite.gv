@@ -1,6 +1,6 @@
 digraph pyservice {
 
-    graph [ rankdir = "LR" ];
+    graph [ rankdir = "LR"];
     node [shape=record,fontname=Arial,fontsize=9];
     edge [arrowsize=0.5,fontname=Arial,fontsize=9];
 
@@ -10,30 +10,43 @@ digraph pyservice {
     
     CollectionUtils [label="<top>       Collection utils |\
                             <open>          open(uri) |\
-                            <remove>        remove(uri)"];
+                            <remove>        remove(uri) |\
+                            <get_uuid>      get_uuid(amount)"];
     
     CollectionManager[label="<top>      class CollectionManager() |\
                              <init>         - __init__(uri) |\
+                             <parse_uri>    - parse_uri(uri) |\
                              <create>       - create(name) |\
-                             <get_collection> - get_collection(name) |\
+                             <collection_class> - collection_class |\
+                             <connection>   - connection |\
                              <collections>  - collections() |\
                              <remove>       - remove(name) |\
                              <close>        - close()"];
     
     MysqlCollectionManager [
                     label="<top>        class MysqlCollectionManager() |\
+                           <init>         - __init__(uri) |\
                            <parse_uri>      - _parse_uri() |\
                            <create>         - create() |\
+                           <connection>     - connection |\
+                           <collection_class> - collection_class |\
+                           <collections>    - collections() |\
                            <remove>         - remove() |\
                            <close>          - close()"];
                            
     SqliteCollectionManager [
                     label="<top>        class SqliteCollectionManager() |\
+                           <init>         - __init__(uri) |\
+                           <parse_uri>      - _parse_uri() |\
+                           <create>         - create() |\
+                           <connection>     - connection |\
+                           <collection_class> - collection_class |\
+                           <collections>    - collections() |\
+                           <remove>         - remove() |\
                            <close>          - close()"];
     
     MysqlCollection [label="<top>       class MysqlCollection() |\
                          <init>             - __init__(uri) |\
-                         <create>           - _create(params) |\
                          <get_uuid>         - get_uuid() |\
                          <get>              - get(k) |\
                          <put>              - put(k, v) |\
@@ -43,8 +56,10 @@ digraph pyservice {
                          <commit>           - commit() |\
                          <close>            - close()"];
 
-    SqliteCollection [label="<top>      class SqliteCollection() |\
+    SqliteCollection [
+                    label="<top>        class SqliteCollection() |\
                          <init>             - __init__(uri) |\
+                         <get_uuid>         - get_uuid() |\
                          <get>              - get(k) |\
                          <put>              - put(k, v) |\
                          <delete>           - delete(k) |\
@@ -52,6 +67,16 @@ digraph pyservice {
                          <count>            - count() |\
                          <commit>           - commit() |\
                          <close>            - close()"];
+
+    cPickleSerializer [
+                    label="<top>        class cPickleSerializer() |\
+                         <loads>            - loads(v) |\
+                         <dumps>            - dumps(v)"];
+    
+    CompressedJsonSerializer [
+                    label="<top>        class CompressedJsonSerializer() |\
+                         <loads>            - loads(v) |\
+                         <dumps>            - dumps(v)"];
                          
     // Links
     
@@ -61,4 +86,11 @@ digraph pyservice {
     CollectionManager:top -> SqliteCollectionManager:top;
     MysqlCollectionManager:top -> MysqlCollection:top;
     SqliteCollectionManager:top -> SqliteCollection:top;
+    
+    MysqlCollection:top -> cPickleSerializer:top;
+    MysqlCollection:top -> CompressedJsonSerializer:top;
+    SqliteCollection:top -> cPickleSerializer:top;
+    SqliteCollection:top -> CompressedJsonSerializer:top;
+
+ 
 }
