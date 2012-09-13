@@ -11,6 +11,8 @@
 #
 #   TODO autocommit for put()
 #   TODO synchronise documents between few datastores
+#   TODO add redis support
+#   TODO is it possible to merge hotqueue functionality with kvlite? Will it be useful?
 #
 #
 __author__ = 'Andrey Usov <http://devel.ownport.net>'
@@ -54,18 +56,12 @@ except ImportError:
     print >> sys.stderr, 'Error! MySQLdb package is not installed, please install python-mysqldb'
     sys.exit()
 
-
-# TODO add test cases for serializers
-# TODO add support user specific serializators
-
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
 '''
 A collection is a group of documents stored in kvlite2, 
 and can be thought of as roughly the equivalent of a 
 table in a relational database.
-
-
 
 For using JSON as serialization
 
