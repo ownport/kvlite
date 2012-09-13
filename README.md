@@ -4,6 +4,14 @@ kvlite is small library for storing documents in SQL databases. At the moment su
 
 A collection is a group of documents stored in kvlite, and it can be thought of as roughly the equivalent of a  table in a relational database.
 
+## Installation
+
+To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it will be needed only if you need to have access to kvlite collections via console. Also kvlite-cli.p can be used as example how to use kvlite library.
+
+## Examples of use
+
+TODO
+
 ## Collection Utils
 
  - open(uri)        - open collection
@@ -46,7 +54,8 @@ Sometimes it will needed to manage collections: create, check if exists, remove.
  - remove(name)     - remove collection
  - close()          - close connection to database
 
-### Links
+
+## Links
  * [What are the performance characteristics of sqlite with very large database files?](http://stackoverflow.com/questions/784173/what-are-the-performance-characteristics-of-sqlite-with-very-large-database-file)
  * [Best practice: Optimizing SQLite database performance](http://docs.blackberry.com/en/developers/deliverables/17952/BP_Optimizing_SQLite_database_performance_1554266_11.jsp)
  * [Limits In SQLite](http://www.sqlite.org/limits.html)
