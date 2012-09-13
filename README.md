@@ -10,7 +10,35 @@ To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. 
 
 ## Examples of use
 
-TODO
+```
+>>> import kvlite
+>>> collection = open('sqlite://memory:test_collection')
+>>> collection
+<kvlite.SqliteCollection object at 0x14cb350>
+>>> collection.count
+0
+>>> collection.put('1', 'first document')
+>>> collection.put('2', ('second', 'document'))
+>>> collection.put('3', {'third': 'document'})
+>>> collection.count
+3
+>>> collection.get('1')
+('1', 'first document')
+>>> collection.get('2')
+('2', ('second', 'document'))
+>>> collection.get('3')
+('3', {'third': 'document'})
+>>>
+>>> [k for k in collection.keys() ]
+['1', '2', '3']
+>>> collection.delete('1')
+>>> collection.delete('2')
+>>> collection.delete('3')
+>>> collection.count
+0
+>>> collection.close()
+>>>
+``` 
 
 ## Collection Utils
 
