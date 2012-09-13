@@ -54,11 +54,8 @@ Sometimes it will needed to manage collections: create, check if exists, remove.
  - remove(name)     - remove collection
  - close()          - close connection to database
 
+# Another topics
 
-## Links
- * [What are the performance characteristics of sqlite with very large database files?](http://stackoverflow.com/questions/784173/what-are-the-performance-characteristics-of-sqlite-with-very-large-database-file)
- * [Best practice: Optimizing SQLite database performance](http://docs.blackberry.com/en/developers/deliverables/17952/BP_Optimizing_SQLite_database_performance_1554266_11.jsp)
- * [Limits In SQLite](http://www.sqlite.org/limits.html)
- * [U1DB](http://packages.python.org/u1db/) is a database API for synchronised databases of JSON documents. It’s simple to use in applications, and allows apps to store documents and synchronise them between machines and devices. U1DB itself is not a database: instead, it’s an API which can be backed by any database for storage. This means that you can use u1db on different platforms, from different languages, and backed on to different databases, and sync between all of them.
- * [kvlite project on Goolge Code](http://code.google.com/p/kvlite/)
- * [Storm](https://storm.canonical.com/) is an object-relational mapper (ORM) for Python developed at Canonical.
+ - [kvlite structure](https://github.com/ownport/kvlite/blob/master/docs/kvlite.png)
+ - [Link collection to similar projects or where the ideas were taken](https://github.com/ownport/kvlite/blob/master/docs/links.md)
+
