@@ -53,9 +53,8 @@ __all__ = ['open', 'remove',]
 try:
     import MySQLdb
 except ImportError:
-    print >> sys.stderr, 'Error! MySQLdb package is not installed, please install python-mysqldb'
-    sys.exit()
-
+    pass
+    
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
 '''
