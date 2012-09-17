@@ -16,5 +16,6 @@
  * [Storm](https://storm.canonical.com/) is an object-relational mapper (ORM) for Python developed at Canonical.
  * [FoundationDB](http://foundationdb.com/)
  * [Whisper database, part of Graphite](http://graphite.wikidot.com/whisper)
+ * [The Whisper Database](http://graphite.readthedocs.org/en/1.0/whisper.html)
  * [Whisper database (source)](http://bazaar.launchpad.net/~graphite-dev/graphite/main/view/head:/whisper/whisper.py)
 
