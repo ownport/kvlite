@@ -11,7 +11,6 @@ setup (
     license = "BSD",
     keywords = "key-value python database mysql sqlite",
     py_modules = ['kvlite', 'kvlite-cli'],
-    data_files = [(os.path.join('share', 'urlfetch'), )],
     classifiers = [
         'Programming Language :: Python',
         'Intended Audience :: Developers',
