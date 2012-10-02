@@ -52,4 +52,6 @@ todo:
 	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite-cli.py
 	@ echo 
 
-	
+sdist:
+	@ python setup.py sdist
+	 	
