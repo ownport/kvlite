@@ -29,5 +29,3 @@ pip-log.txt
 # sqlite databases
 *.sqlite
 
-# distrib
-dist/*
