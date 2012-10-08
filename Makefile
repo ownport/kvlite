@@ -52,6 +52,9 @@ todo:
 	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite-cli.py
 	@ echo 
 
-sdist:
-	@ python setup.py sdist
+distrib:
+	@ rm -R build/
+	@ rm -R dist/
+	@ rm -R kvlite.egg-info/
+	@ python setup.py sdist bdist bdist_wininst
 	 	
