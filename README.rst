@@ -1,46 +1,49 @@
-# kvlite
+======
+kvlite
+======
 
 kvlite is small library for storing documents in SQL databases. At the moment supported MySQL and SQLite. A document can be string, list/tuple or dictionary. But of course it possible to define own serialization to store data in kvlite database.
 
 A collection is a group of documents stored in kvlite, and it can be thought of as roughly the equivalent of a  table in a relational database.
 
-## Installation
+Installation
+============
 
 To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it will be needed only if you need to have access to kvlite collections via console. Also kvlite-cli.p can be used as example how to use kvlite library.
 
-## Examples of use
+Examples of use
+===============
 
-```
->>> import kvlite
->>> collection = open('sqlite://memory:test_collection')
->>> collection
-<kvlite.SqliteCollection object at 0x14cb350>
->>> collection.count
-0
->>> collection.put('1', 'first document')
->>> collection.put('2', ('second', 'document'))
->>> collection.put('3', {'third': 'document'})
->>> collection.count
-3
->>> collection.get('1')
-('1', 'first document')
->>> collection.get('2')
-('2', ('second', 'document'))
->>> collection.get('3')
-('3', {'third': 'document'})
->>>
->>> [k for k in collection.keys() ]
-['1', '2', '3']
->>> collection.delete('1')
->>> collection.delete('2')
->>> collection.delete('3')
->>> collection.count
-0
->>> collection.close()
->>>
-``` 
+    >>> import kvlite
+    >>> collection = open('sqlite://memory:test_collection')
+    >>> collection
+    <kvlite.SqliteCollection object at 0x14cb350>
+    >>> collection.count
+    0
+    >>> collection.put('1', 'first document')
+    >>> collection.put('2', ('second', 'document'))
+    >>> collection.put('3', {'third': 'document'})
+    >>> collection.count
+    3
+    >>> collection.get('1')
+    ('1', 'first document')
+    >>> collection.get('2')
+    ('2', ('second', 'document'))
+    >>> collection.get('3')
+    ('3', {'third': 'document'})
+    >>>
+    >>> [k for k in collection.keys() ]
+    ['1', '2', '3']
+    >>> collection.delete('1')
+    >>> collection.delete('2')
+    >>> collection.delete('3')
+    >>> collection.count
+    0
+    >>> collection.close()
+    >>>
 
-## Collection Utils
+Collection Utils
+================
 
  - open(uri)        - open collection
  - remove(uri)      - remove collection
@@ -57,7 +60,8 @@ In case when sqlite is in use two variants of collection is possible: in file an
 
 The function open(uri) returns MysqlCollection or SqliteCollection object
 
-## Collection
+Collection
+==========
 
 MysqlCollection and SqliteCollection have the same methods:
 
@@ -70,7 +74,8 @@ MysqlCollection and SqliteCollection have the same methods:
  - commit()     - as kvlite based on transactional databases, commit() is used for commitment changes in collection
  - close()      - close connection to database
 
-## CollectionManager
+CollectionManager
+=================
 
 Sometimes it will needed to manage collections: create, check if exists, remove. For these operations you can use CollectionManager. This class has the next methods:
 
@@ -82,8 +87,9 @@ Sometimes it will needed to manage collections: create, check if exists, remove.
  - remove(name)     - remove collection
  - close()          - close connection to database
 
-# Another topics
+Another topics
+==============
 
- - [kvlite structure](https://github.com/ownport/kvlite/blob/master/docs/kvlite.png)
- - [Link collection to similar projects or where the ideas were taken](https://github.com/ownport/kvlite/blob/master/docs/links.md)
+.. _kvlite structure: https://github.com/ownport/kvlite/blob/master/docs/kvlite.png
+ .. _Link collection to similar projects or where the ideas were taken: https://github.com/ownport/kvlite/blob/master/docs/links.md
 
