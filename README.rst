@@ -90,6 +90,6 @@ Sometimes it will needed to manage collections: create, check if exists, remove.
 Another topics
 ==============
 
-.. _kvlite structure: https://github.com/ownport/kvlite/blob/master/docs/kvlite.png
- .. _Link collection to similar projects or where the ideas were taken: https://github.com/ownport/kvlite/blob/master/docs/links.md
+ - kvlite structure <https://github.com/ownport/kvlite/blob/master/docs/kvlite.png>
+ - Link collection to similar projects or where the ideas were taken <https://github.com/ownport/kvlite/blob/master/docs/links.md>
 
