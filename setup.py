@@ -5,9 +5,11 @@ import kvlite
 setup (
     name = "kvlite",
     version = kvlite.__version__,
-    author = kvlite.__author__,
+    author = 'Andrey Usov',
+    author_email = 'ownport@gmail.com',
+    url = 'https://github.com/ownport/kvlite',
     description = ("key-value database wrapper for SQL database (MySQL, SQLite) "),
-    long_description = open('README.md').read(),
+    long_description = open('README.rst').read(),
     license = "BSD",
     keywords = "key-value python database mysql sqlite",
     py_modules = ['kvlite', 'kvlite-cli'],
