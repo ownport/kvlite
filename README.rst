@@ -9,7 +9,11 @@ A collection is a group of documents stored in kvlite, and it can be thought of 
 Installation
 ============
 
-To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it will be needed only if you need to have access to kvlite collections via console. Also kvlite-cli.p can be used as example how to use kvlite library.
+To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it will be needed only if you need to have access to kvlite collections via console. Also kvlite-cli.py can be used as example how to use kvlite library.
+
+If `pip <http://www.pip-installer.org/>` installed in your system, you can install kvlite via
+
+    pip install kvlite
 
 Examples of use
 ===============
