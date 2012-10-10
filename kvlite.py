@@ -173,6 +173,8 @@ class CollectionManager(object):
     
         self.backend_manager = None
         
+        if not uri or uri.find('://') <= 0:
+            raise RuntimeError('Incorrect URI definition: {}'.format(uri))
         backend, rest_uri = uri.split('://')
         if backend in SUPPORTED_BACKENDS:
             if backend == 'mysql':

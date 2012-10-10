@@ -4,6 +4,11 @@ from kvlite import CollectionManager
 
 class KvliteCollectionManagerTests(unittest.TestCase):
 
+    def test_wrong_uri(self):
+        
+        URI = None
+        self.assertRaises(RuntimeError, CollectionManager, URI)
+
     def test_mysql_manager(self):
         
         URI = 'mysql://kvlite_test:eixaaghiequ6ZeiBahn0@localhost/kvlite_test'
