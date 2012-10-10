@@ -2,7 +2,7 @@
 kvlite
 ======
 
-kvlite is small library for storing documents in SQL databases. At the moment supported MySQL and SQLite. A document can be string, list/tuple or dictionary. But of course it possible to define own serialization to store data in kvlite database.
+kvlite is small library for storing documents in SQL databases. At the moment supported MySQL and SQLite. A document can be string, list/tuple or dictionary. Default serialization is based on cPickleSerializer methods but of course it is possible to define own serialization to store data in kvlite database. 
 
 A collection is a group of documents stored in kvlite, and it can be thought of as roughly the equivalent of a  table in a relational database.
 
@@ -86,6 +86,28 @@ Sometimes it will needed to manage collections: create, check if exists, remove.
  - collections()    - returns the list of collections in database
  - remove(name)     - remove collection
  - close()          - close connection to database
+
+Serializers
+===========
+
+ - cPickleSerializer (by default)
+ - CompressedJsonSerializer
+
+Serializer can be defined via open function
+
+    def open(uri, serializer=cPickleSerializer):
+        ''' 
+        open collection by URI, 
+        if collection does not exist kvlite will try to create it
+        
+        in case of successful opening or creation new collection 
+        return Collection object
+        
+        serializer: the class or module to serialize msgs with, must have
+        methods or functions named ``dumps`` and ``loads``,
+        `pickle <http://docs.python.org/library/pickle.html>`_ is the default,
+        use ``None`` to store messages in plain text (suitable for strings,
+        integers, etc)
 
 Another topics
 ==============
