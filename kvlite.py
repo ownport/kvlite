@@ -13,10 +13,11 @@
 #   TODO synchronise documents between few datastores
 #   TODO add redis support
 #   TODO is it possible to merge hotqueue functionality with kvlite? Will it be useful?
+#   TODO to store binary data
 #
 #
 __author__ = 'Andrey Usov <http://devel.ownport.net>'
-__version__ = '0.4.2'
+__version__ = '0.4.3'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
