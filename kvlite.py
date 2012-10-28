@@ -391,7 +391,8 @@ class MysqlCollection(object):
         ''' return document keys in collection'''
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT __rowid__, k FROM %s WHERE __rowid__ > %d LIMIT 1000 ;' % (self.__collection, rowid)
+            SQL_SELECT_MANY = 'SELECT __rowid__, k FROM %s WHERE __rowid__ > %d LIMIT 1000 ;'
+            SQL_SELECT_MANY = SQL_SELECT_MANY % (self.__collection, rowid)
             self.__cursor.execute(SQL_SELECT_MANY)
             result = self.__cursor.fetchall()
             if not result:
