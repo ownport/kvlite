@@ -5,7 +5,7 @@
 #
 #
 __author__ = 'Andrey Usov <http://devel.ownport.net>'
-__version__ = '0.2'
+__version__ = '0.2.1'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -282,14 +282,18 @@ class Console(cmd.Cmd):
     def do_delete(self, key):
         '''   delete <key>\t\tdelete entry by key '''
         key = key.rstrip().lstrip()
-        if self.__current_coll.get(key) <> (None, None):
-            self.__current_coll.delete(key)
-            self.__current_coll.commit()
-            print 'Done'
+        try:
+            if self.__current_coll.get(key) <> (None, None):
+                self.__current_coll.delete(key)
+                self.__current_coll.commit()
+                print 'Done'
+                return
+            else:
+                print 'Error! The key %s does not exist' % key
+                return        
+        except RuntimeError, err:
+            print 'Error!', err
             return
-        else:
-            print 'Error! The key %s does not exist' % key
-            return        
         
 # ----------------------------------
 #   main
