@@ -9,6 +9,9 @@
  * [What are the performance characteristics of sqlite with very large database files?](http://stackoverflow.com/questions/784173/what-are-the-performance-characteristics-of-sqlite-with-very-large-database-file)
  * [Best practice: Optimizing SQLite database performance](http://docs.blackberry.com/en/developers/deliverables/17952/BP_Optimizing_SQLite_database_performance_1554266_11.jsp)
  * [Limits In SQLite](http://www.sqlite.org/limits.html)
+ * [SQLite performance tuning and optimization on embedded systems](https://katastrophos.net/andre/blog/2007/01/04/sqlite-performance-tuning-and-optimization-on-embedded-systems/)
+ * [SQLite Optimization FAQ](http://web.utk.edu/~jplyon/sqlite/SQLite_optimization_FAQ.html)
+ * [How do I improve the performance of SQLite?](http://stackoverflow.com/questions/1711631/how-do-i-improve-the-performance-of-sqlite)
  
 ## Another databases
 
@@ -20,3 +23,5 @@
  * [Whisper database (source)](http://bazaar.launchpad.net/~graphite-dev/graphite/main/view/head:/whisper/whisper.py)
  * [anandology/datastore](https://github.com/anandology/datastore) Datastore is a simple document database that runs on any relational database. It is built with good ideas from CouchDB, FriendFeed Datastore and Open Library datastore.
  * [eklitzke/schemaless](https://github.com/eklitzke/schemaless) Schemaless is a Python module that implements the pattern described by Bret Taylor in his post How FriendFeed uses MySQL to store schema-less data.
+ 
+ 
