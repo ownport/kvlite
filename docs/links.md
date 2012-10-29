@@ -18,4 +18,5 @@
  * [Whisper database, part of Graphite](http://graphite.wikidot.com/whisper)
  * [The Whisper Database](http://graphite.readthedocs.org/en/1.0/whisper.html)
  * [Whisper database (source)](http://bazaar.launchpad.net/~graphite-dev/graphite/main/view/head:/whisper/whisper.py)
-
+ * [anandology/datastore](https://github.com/anandology/datastore) Datastore is a simple document database that runs on any relational database. It is built with good ideas from CouchDB, FriendFeed Datastore and Open Library datastore.
+ * [eklitzke/schemaless](https://github.com/eklitzke/schemaless) Schemaless is a Python module that implements the pattern described by Bret Taylor in his post How FriendFeed uses MySQL to store schema-less data.
