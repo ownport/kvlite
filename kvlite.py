@@ -14,6 +14,7 @@
 #   TODO add redis support
 #   TODO is it possible to merge hotqueue functionality with kvlite? Will it be useful?
 #   TODO to store binary data
+#   TODO add function to view plain structure of documents in database
 #
 #
 __author__ = 'Andrey Usov <http://devel.ownport.net>'
