@@ -165,6 +165,24 @@ def get_uuid(amount=100):
         uuids.append(("%040s" % u).replace(' ','0'))
     return uuids
 
+def dict2flat(root_name, source, removeEmptyFields=False):
+    ''' returns a simplified "flat" form of the complex hierarchical dictionary '''
+    flat_dict = {}
+    if isinstance(source, list):
+        for i,e in enumerate(source):
+            new_root_name = "%s[%d]" % (root_name,i)
+            for k,v in dict2flat(new_root_name,e).items():
+                flat_dict[k] = v
+    elif isinstance(source, dict):
+        for k,v in source.items():
+            new_root_name = "%s.%s" % (root_name, k)
+            for kk, vv in dict2flat(new_root_name,v).items():
+                flat_dict[kk] = vv
+    else:
+        if source is not None:
+            flat_dict[root_name] = source
+    return flat_dict
+
 # -----------------------------------------------------------------
 # CollectionManager class
 # -----------------------------------------------------------------
