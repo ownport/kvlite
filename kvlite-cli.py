@@ -35,6 +35,8 @@ import pprint
 # TODO check remove <collection>
 # TODO add autocomplition for command parameters
 # TODO add filter command
+# TODO add index creation/removing support
+# TODO add search support
 
 # -----------------------------------------------------------------
 # Console class
