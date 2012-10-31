@@ -39,6 +39,8 @@ You can create indexes on fields that exist in sub-documents within your collect
 }
 ```
 
+
+
 def remove_index(index_uri)
 
 ### Index Limitations
