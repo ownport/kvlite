@@ -33,6 +33,52 @@ class KvliteUtilsTests(unittest.TestCase):
     def test_mysql_remove(self):
         pass
 
+    def test_dict2plain(self):
+        
+        # simple 
+        source = {
+            'string': 'str', 
+            'unicode': u'unicode', 
+            'integer': 10,
+            'double': 10.,
+        }
+        self.assertEqual(
+                kvlite.dict2flat('root', source),
+                {
+                    'root.string':'str',
+                    'root.unicode':u'unicode',
+                    'root.integer':10,
+                    'root.double': 10.,
+                }
+        )
+        
+        # compound
+        source = {
+            'list': ['a1', 'b2', 'c3'],
+            'tuple': ('a1', 'b2', 'c3'),
+            'dict1': {'a':1,'b':2,'c':3},
+            'dict2': {'a': ['b2', 'c3'], 'b': ('b2', 'c3'), 'c': {'b':2, 'c':3}}
+        }
+        self.assertEqual(
+                kvlite.dict2flat('root', source),
+                {
+                    'root.list':['a1', 'b2', 'c3'],
+                    'root.tuple':('a1', 'b2', 'c3'),
+                    'root.dict1.a':1,
+                    'root.dict1.b':2,
+                    'root.dict1.c':3,
+                    'root.dict2.a':['b2','c3'],
+                    'root.dict2.b':('b2','c3'),
+                    'root.dict2.c.b':2,
+                    'root.dict2.c.c':3,
+                }
+        )
+    
+    def test_basic_types(self):
+        
+        pass
+                
+        
         
 if __name__ == '__main__':
     unittest.main()        
