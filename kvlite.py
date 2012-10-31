@@ -175,7 +175,10 @@ def dict2flat(root_name, source, removeEmptyFields=False):
                 flat_dict[k] = v
     elif isinstance(source, dict):
         for k,v in source.items():
-            new_root_name = "%s.%s" % (root_name, k)
+            if root_name:
+                new_root_name = "%s.%s" % (root_name, k)
+            else:
+                new_root_name = "%s" % k
             for kk, vv in dict2flat(new_root_name,v).items():
                 flat_dict[kk] = vv
     else:
