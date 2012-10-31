@@ -167,12 +167,25 @@ def get_uuid(amount=100):
 
 def dict2flat(root_name, source, removeEmptyFields=False):
     ''' returns a simplified "flat" form of the complex hierarchical dictionary '''
+    
+    def is_simple_elements(source):
+        ''' check if the source contains simple element types,
+        not lists, tuples, dicts
+        '''
+        for i in source:
+            if isinstance(i, (list, tuple, dict)):
+                return False
+        return True
+    
     flat_dict = {}
-    if isinstance(source, list):
-        for i,e in enumerate(source):
-            new_root_name = "%s[%d]" % (root_name,i)
-            for k,v in dict2flat(new_root_name,e).items():
-                flat_dict[k] = v
+    if isinstance(source, (list, tuple)):
+        if not is_simple_elements(source):
+            for i,e in enumerate(source):
+                new_root_name = "%s[%d]" % (root_name,i)
+                for k,v in dict2flat(new_root_name,e).items():
+                    flat_dict[k] = v
+        else:
+            flat_dict[root_name] = source
     elif isinstance(source, dict):
         for k,v in source.items():
             if root_name:
