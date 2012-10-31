@@ -59,7 +59,7 @@ except ImportError:
     
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
-SUPPORTED_VALUE_TYPES {
+SUPPORTED_VALUE_TYPES = {
     'NONE': {},
     'BOOLEAN': {},
     'INTEGER': {},
@@ -71,7 +71,6 @@ SUPPORTED_VALUE_TYPES {
     'TUPLE': {},
     'LIST': {},
     'DICT': {},
-    
 }
 
 '''
