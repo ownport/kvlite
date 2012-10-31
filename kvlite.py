@@ -59,6 +59,21 @@ except ImportError:
     
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
+SUPPORTED_VALUE_TYPES {
+    'NONE': {},
+    'BOOLEAN': {},
+    'INTEGER': {},
+    'LONGINTEGER': {},
+    'FLOAT': {},
+    'COMPLEX': {},
+    'STRING': {},
+    'UNICODE': {},
+    'TUPLE': {},
+    'LIST': {},
+    'DICT': {},
+    
+}
+
 '''
 A collection is a group of documents stored in kvlite2, 
 and can be thought of as roughly the equivalent of a 
