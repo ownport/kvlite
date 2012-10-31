@@ -75,7 +75,8 @@ class Console(cmd.Cmd):
             names = [
                 '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', '',
                 'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', '',
-                'do_hash', 'do_keys', 'do_items', 'do_get', 'do_put', 'do_delete', 'do_count', ''
+                'do_hash', 'do_keys', 'do_items', 'do_get', 'do_put', 'do_delete', 
+                'do_count', 'do_scheme', ''
             ]
             for name in names:
                 if not name:
@@ -208,6 +209,24 @@ class Console(cmd.Cmd):
         except Exception, err:
             print 'Error! %s' % err
             return
+
+    def do_scheme(self, line):
+        '''   scheme\tshow structure of collection'''
+        if not self.__current_coll_name in self.__kvlite_colls:
+            print 'Error! Unknown collection: %s' % self.__current_coll_name
+            return
+        print 'Building ...'
+        coll_struct = dict()
+        i = 0
+        for i, (k,v) in enumerate(self.__current_coll.get()):
+            for f in kvlite.dict2flat('', v).keys():
+                if f not in coll_struct.keys():
+                    coll_struct[f] = { 'count': 1 }
+                else:
+                    coll_struct[f]['count'] += 1
+        if i > 0:
+            pprint.pprint(coll_struct)
+            print 'Total entries in collection: %d' % (i+1)
 
     def do_hash(self, line):
         '''   hash [string]\tgenerate sha1 hash, random if string is not defined'''        
