@@ -23,5 +23,9 @@
  * [Whisper database (source)](http://bazaar.launchpad.net/~graphite-dev/graphite/main/view/head:/whisper/whisper.py)
  * [anandology/datastore](https://github.com/anandology/datastore) Datastore is a simple document database that runs on any relational database. It is built with good ideas from CouchDB, FriendFeed Datastore and Open Library datastore.
  * [eklitzke/schemaless](https://github.com/eklitzke/schemaless) Schemaless is a Python module that implements the pattern described by Bret Taylor in his post How FriendFeed uses MySQL to store schema-less data.
+ * [MongoDB, Indexing Overview](http://docs.mongodb.org/manual/core/indexes/)
+ * [MongoDB, Indexing Strategies](http://docs.mongodb.org/manual/applications/indexes/)
+ * [MongoDB, Indexing Operations](http://docs.mongodb.org/manual/administration/indexes/)
+ * [CouchDB, Getting_started_with_Python](http://wiki.apache.org/couchdb/Getting_started_with_Python)
  
  
