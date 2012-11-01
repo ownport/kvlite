@@ -76,9 +76,22 @@ class KvliteUtilsTests(unittest.TestCase):
     
     def test_basic_types(self):
         
-        pass
-                
+        import types
         
+        none_value = None
+        boolean_value = True
+        integer_value = 1
+        longinteger_value = 1L
+        float_value = 0.1
+        complex_value = -1+0j
+        string_value = 'str'
+        unicode_value = u'unicode'
+        tuple_value = (1,2,3)
+        list_value = [1,2,3]
+        dict_value = {'a':1,'b':2,'c':3}
+                
+        print type(none_value) is types.NoneType
+        print type(boolean_value) is types.BooleanType
         
 if __name__ == '__main__':
     unittest.main()        
