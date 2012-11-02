@@ -216,17 +216,10 @@ class Console(cmd.Cmd):
             print 'Error! Unknown collection: %s' % self.__current_coll_name
             return
         print 'Building ...'
-        coll_struct = dict()
-        i = 0
-        for i, (k,v) in enumerate(self.__current_coll.get()):
-            for f in kvlite.dict2flat('', v).keys():
-                if f not in coll_struct.keys():
-                    coll_struct[f] = { 'count': 1 }
-                else:
-                    coll_struct[f]['count'] += 1
-        if i > 0:
-            pprint.pprint(coll_struct)
-            print 'Total entries in collection: %d' % (i+1)
+        doc_struct = kvlite.docs_struct(self.__current_coll.get())
+        if doc_struct:
+            pprint.pprint(doc_struct)
+        print 'Done'
 
     def do_hash(self, line):
         '''   hash [string]\tgenerate sha1 hash, random if string is not defined'''        

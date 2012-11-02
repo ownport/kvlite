@@ -46,6 +46,7 @@ import sys
 import json
 import zlib
 import uuid
+import types
 import sqlite3
 import binascii
 import cPickle as pickle
@@ -60,17 +61,39 @@ except ImportError:
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
 SUPPORTED_VALUE_TYPES = {
-    'NONE': {},
-    'BOOLEAN': {},
-    'INTEGER': {},
-    'LONGINTEGER': {},
-    'FLOAT': {},
-    'COMPLEX': {},
-    'STRING': {},
-    'UNICODE': {},
-    'TUPLE': {},
-    'LIST': {},
-    'DICT': {},
+    types.NoneType: {
+        'name': 'none_type',
+    },
+    types.BooleanType: {
+        'name': 'boolean_type',
+    },
+    types.IntType: {
+        'name': 'integer_type',
+    },
+    types.LongType: {
+        'name': 'long_type',
+    },
+    types.FloatType: {
+        'name': 'float_type',
+    },
+    types.ComplexType: {
+        'name': 'complex_type',
+    },
+    types.StringType: {
+        'name': 'string_type',
+    },
+    types.UnicodeType: {
+        'name': 'unicode_type',
+    },
+    types.TupleType: {
+        'name': 'tuple_type',
+    },
+    types.ListType: {
+        'name': 'list_type',
+    },
+    types.DictType: {
+        'name': 'dict_type',
+    },
 }
 
 '''
@@ -212,6 +235,94 @@ def dict2flat(root_name, source, removeEmptyFields=False):
         if source is not None:
             flat_dict[root_name] = source
     return flat_dict
+
+def make_struct_prev(items):
+    ''' returns dictionary with structure of items:
+    amount of items, types'''
+    
+    def seq_struct(items):
+        ''' return element structure of list or tuple'''
+        struct = dict()
+        for i, e in enumerate(items):
+            if type(e) in struct:
+                struct[type(e)] += 1
+            else:
+                struct[type(e)] = 1     
+        return {'items': len(items), 'struct': struct}        
+    
+    coll_struct = dict()
+    i = 0
+    for i, (k,v) in enumerate(items):
+        for dk, dv in dict2flat('', v).items():
+            dv_type = type(dv)
+            if dk in coll_struct.keys():
+                coll_struct[dk]['items'] += 1
+                if dv_type in coll_struct[dk]['type']:
+                    coll_struct[dk]['type'][dv_type] += 1
+                else:
+                    coll_struct[dk]['type'][dv_type] = 1
+                if isinstance(dv, (list, tuple)):
+                    coll_struct[dk]['type']['items'] = seq_struct(dv)
+            else:
+                coll_struct[dk] = { 'items': 1, 'type': { dv_type: 1 } }
+    if i > 0: 
+        i += 1
+    return {'total_documents': i, 'structure': coll_struct }
+
+def docs_struct(documents):
+    ''' returns structure for all documents in the list '''
+    
+    def seq_struct(items):
+        struct = dict()
+        for item in items:
+            item_type = SUPPORTED_VALUE_TYPES[type(item)]['name']
+            
+            if item_type in struct:
+                struct[item_type] += 1
+            else:
+                struct[item_type] = 1
+        return struct
+    
+    def doc_struct(document):
+        struct = list()
+        for name, value in dict2flat('', document).items():
+            field = dict()
+            field['name'] = name
+            field_type = SUPPORTED_VALUE_TYPES[type(value)]['name']
+            field['types'] = { field_type: 1 }
+            
+            if field_type == 'list_type':
+                field['types'][field_type] = seq_struct(value)
+            if field_type == 'tuple_type':
+                field['types'][field_type] = seq_struct(value)
+            struct.append(field)
+        return struct
+    
+    struct = list()
+    total_documents = 0
+    for k,document in documents:
+        total_documents += 1
+
+        for s in doc_struct(document):
+            names = [f['name'] for f in struct]
+            if s['name'] in names:
+                idx = names.index(s['name'])
+                for t in s['types']:
+                    if t in struct[idx]['types']:
+                        if t == 'list_type':
+                            list_types = set(s['types'][t]) | set(struct[idx]['types'][t])
+                            for n in list_types:
+                                struct[idx]['types'][t][n] = struct[idx]['types'][t].get(n, 0) + s['types'][t].get(n,0)
+                        else:
+                            struct[idx]['types'][t] += s['types'][t]
+                    else:
+                        struct[idx]['types'][t] = s['types'][t]
+            else:
+                struct.append(s)
+    return { 
+        'total_documents': total_documents,
+        'structure': struct,
+    }
 
 # -----------------------------------------------------------------
 # CollectionManager class

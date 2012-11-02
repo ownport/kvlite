@@ -2,6 +2,7 @@ import sys
 if '' not in sys.path:
     sys.path.append('')
 
+import pprint
 import kvlite
 import unittest
 
@@ -76,8 +77,6 @@ class KvliteUtilsTests(unittest.TestCase):
     
     def test_basic_types(self):
         
-        import types
-        
         none_value = None
         boolean_value = True
         integer_value = 1
@@ -90,8 +89,62 @@ class KvliteUtilsTests(unittest.TestCase):
         list_value = [1,2,3]
         dict_value = {'a':1,'b':2,'c':3}
                 
-        print type(none_value) is types.NoneType
-        print type(boolean_value) is types.BooleanType
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(none_value)]['name'], 'none_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(boolean_value)]['name'], 'boolean_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(integer_value)]['name'], 'integer_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(longinteger_value)]['name'], 'long_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(float_value)]['name'], 'float_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(complex_value)]['name'], 'complex_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(string_value)]['name'], 'string_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(unicode_value)]['name'], 'unicode_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(tuple_value)]['name'], 'tuple_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(list_value)]['name'], 'list_type')
+        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(dict_value)]['name'], 'dict_type')
+
+    def test_docs_struct(self):
+        
+        import json
+        documents = [
+            ('id1', {
+                'title': 'title1', 'pages': 1, 'description': u'Description1',
+                'keywords': ['a1', 'b1', 'c1', u'd1', 1] 
+            }),
+            ('id2', {
+                'title': 'title2', 'pages': 2, 'description': u'Description2',
+                'keywords': ['a2', 'b2', 'c2', u'd2', 2 ] 
+            }),
+            ('id3', {
+                'title': 'title1', 'pages': 3, 'description': u'Description3',
+                'keywords': ['a3', 'b3', 3] 
+            }),            
+            ('id4', {
+                'title': u'title4', 'pages': '4', 'description': u'Description4',
+                'keywords': ['a4', 'b4', 'c4',  u'd4'] 
+            }),            
+        ] 
+        result = [
+            {
+                'name': 'keywords',
+                'types': {'list_type': { 'string_type': 11, 'unicode_type': 3, 'integer_type':3 }}
+            },
+            {
+                'name': 'title', 
+                'types': { 'string_type': 3, 'unicode_type': 1},
+            },
+            {
+                'name': 'description',
+                'types': { 'unicode_type': 4},
+            },
+            { 
+                'name': 'pages',
+                'types': { 'integer_type': 3, 'string_type': 1},
+            },
+        ]
+        
+        for s in kvlite.docs_struct(documents)['structure']:
+            if json.dumps(s) not in [json.dumps(r) for r in result]:
+                raise RuntimeError('Incorrect document structure')
+
         
 if __name__ == '__main__':
     unittest.main()        
