@@ -37,7 +37,7 @@ class KvliteSqliteTests(unittest.TestCase):
         k = self.collection.get_uuid()
         v = 'test_put_one'
         self.collection.put(k, v)
-        self.assertEqual(self.collection.get(k), (k,v))
+        self.assertEqual(self.collection.get({'_key': k}), (k,v))
         self.assertEqual(self.collection.count, 1)
         self.collection.delete(k)
         self.assertEqual(self.collection.count, 0)
@@ -63,7 +63,7 @@ class KvliteSqliteTests(unittest.TestCase):
 
     def test_long_key(self):
         
-        self.assertRaises(RuntimeError, self.collection.get, '1'*41)
+        self.assertRaises(RuntimeError, self.collection.get, {'_key':'1'*41})
         self.assertRaises(RuntimeError, self.collection.put, '1'*41, 'long_key')
         self.assertRaises(RuntimeError, self.collection.delete, '1'*41)
 
@@ -86,7 +86,7 @@ class KvliteSqliteTests(unittest.TestCase):
         collection_class = manager.collection_class
         collection = collection_class(manager.connection, collection_name, cPickleSerializer)
         
-        self.assertRaises(RuntimeError, collection.get, u'1')
+        self.assertRaises(RuntimeError, collection.get, {'_key':u'1'})
         collection.put(u'1', u'diffser')
         collection.commit()
         collection.close()
@@ -95,7 +95,7 @@ class KvliteSqliteTests(unittest.TestCase):
         collection_class = manager.collection_class
         collection = collection_class(manager.connection, collection_name, CompressedJsonSerializer)
         
-        self.assertRaises(RuntimeError, collection.get, u'1')
+        self.assertRaises(RuntimeError, collection.get, {'_key':u'1'})
         collection.close()
 
     def test_use_different_serializators_for_many(self):
