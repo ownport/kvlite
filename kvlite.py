@@ -643,6 +643,8 @@ class SqliteCollection(BaseCollection):
         offset  - starts with this position in database
         limit   - how many document will be returned
         '''
+        if not isinstance(criteria, dict):
+            raise RuntimeError('Incorrect criteria format')
         if k:
             if len(k) > _KEY_LENGTH:
                 raise RuntimeError('The key length is more than 40 bytes')
