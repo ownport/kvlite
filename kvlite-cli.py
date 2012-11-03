@@ -4,7 +4,7 @@
 #   kvlite console
 #
 #
-__author__ = 'Andrey Usov <http://devel.ownport.net>'
+__author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
 __version__ = '0.2.1'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
@@ -31,12 +31,6 @@ POSSIBILITY OF SUCH DAMAGE."""
 import cmd
 import kvlite
 import pprint
-
-# TODO check remove <collection>
-# TODO add autocomplition for command parameters
-# TODO add filter command
-# TODO add index creation/removing support
-# TODO add search support
 
 # -----------------------------------------------------------------
 # Console class
@@ -130,7 +124,6 @@ class Console(cmd.Cmd):
         '''   export <filename>\t\texport collection configurations to JSON file'''
         import json
         
-        # TODO check if file exists. If yes, import about it
         if not filename:
             print getattr(self, 'do_import').__doc__
             return
@@ -143,7 +136,7 @@ class Console(cmd.Cmd):
     def do_show(self, line):
         '''   show collections <details>\tlist of available collections (defined in settings.py)'''
         if line.startswith('collections'):
-            # TODO add handling 'collections details'
+
             for coll in self.__kvlite_colls:
                 print '   %s' % coll
         else:
@@ -272,7 +265,7 @@ class Console(cmd.Cmd):
     
     def do_put(self, line):
         '''   put <key> <value>\tstore entry to collection'''
-        # TODO check different type of values
+
         try:
             k,v = [i for i in line.split(' ',1) if i <> '']
         except ValueError:

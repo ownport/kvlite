@@ -9,15 +9,7 @@
 #   some ideas taked from PyMongo interface http://api.mongodb.org/python/current/index.html
 #   kvlite2 tutorial http://code.google.com/p/kvlite/wiki/kvlite2
 #
-#   TODO autocommit for put()
-#   TODO synchronise documents between few datastores
-#   TODO add redis support
-#   TODO is it possible to merge hotqueue functionality with kvlite? Will it be useful?
-#   TODO to store binary data
-#   TODO add function to view plain structure of documents in database
-#
-#
-__author__ = 'Andrey Usov <http://devel.ownport.net>'
+__author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
 __version__ = '0.4.5'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
@@ -134,8 +126,6 @@ class cPickleSerializer(object):
 class CompressedJsonSerializer(object):
     ''' CompressedJsonSerializer '''
 
-    # TODO issue: sqlite doesn't support binary values
-
     @staticmethod
     def dumps(v):
         ''' dumps value '''
@@ -173,7 +163,6 @@ def open(uri, serializer=cPickleSerializer):
     use ``None`` to store messages in plain text (suitable for strings,
     integers, etc)
     '''
-    # TODO save kvlite configuration in database
     
     manager = CollectionManager(uri)
     params = manager.parse_uri(uri)
@@ -192,9 +181,6 @@ def remove(uri):
 
 def get_uuid(amount=100):
     ''' return UUIDs '''
-    
-    # TODO check another approach for generation UUIDs, more fast
-    # TODO get uuids from file as approach to speedup UUIDs generation
     
     uuids = list()
     for _ in xrange(amount):
@@ -583,8 +569,6 @@ class MysqlCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection '''
         
-        # TODO many k/v in put()
-        
         if len(k) > 40:
             raise RuntimeError('The length of key is more than 40 bytes')
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
@@ -631,8 +615,6 @@ class SqliteCollection(BaseCollection):
 
     def put(self, k, v):
         ''' put document in collection '''
-        
-        # TODO many k/v in put()
         
         if len(k) > 40:
             raise RuntimeError('The length of key is more than 40 bytes')
