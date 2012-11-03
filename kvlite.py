@@ -51,7 +51,7 @@ except ImportError:
     pass
 
 # ITEMS_PER_REQUEST is used in Collection._get_many()
-ITEMS_PER_REQUEST = 1000
+ITEMS_PER_REQUEST = 100
 # the length of key 
 _KEY_LENGTH = 40
     
@@ -589,21 +589,6 @@ class MysqlCollection(BaseCollection):
         SQL_DELETE = '''DELETE FROM %s WHERE k = ''' % self._collection
         self._cursor.execute(SQL_DELETE + "%s;", binascii.a2b_hex(k))
 
-    def keys(self):
-        ''' return document keys in collection'''
-        rowid = 0
-        while True:
-            SQL_SELECT_MANY = 'SELECT __rowid__, k FROM %s WHERE __rowid__ > %d LIMIT %d ;'
-            SQL_SELECT_MANY %= (self._collection, rowid, ITEMS_PER_REQUEST)
-            self._cursor.execute(SQL_SELECT_MANY)
-            result = self._cursor.fetchall()
-            if not result:
-                break
-            for r in result:
-                rowid = r[0]
-                k = binascii.b2a_hex(r[1])
-                yield k
-
 # -----------------------------------------------------------------
 # SqliteCollection class
 # -----------------------------------------------------------------
@@ -654,6 +639,9 @@ class SqliteCollection(BaseCollection):
         - If the criteria is not defined, get() returns all documents.
         - Hint: the combination `offset` and `limit` paramters can be 
         used for pagination
+        
+        offset  - starts with this position in database
+        limit   - how many document will be returned
         '''
         if k:
             if len(k) > _KEY_LENGTH:
@@ -674,20 +662,6 @@ class SqliteCollection(BaseCollection):
                 return (None, None)
         else:
             return self._get_many()            
-
-    def keys(self):
-        ''' return document keys in collection'''
-        rowid = 0
-        while True:
-            SQL_SELECT_MANY = 'SELECT rowid, k FROM %s WHERE rowid > %d LIMIT %d ;'
-            SQL_SELECT_MANY %= (self._collection, rowid, ITEMS_PER_REQUEST)
-            self._cursor.execute(SQL_SELECT_MANY)
-            result = self._cursor.fetchall()
-            if not result:
-                break
-            for r in result:
-                rowid = r[0]
-                yield r[1]
 
     def delete(self, k):
         ''' delete document by k '''
