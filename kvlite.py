@@ -49,6 +49,9 @@ try:
     import MySQLdb
 except ImportError:
     pass
+
+# ITEMS_PER_REQUEST is used in Collection._get_many()
+ITEMS_PER_REQUEST = 1000
     
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
@@ -529,8 +532,8 @@ class MysqlCollection(BaseCollection):
         ''' return all docs '''
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT __rowid__, k,v FROM %s WHERE __rowid__ > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %=  (self._collection, rowid)
+            SQL_SELECT_MANY = 'SELECT __rowid__, k,v FROM %s WHERE __rowid__ > %d LIMIT %s;'
+            SQL_SELECT_MANY %=  (self._collection, rowid, ITEMS_PER_REQUEST)
             self._cursor.execute(SQL_SELECT_MANY)
             result = self._cursor.fetchall()
             if not result:
@@ -627,8 +630,8 @@ class SqliteCollection(BaseCollection):
         ''' return all docs '''
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT rowid, k,v FROM %s WHERE rowid > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %= (self._collection, rowid)
+            SQL_SELECT_MANY = 'SELECT rowid, k,v FROM %s WHERE rowid > %d LIMIT %d ;'
+            SQL_SELECT_MANY %= (self._collection, rowid, ITEMS_PER_REQUEST)
             self._cursor.execute(SQL_SELECT_MANY)
             result = self._cursor.fetchall()
             if not result:
