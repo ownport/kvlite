@@ -55,9 +55,6 @@ class KvliteSqliteTests(unittest.TestCase):
         kvs = [kv[0] for kv in self.collection.get()]
         self.assertEqual(len(kvs), 100)
 
-        kvs = [kv for kv in self.collection.keys()]
-        self.assertEqual(len(kvs), 100)
-
         self.assertEqual(self.collection.count, 100)
         for k in ks:
             self.collection.delete(k)
