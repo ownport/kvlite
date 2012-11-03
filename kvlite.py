@@ -591,8 +591,8 @@ class MysqlCollection(BaseCollection):
         ''' return document keys in collection'''
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT __rowid__, k FROM %s WHERE __rowid__ > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %= (self._collection, rowid)
+            SQL_SELECT_MANY = 'SELECT __rowid__, k FROM %s WHERE __rowid__ > %d LIMIT %d ;'
+            SQL_SELECT_MANY %= (self._collection, rowid, ITEMS_PER_REQUEST)
             self._cursor.execute(SQL_SELECT_MANY)
             result = self._cursor.fetchall()
             if not result:
@@ -674,8 +674,8 @@ class SqliteCollection(BaseCollection):
         ''' return document keys in collection'''
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT rowid, k FROM %s WHERE rowid > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %= (self._collection, rowid)
+            SQL_SELECT_MANY = 'SELECT rowid, k FROM %s WHERE rowid > %d LIMIT %d ;'
+            SQL_SELECT_MANY %= (self._collection, rowid, ITEMS_PER_REQUEST)
             self._cursor.execute(SQL_SELECT_MANY)
             result = self._cursor.fetchall()
             if not result:
@@ -691,4 +691,11 @@ class SqliteCollection(BaseCollection):
         SQL_DELETE = '''DELETE FROM %s WHERE k = ?;''' % self._collection
         self._cursor.execute(SQL_DELETE, (k,))
                     
-
+    def find(self, criteria=None, offset=0, limit=ITEMS_PER_REQUEST):
+        ''' return the result of search by criteria.
+        if the criteria is not defined the find() returns all documents.
+        The combination `offset` and `limit` paramters can be used for 
+        pagination'''
+        
+        pass
+        
