@@ -52,6 +52,8 @@ except ImportError:
 
 # ITEMS_PER_REQUEST is used in Collection._get_many()
 ITEMS_PER_REQUEST = 1000
+# the length of key 
+_KEY_LENGTH = 40
     
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
@@ -553,7 +555,7 @@ class MysqlCollection(BaseCollection):
         return documents if key is not defined
         '''
         if k:
-            if len(k) > 40:
+            if len(k) > _KEY_LENGTH:
                 raise RuntimeError('The key length is more than 40 bytes')
             SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
             try:
@@ -572,7 +574,7 @@ class MysqlCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection '''
         
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than 40 bytes')
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (%s,%s) ON DUPLICATE KEY UPDATE v=%s;;'
@@ -581,7 +583,7 @@ class MysqlCollection(BaseCollection):
 
     def delete(self, k):
         ''' delete document by k '''
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than 40 bytes')
 
         SQL_DELETE = '''DELETE FROM %s WHERE k = ''' % self._collection
@@ -619,7 +621,7 @@ class SqliteCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection '''
         
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than 40 bytes')
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
@@ -645,13 +647,16 @@ class SqliteCollection(BaseCollection):
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
 
-    def get(self, k=None):
+    def get(self, criteria=None, offset=0, limit=ITEMS_PER_REQUEST):
         ''' 
-        return document by key from collection 
-        return documents if key is not defined
+        returns documents selected from collection by criteria.
+        
+        - If the criteria is not defined, get() returns all documents.
+        - Hint: the combination `offset` and `limit` paramters can be 
+        used for pagination
         '''
         if k:
-            if len(k) > 40:
+            if len(k) > _KEY_LENGTH:
                 raise RuntimeError('The key length is more than 40 bytes')
             SQL = 'SELECT k,v FROM %s WHERE k = ?;' % self._collection
             try:
@@ -686,16 +691,9 @@ class SqliteCollection(BaseCollection):
 
     def delete(self, k):
         ''' delete document by k '''
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The key length is more than 40 bytes')
         SQL_DELETE = '''DELETE FROM %s WHERE k = ?;''' % self._collection
         self._cursor.execute(SQL_DELETE, (k,))
                     
-    def find(self, criteria=None, offset=0, limit=ITEMS_PER_REQUEST):
-        ''' return the result of search by criteria.
-        if the criteria is not defined the find() returns all documents.
-        The combination `offset` and `limit` paramters can be used for 
-        pagination'''
-        
-        pass
         
