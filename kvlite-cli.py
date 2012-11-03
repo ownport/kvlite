@@ -76,7 +76,7 @@ class Console(cmd.Cmd):
                 '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', '',
                 'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', '',
                 'do_hash', 'do_keys', 'do_items', 'do_get', 'do_put', 'do_delete', 
-                'do_count', 'do_scheme', ''
+                'do_count', 'do_scheme', 'do_index', ''
             ]
             for name in names:
                 if not name:
@@ -211,7 +211,7 @@ class Console(cmd.Cmd):
             return
 
     def do_scheme(self, line):
-        '''   scheme\tshow structure of collection'''
+        '''   scheme\t\tshow structure of collection'''
         if not self.__current_coll_name in self.__kvlite_colls:
             print 'Error! Unknown collection: %s' % self.__current_coll_name
             return
@@ -308,6 +308,12 @@ class Console(cmd.Cmd):
         except RuntimeError, err:
             print 'Error!', err
             return
+
+    def do_index(self, line):
+        '''   index <details>\tmake index for current collection'''
+        print 'Warning! This functionality is not implemented yet'
+        print line
+        print 'Done'
         
 # ----------------------------------
 #   main
