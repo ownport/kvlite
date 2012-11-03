@@ -236,39 +236,6 @@ def dict2flat(root_name, source, removeEmptyFields=False):
             flat_dict[root_name] = source
     return flat_dict
 
-def make_struct_prev(items):
-    ''' returns dictionary with structure of items:
-    amount of items, types'''
-    
-    def seq_struct(items):
-        ''' return element structure of list or tuple'''
-        struct = dict()
-        for i, e in enumerate(items):
-            if type(e) in struct:
-                struct[type(e)] += 1
-            else:
-                struct[type(e)] = 1     
-        return {'items': len(items), 'struct': struct}        
-    
-    coll_struct = dict()
-    i = 0
-    for i, (k,v) in enumerate(items):
-        for dk, dv in dict2flat('', v).items():
-            dv_type = type(dv)
-            if dk in coll_struct.keys():
-                coll_struct[dk]['items'] += 1
-                if dv_type in coll_struct[dk]['type']:
-                    coll_struct[dk]['type'][dv_type] += 1
-                else:
-                    coll_struct[dk]['type'][dv_type] = 1
-                if isinstance(dv, (list, tuple)):
-                    coll_struct[dk]['type']['items'] = seq_struct(dv)
-            else:
-                coll_struct[dk] = { 'items': 1, 'type': { dv_type: 1 } }
-    if i > 0: 
-        i += 1
-    return {'total_documents': i, 'structure': coll_struct }
-
 def docs_struct(documents):
     ''' returns structure for all documents in the list '''
     
