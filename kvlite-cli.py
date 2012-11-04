@@ -5,7 +5,7 @@
 #
 #
 __author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
-__version__ = '0.2.1'
+__version__ = '0.3'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -69,7 +69,7 @@ class Console(cmd.Cmd):
             names = [
                 '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', '',
                 'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', '',
-                'do_hash', 'do_keys', 'do_items', 'do_get', 'do_put', 'do_delete', 
+                'do_hash', 'do_items', 'do_get', 'do_put', 'do_delete', 
                 'do_count', 'do_scheme', 'do_index', ''
             ]
             for name in names:
@@ -225,21 +225,13 @@ class Console(cmd.Cmd):
             line = line.rstrip().lstrip()
             print 'sha1 hash:', hashlib.sha1(line).hexdigest()
         
-    def do_keys(self, line):
-        '''   keys\t\t\tlist of keys '''        
-        if not self.__current_coll_name in self.__kvlite_colls:
-            print 'Error! Unknown collection: %s' % self.__current_coll_name
-            return
-        for k,v in self.__current_coll.get():
-            print k
-
     def do_items(self, line):
         '''   items\t\tlist of collection's items '''        
         if not self.__current_coll_name in self.__kvlite_colls:
             print 'Error! Unknown collection: %s' % self.__current_coll_name
             return
         for k,v in self.__current_coll.get():
-            print k
+            print '_key:', k
             pprint.pprint(v)
             print
         
@@ -255,8 +247,8 @@ class Console(cmd.Cmd):
             return
         for key in [k for k in key.split(' ') if k <> '']:
             if self.__current_coll:
-                k, v = self.__current_coll.get(key)
-                print k
+                k, v = self.__current_coll.get({'_key': key})
+                print '_key:', k
                 pprint.pprint(v)
                 print
             else:
