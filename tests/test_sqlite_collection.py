@@ -154,6 +154,23 @@ class KvliteSqliteTests(unittest.TestCase):
     def test_incorrect_key(self):
         
         self.assertRaises(RuntimeError, self.collection.get, (1,2,3))        
+    
+    def test_pagination(self):
+
+        PAGE_SIZE=10
+        kvs = [(self.collection.get_uuid(), 'test') for _ in range(100)]
+        for kv in kvs:
+            self.collection.put(*kv)
+        # first page
+        result = [kv for kv in self.collection.get(offset=0,limit=PAGE_SIZE)] 
+        self.assertEqual(len(result), len(kvs[0:PAGE_SIZE]))
+        for res in result:
+            self.assertIn(res, kvs[0:PAGE_SIZE])
+        # second page
+        result = [kv for kv in self.collection.get(offset=2*PAGE_SIZE,limit=PAGE_SIZE)] 
+        self.assertEqual(len(result), len(kvs[2*PAGE_SIZE:2*PAGE_SIZE+PAGE_SIZE]))
+        for res in result:
+            self.assertIn(res, kvs[2*PAGE_SIZE:2*PAGE_SIZE+PAGE_SIZE])
         
 if __name__ == '__main__':
     unittest.main()        

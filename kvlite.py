@@ -501,7 +501,7 @@ class BaseCollection(object):
         self._cursor.execute('SELECT count(*) FROM %s;' % self._collection)
         return int(self._cursor.fetchone()[0])
 
-    def get(self, criteria=None, offset=0, limit=ITEMS_PER_REQUEST):
+    def get(self, criteria=None, offset=None, limit=ITEMS_PER_REQUEST):
         ''' 
         returns documents selected from collection by criteria.
         
@@ -513,7 +513,10 @@ class BaseCollection(object):
         limit   - how many document will be returned
         '''
         if criteria is None:
-            return self._get_all()
+            if offset >=0 and limit > 0:
+                return self._get_paged(offset=offset, limit=limit)
+            else:
+                return self._get_all()
             
         if not isinstance(criteria, dict):
             raise RuntimeError('Incorrect criteria format')
@@ -609,6 +612,31 @@ class MysqlCollection(BaseCollection):
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
 
+    def _get_paged(self, offset=None, limit=ITEMS_PER_REQUEST):
+        ''' return docs by offset and limit
+        
+        offset and limit are used for pagination, for details 
+        see BaseCollection.get()
+        '''
+        
+        if not offset and not limit:
+            return
+        
+        SQL_SELECT_MANY = 'SELECT k,v FROM %s LIMIT %d, %d ;'
+        SQL_SELECT_MANY %= (self._collection, int(offset), int(limit))
+        self._cursor.execute(SQL_SELECT_MANY)
+        result = self._cursor.fetchall()
+        if not result:
+            return
+        for r in result:
+            k = binascii.b2a_hex(r[0])
+            try:
+                v = self._serializer.loads(r[1])
+            except Exception, err:
+                raise RuntimeError('key %s, %s' % (k, err))
+            yield (k, v)
+
+
     def put(self, k, v):
         ''' put document in collection '''
         
@@ -692,7 +720,11 @@ class SqliteCollection(BaseCollection):
                     yield (k, v)
 
     def _get_all(self):
-        ''' return all docs '''
+        ''' return all docs 
+        
+        offset and limit are used for pagination, for details 
+        see BaseCollection.get()
+        '''
         
         rowid = 0
         while True:
@@ -710,6 +742,30 @@ class SqliteCollection(BaseCollection):
                 except Exception, err:
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
+
+    def _get_paged(self, offset=None, limit=ITEMS_PER_REQUEST):
+        ''' return docs by offset and limit
+        
+        offset and limit are used for pagination, for details 
+        see BaseCollection.get()
+        '''
+        
+        if not offset and not limit:
+            return
+        
+        SQL_SELECT_MANY = 'SELECT k,v FROM %s LIMIT %d, %d ;'
+        SQL_SELECT_MANY %= (self._collection, int(offset), int(limit))
+        self._cursor.execute(SQL_SELECT_MANY)
+        result = self._cursor.fetchall()
+        if not result:
+            return
+        for r in result:
+            k = r[0]
+            try:
+                v = self._serializer.loads(r[1])
+            except Exception, err:
+                raise RuntimeError('key %s, %s' % (k, err))
+            yield (k, v)
 
     def delete(self, k):
         ''' delete document by k '''
