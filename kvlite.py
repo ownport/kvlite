@@ -39,6 +39,8 @@ import json
 import zlib
 import uuid
 import types
+import string
+import random
 import sqlite3
 import binascii
 import cPickle as pickle
@@ -281,6 +283,12 @@ def docs_struct(documents):
         'total_documents': total_documents,
         'structure': struct,
     }
+
+def tmp_name(size = 10):
+    ''' generate temporary collection name '''
+    name = ''.join(random.choice(string.ascii_lowercase) for x in range(int(size * .8)))
+    name += ''.join(random.choice(string.digits) for x in range(int(size * .2))) 
+    return name
 
 # -----------------------------------------------------------------
 # CollectionManager class
@@ -568,7 +576,10 @@ class MysqlCollection(BaseCollection):
             raise RuntimeError(err)
         result = self._cursor.fetchone()
         if result:
-            v = self._serializer.loads(result[1])
+            try:
+                v = self._serializer.loads(result[1])
+            except Exception, err:
+                raise RuntimeError('key %s, %s' % (_key, err))
             return (binascii.b2a_hex(result[0]), v)
         else:
             return (None, None)
@@ -684,6 +695,8 @@ class SqliteCollection(BaseCollection):
         
         if len(_key) > _KEY_LENGTH:
             raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
+        if len(_key) % 2 == 1:
+            raise RuntimeError('Odd-length string')
         SQL = 'SELECT k,v FROM %s WHERE k = ?;' % self._collection
         try:
             self._cursor.execute(SQL, (_key,))
@@ -704,6 +717,10 @@ class SqliteCollection(BaseCollection):
         
         if _keys:
             if isinstance(_keys, (list, tuple)):
+                # check if keys are even
+                for key in _keys:
+                    if len(key) % 2 == 1:
+                        raise RuntimeError('Odd-length string')
                 SQL_SELECT_MANY = 'SELECT k,v FROM %s WHERE k IN ({seq})';
                 SQL_SELECT_MANY %= (self._collection)
                 SQL_SELECT_MANY = SQL_SELECT_MANY.format(seq=','.join(['?']*len(_keys)))
