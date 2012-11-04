@@ -16,12 +16,12 @@ class KvliteUtilsTests(unittest.TestCase):
     def test_sqlite_open(self):
         
         collection = kvlite.open('sqlite://tests/db/testdb.sqlite:kvlite_test')
-        collection.put('a',1)
+        collection.put('a0',1)
         self.assertEqual(collection.count,1)
-        self.assertEqual(collection.get({'_key': 'a'}), ('a',1))
-        collection.delete('a')
+        self.assertEqual(collection.get({'_key': 'a0'}), ('a0',1))
+        collection.delete('a0')
         self.assertEqual(collection.count,0)
-        self.assertEqual(collection.get({'_key': 'a'}), (None,None))
+        self.assertEqual(collection.get({'_key': 'a0'}), (None,None))
         collection.close()
     
     def test_sqlite_remove(self):
