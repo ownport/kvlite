@@ -42,7 +42,7 @@ class KvliteMysqlTests(unittest.TestCase):
         k = self.collection.get_uuid()
         v = 'test_put_one'
         self.collection.put(k, v)
-        self.assertEqual(self.collection.get(k), (k,v))
+        self.assertEqual(self.collection.get({'_key':k}), (k,v))
         self.assertEqual(self.collection.count, 1)
         self.collection.delete(k)
         self.assertEqual(self.collection.count, 0)
@@ -68,17 +68,17 @@ class KvliteMysqlTests(unittest.TestCase):
 
     def test_long_key(self):
         
-        self.assertRaises(RuntimeError, self.collection.get, '1'*41)
+        self.assertRaises(RuntimeError, self.collection.get, {'_key':'1'*41})
         self.assertRaises(RuntimeError, self.collection.put, '1'*41, 'long_key')
         self.assertRaises(RuntimeError, self.collection.delete, '1'*41)
     
     def test_absent_key(self):
         
-        self.assertEqual(self.collection.get(u'a1b2c3'), (None,None))
+        self.assertEqual(self.collection.get({'_key':u'a1b2c3'}), (None,None))
     
     def test_incorrect_key(self):
 
-        self.assertRaises(RuntimeError, self.collection.get, '12345')
+        self.assertRaises(RuntimeError, self.collection.get, {'_key':'12345'})
         
     def test_use_different_serializators_for_many(self):
         URI = 'mysql://kvlite_test:eixaaghiequ6ZeiBahn0@localhost/kvlite_test'

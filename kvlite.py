@@ -501,6 +501,29 @@ class BaseCollection(object):
         self._cursor.execute('SELECT count(*) FROM %s;' % self._collection)
         return int(self._cursor.fetchone()[0])
 
+    def get(self, criteria=None, offset=0, limit=ITEMS_PER_REQUEST):
+        ''' 
+        returns documents selected from collection by criteria.
+        
+        - If the criteria is not defined, get() returns all documents.
+        - Hint: the combination `offset` and `limit` paramters can be 
+        used for pagination
+        
+        offset  - starts with this position in database
+        limit   - how many document will be returned
+        '''
+        if criteria is None:
+            return self._get_many()
+            
+        if not isinstance(criteria, dict):
+            raise RuntimeError('Incorrect criteria format')
+        
+        if '_key' in criteria:
+            if isinstance(criteria['_key'], (str, unicode)):
+                return self._get_one(criteria['_key'])
+            elif isinstance(criteria['_key'], (list, tuple)):
+                return self._get_many(criteria['_key'])
+
     def commit(self):
         self._conn.commit()
 
@@ -530,6 +553,23 @@ class MysqlCollection(BaseCollection):
                 self._uuid_cache.append(u)
         return self._uuid_cache.pop()
 
+    def _get_one(self, _key):
+        ''' return document by _key '''
+        
+        if len(_key) > _KEY_LENGTH:
+            raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
+        SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
+        try:
+            self._cursor.execute(SQL + "%s", binascii.a2b_hex(_key))
+        except Exception, err:
+            raise RuntimeError(err)
+        result = self._cursor.fetchone()
+        if result:
+            v = self._serializer.loads(result[1])
+            return (binascii.b2a_hex(result[0]), v)
+        else:
+            return (None, None)
+
     def _get_many(self):
         ''' return all docs '''
         rowid = 0
@@ -548,28 +588,6 @@ class MysqlCollection(BaseCollection):
                 except Exception, err:
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
-
-    def get(self, k=None):
-        ''' 
-        return document by key from collection 
-        return documents if key is not defined
-        '''
-        if k:
-            if len(k) > _KEY_LENGTH:
-                raise RuntimeError('The key length is more than 40 bytes')
-            SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
-            try:
-                self._cursor.execute(SQL + "%s", binascii.a2b_hex(k))
-            except Exception, err:
-                raise RuntimeError(err)
-            result = self._cursor.fetchone()
-            if result:
-                v = self._serializer.loads(result[1])
-                return (binascii.b2a_hex(result[0]), v)
-            else:
-                return (None, None)
-        else:
-            return self._get_many()            
 
     def put(self, k, v):
         ''' put document in collection '''
@@ -651,29 +669,6 @@ class SqliteCollection(BaseCollection):
                 except Exception, err:
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
-
-    def get(self, criteria=None, offset=0, limit=ITEMS_PER_REQUEST):
-        ''' 
-        returns documents selected from collection by criteria.
-        
-        - If the criteria is not defined, get() returns all documents.
-        - Hint: the combination `offset` and `limit` paramters can be 
-        used for pagination
-        
-        offset  - starts with this position in database
-        limit   - how many document will be returned
-        '''
-        if criteria is None:
-            return self._get_many()
-            
-        if not isinstance(criteria, dict):
-            raise RuntimeError('Incorrect criteria format')
-        
-        if '_key' in criteria:
-            if isinstance(criteria['_key'], (str, unicode)):
-                return self._get_one(criteria['_key'])
-            elif isinstance(criteria['_key'], (list, tuple)):
-                return self._get_many(criteria['_key'])
 
     def delete(self, k):
         ''' delete document by k '''
