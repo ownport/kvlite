@@ -513,7 +513,7 @@ class BaseCollection(object):
         limit   - how many document will be returned
         '''
         if criteria is None:
-            return self._get_many()
+            return self._get_all()
             
         if not isinstance(criteria, dict):
             raise RuntimeError('Incorrect criteria format')
@@ -522,7 +522,7 @@ class BaseCollection(object):
             if isinstance(criteria['_key'], (str, unicode)):
                 return self._get_one(criteria['_key'])
             elif isinstance(criteria['_key'], (list, tuple)):
-                return self._get_many(criteria['_key'])
+                return self._get_many(*criteria['_key'])
 
     def commit(self):
         self._conn.commit()
@@ -570,13 +570,33 @@ class MysqlCollection(BaseCollection):
         else:
             return (None, None)
 
-    def _get_many(self):
+    def _get_many(self, *_keys):
+        ''' return docs by keys '''
+        
+        if _keys:
+            if isinstance(_keys, (list, tuple)):
+                bin_keys = [binascii.a2b_hex(k) for k in _keys]
+                SQL_SELECT_MANY = 'SELECT k,v FROM {} WHERE k IN ({})'
+                SQL_SELECT_MANY = SQL_SELECT_MANY.format(self._collection,','.join(['%s']*len(bin_keys)));
+                self._cursor.execute(SQL_SELECT_MANY, tuple(bin_keys))
+                result = self._cursor.fetchall()
+                if not result:
+                    return
+                for r in result:
+                    k = binascii.b2a_hex(r[0])
+                    try:
+                        v = self._serializer.loads(r[1])
+                    except Exception, err:
+                        raise RuntimeError('key %s, %s' % (k, err))
+                    yield (k, v)
+
+    def _get_all(self):
         ''' return all docs '''
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT __rowid__, k,v FROM %s WHERE __rowid__ > %d LIMIT %s;'
-            SQL_SELECT_MANY %=  (self._collection, rowid, ITEMS_PER_REQUEST)
-            self._cursor.execute(SQL_SELECT_MANY)
+            SQL_SELECT_ALL = 'SELECT __rowid__, k,v FROM %s WHERE __rowid__ > %d LIMIT %s;'
+            SQL_SELECT_ALL %=  (self._collection, rowid, ITEMS_PER_REQUEST)
+            self._cursor.execute(SQL_SELECT_ALL)
             result = self._cursor.fetchall()
             if not result:
                 break
@@ -652,7 +672,28 @@ class SqliteCollection(BaseCollection):
             return (None, None)
 
     def _get_many(self, *_keys):
+        ''' return docs by keys or all docs if keys are not defined '''
+        
+        if _keys:
+            if isinstance(_keys, (list, tuple)):
+                SQL_SELECT_MANY = 'SELECT k,v FROM %s WHERE k IN ({seq})';
+                SQL_SELECT_MANY %= (self._collection)
+                SQL_SELECT_MANY = SQL_SELECT_MANY.format(seq=','.join(['?']*len(_keys)))
+                self._cursor.execute(SQL_SELECT_MANY, _keys)
+                result = self._cursor.fetchall()
+                if not result:
+                    return
+                for r in result:
+                    k = r[0]
+                    try:
+                        v = self._serializer.loads(r[1])
+                    except Exception, err:
+                        raise RuntimeError('key %s, %s' % (k, err))
+                    yield (k, v)
+
+    def _get_all(self):
         ''' return all docs '''
+        
         rowid = 0
         while True:
             SQL_SELECT_MANY = 'SELECT rowid, k,v FROM %s WHERE rowid > %d LIMIT %d ;'

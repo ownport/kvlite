@@ -48,6 +48,21 @@ class KvliteMysqlTests(unittest.TestCase):
         self.assertEqual(self.collection.count, 0)
         self.collection.commit()
 
+    def test_get_many_by_keys(self):
+        
+        kvs = [(self.collection.get_uuid(), 'test') for _ in range(10)]
+        for kv in kvs:
+            self.collection.put(*kv)
+        self.collection.commit()
+        # keys are in database
+        result = [kv for kv in self.collection.get({'_key': [kv[0] for kv in kvs[0:3]]})]
+        self.assertEqual(len(kvs[0:3]), len(result))
+        for res in result:
+            self.assertIn(res, kvs[0:3])
+        # keys are not in database
+        result = [kv for kv in self.collection.get({'_key': ['00' for kv in range(3)]})]
+        self.assertNotEqual(len(kvs[0:3]), len(result))
+
     def test_put_get_delete_count_many(self):
         
         ks = list()
