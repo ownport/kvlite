@@ -10,7 +10,7 @@
 #   kvlite2 tutorial http://code.google.com/p/kvlite/wiki/kvlite2
 #
 __author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
-__version__ = '0.4.5'
+__version__ = '0.5'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
