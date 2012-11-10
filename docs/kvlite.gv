@@ -9,9 +9,11 @@ digraph pyservice {
     kvlite          [label="<top>       kvlite library"];
     
     CollectionUtils [label="<top>       Collection utils |\
-                            <open>          open(uri) |\
+                            <open>          open(uri,serializer=cPickleSerializer) |\
                             <remove>        remove(uri) |\
-                            <get_uuid>      get_uuid(amount)"];
+                            <get_uuid>      get_uuid(amount=100) |\
+                            <dict2flat>     dict2flat(root_name, source, removeEmptyFields=False) |\
+                            <docs_struct>   docs_struct(documents)"];
     
     CollectionManager[label="<top>      class CollectionManager() |\
                              <init>         - __init__(uri) |\
@@ -36,7 +38,7 @@ digraph pyservice {
                            
     SqliteCollectionManager [
                     label="<top>        class SqliteCollectionManager() |\
-                           <init>         - __init__(uri) |\
+                           <init>           - __init__(uri) |\
                            <parse_uri>      - _parse_uri() |\
                            <create>         - create() |\
                            <connection>     - connection |\
@@ -44,29 +46,35 @@ digraph pyservice {
                            <collections>    - collections() |\
                            <remove>         - remove() |\
                            <close>          - close()"];
+
+    BaseCollection [
+                    label="<top>       class BaseCollection() |\
+                           <init>           - __init__(uri) |\
+                           <get>            - get(k) |\
+                           <count>          - count() |\
+                           <commit>         - commit() |\
+                           <close>          - close()"];
     
     MysqlCollection [label="<top>       class MysqlCollection() |\
                          <init>             - __init__(uri) |\
                          <get_uuid>         - get_uuid() |\
-                         <get>              - get(k) |\
+                         <_get_one>         - _get_one(_key) |\
+                         <_get_many>        - _get_many(*_keys) |\
+                         <_get_all>         - _get_all() |\
+                         <_get_paged>       - _get_paged(offset=None, limit=ITEMS_PER_REQUEST) |\
                          <put>              - put(k, v) |\
-                         <delete>           - delete(k) |\
-                         <keys>             - keys() |\
-                         <count>            - count() |\
-                         <commit>           - commit() |\
-                         <close>            - close()"];
+                         <delete>           - delete(k)"];
 
     SqliteCollection [
                     label="<top>        class SqliteCollection() |\
                          <init>             - __init__(uri) |\
                          <get_uuid>         - get_uuid() |\
-                         <get>              - get(k) |\
+                         <_get_one>         - _get_one(_key) |\
+                         <_get_many>        - _get_many(*_keys) |\
+                         <_get_all>         - _get_all() |\
+                         <_get_paged>       - _get_paged(offset=None, limit=ITEMS_PER_REQUEST) |\
                          <put>              - put(k, v) |\
-                         <delete>           - delete(k) |\
-                         <keys>             - keys() |\
-                         <count>            - count() |\
-                         <commit>           - commit() |\
-                         <close>            - close()"];
+                         <delete>           - delete(k)"];
 
     cPickleSerializer [
                     label="<top>        class cPickleSerializer() |\
@@ -86,6 +94,8 @@ digraph pyservice {
     CollectionManager:top -> SqliteCollectionManager:top;
     MysqlCollectionManager:top -> MysqlCollection:top;
     SqliteCollectionManager:top -> SqliteCollection:top;
+    BaseCollection:top -> MysqlCollection:top;
+    BaseCollection:top -> SqliteCollection:top;
     
     MysqlCollection:top -> cPickleSerializer:top;
     MysqlCollection:top -> CompressedJsonSerializer:top;
