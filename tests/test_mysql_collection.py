@@ -19,7 +19,7 @@ class KvliteMysqlTests(test_collection_common.CommonCollectionTests):
         manager = kvlite.CollectionManager(self.URI)
         for collection in manager.collections():
             manager.remove(collection)
-                                
+  
 if __name__ == '__main__':
     unittest.main()        
 

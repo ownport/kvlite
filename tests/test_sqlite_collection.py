@@ -6,8 +6,6 @@ import kvlite
 import unittest
 import test_collection_common
 
-URI = 'sqlite://tests/db/testdb.sqlite:{}'
-
 class KvliteSqliteTests(test_collection_common.CommonCollectionTests):
 
     @classmethod
@@ -21,7 +19,7 @@ class KvliteSqliteTests(test_collection_common.CommonCollectionTests):
         manager = kvlite.CollectionManager(self.URI)
         for collection in manager.collections():
             manager.remove(collection)
-            
+
 if __name__ == '__main__':
     unittest.main()        
 
