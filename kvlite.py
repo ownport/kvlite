@@ -680,6 +680,8 @@ class SqliteCollection(BaseCollection):
         
         if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than 40 bytes')
+        if len(k) % 2 == 1:
+            raise RuntimeError('Odd-length string')
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
         v = self._serializer.dumps(v)
