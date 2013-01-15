@@ -159,13 +159,11 @@ def open(uri, serializer=cPickleSerializer):
     in case of successful opening or creation new collection 
     return Collection object
     
-    serializer: the class or module to serialize msgs with, must have
-    methods or functions named ``dumps`` and ``loads``,
-    `pickle <http://docs.python.org/library/pickle.html>`_ is the default,
-    use ``None`` to store messages in plain text (suitable for strings,
-    integers, etc)
+    serializer: the class or module to serialize msgs with, must have methods or 
+    functions named ``dumps`` and ``loads``, cPickleSerializer is the default,
     '''
-    
+    # TODO use `None` for serializer to store messages in plain text, suitable for strings, integers, etc
+
     manager = CollectionManager(uri)
     params = manager.parse_uri(uri)
     if params['collection'] not in manager.collections():
