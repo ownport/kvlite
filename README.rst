@@ -89,9 +89,4 @@ Links
 =====
  - Links <https://github.com/ownport/kvlite/blob/v0.5/docs/links.md> 
 
-Another topics
-==============
-
- - kvlite structure <https://github.com/ownport/kvlite/blob/master/docs/kvlite.png>
- - Link collection to similar projects or where the ideas were taken <https://github.com/ownport/kvlite/blob/master/docs/links.md>
 
