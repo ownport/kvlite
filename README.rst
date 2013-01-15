@@ -62,6 +62,13 @@ Examples of use
     >>> collection.close()
     >>>
 
+Developer interface
+===================
+ - Utils <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collection-utils>
+ - Collection <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collection>
+ - CollectionManager <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collectionmanager>
+ - Serializers <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#serializers>
+ 
 
 Another topics
 ==============
