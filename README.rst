@@ -69,13 +69,25 @@ Examples of use
     >>> collection.close()
     >>>
 
+Usage
+=====
+ - Search criterias <https://github.com/ownport/kvlite/blob/v0.5/docs/search-criterias.md>
+
 Developer interface
 ===================
  - Utils <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collection-utils>
  - Collection <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collection>
  - CollectionManager <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collectionmanager>
  - Serializers <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#serializers>
+ - kvlite diagram <https://raw.github.com/ownport/kvlite/v0.5/docs/kvlite.png>
+
+Articles
+========
+ - How FriendFeed uses MySQL to store schema-less data <https://github.com/ownport/kvlite/blob/v0.5/docs/articles/friendfeed-mysql-datastore.md>
  
+Links
+=====
+ - Links <https://github.com/ownport/kvlite/blob/v0.5/docs/links.md> 
 
 Another topics
 ==============
