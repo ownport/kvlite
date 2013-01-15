@@ -2,20 +2,27 @@
 
 ## Collection Utils
 
-- open(uri)        - open collection
-- remove(uri)      - remove collection
-- get_uuid(amount) - get list of uuid 
+- **open**(uri, serializer=cPickleSerializer)
+
+open collection
+
+If collection does not exist, kvlite will try to create it.
+    
+In case of successful opening or creation new collection return Collection object
+    
+serializer: the class or module to serialize msgs with, must have methods or functions named `dumps` and `loads`, 
+cPickleSerializer is the default
+
+returns MysqlCollection or SqliteCollection object
+    
+- **remove**(uri)
+
+remove collection by uri
+
+- **get_uuid**(amount=100)
+
+return the list of uuids. By `amount` argument you can define how many UUIDs will be generated and returned. By default `get_uuid` returns 100 UUIDs
  
-To get started just open() function is needed.
-
-URI format is:
-
-- for mysql: `mysql://username:password@hostname:port/database.collection_name`
-- for sqlite: `sqlite://path-to-sqlite-file:collection_name` or `sqlite://memory:collection_name`
- 
-In case when sqlite is in use two variants of collection is possible: in file and in memory.
-
-The function open(uri) returns MysqlCollection or SqliteCollection object
 
 ## Collection
 
