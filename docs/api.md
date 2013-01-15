@@ -67,9 +67,9 @@ Please note that there's no way to store which serializer was used for collectio
 
 For using JSON as serialization
 ```python
->>> collection = open('sqlite://test.kvlite:test', serializer=json)
+>>> collection = open('sqlite://test.kvlite:test', serializer=CompressedJsonSerializer)
 >>>
 ```
 
-To create custom serializer you need to create new class with static methods: `dumps(v)` and `loads(v)`
+To create custom serializer you need to create the class or module to serialize msgs with, must have methods or functions named `dumps(v)` and `loads(v)`
 
