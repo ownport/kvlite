@@ -65,7 +65,7 @@ def open(uri, serializer=cPickleSerializer):
 ```
 For using JSON as serialization
 ```python
->>> collection = open('sqlite://test.kvlite:test', serializer=CompressedJsonSerializer)
+>>> collection = kvlite.open('sqlite://test.kvlite:test', serializer=kvlite.CompressedJsonSerializer)
 >>>
 ```
 
