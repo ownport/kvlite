@@ -8,7 +8,7 @@ A ``document`` is a string, list/tuple, dictionary or any structure which can be
 
 A ``collection`` is a group of documents stored in kvlite. It can be thought of as roughly the equivalent of a table in a relational database.
 
-``URI`` is uniform resource identifier for databases. The format is:
+``uri`` is uniform resource identifier for databases. The format is:
  - for mysql: 'mysql://username:password@hostname:port/database.collection_name'
  - for sqlite: 'sqlite://path-to-sqlite-file:collection_name' or 'sqlite://memory:collection_name'
 In case when sqlite is in use two variants of collection is possible: in file and in memory.
