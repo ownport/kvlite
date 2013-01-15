@@ -4,14 +4,14 @@ kvlite
 
 kvlite is small open-source library for storing documents in SQL databases. Only three methods are needed to manipulate documents in database: get(), put(), delete(). At the moment supported MySQL and SQLite databases only. A document can be string, list/tuple or dictionary. Default serialization is based on cPickleSerializer methods but of course it is possible to define own serialization to store data in kvlite databases. 
 
- - A document is a string, list/tuple, dictionary or any structure which can be serialized by cPickle or JSON
- - A collection is a group of documents stored in kvlite. It can be thought of as roughly the equivalent of a table in a relational database.
- - URI is uniform resource identifier for databases. The format is:
- ```
- for mysql: 'mysql://username:password@hostname:port/database.collection_name'
- for sqlite: 'sqlite://path-to-sqlite-file:collection_name' or 'sqlite://memory:collection_name'
- ```
- In case when sqlite is in use two variants of collection is possible: in file and in memory.
+A ``document`` is a string, list/tuple, dictionary or any structure which can be serialized by cPickle or JSON
+
+A ``collection`` is a group of documents stored in kvlite. It can be thought of as roughly the equivalent of a table in a relational database.
+
+``URI`` is uniform resource identifier for databases. The format is:
+ - for mysql: 'mysql://username:password@hostname:port/database.collection_name'
+ - for sqlite: 'sqlite://path-to-sqlite-file:collection_name' or 'sqlite://memory:collection_name'
+In case when sqlite is in use two variants of collection is possible: in file and in memory.
 
 Installation
 ============
