@@ -56,9 +56,7 @@ Examples of use
     00dc4937d674754942b516a3a96d81416e {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
     00dc4937d674754942b516a3a96d81417f {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}
     >>>
-    >>> collection.delete('1')
-    >>> collection.delete('2')
-    >>> collection.delete('3')
+    >>> for k in [doc_key1, doc_key2, doc_key3]: collection.delete(k)
     >>> collection.count
     0
     >>> collection.close()
