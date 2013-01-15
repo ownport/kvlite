@@ -4,12 +4,14 @@ kvlite
 
 kvlite is small open-source library for storing documents in SQL databases. Only three methods are needed to manipulate documents in database: get(), put(), delete(). At the moment supported MySQL and SQLite databases only. A document can be string, list/tuple or dictionary. Default serialization is based on cPickleSerializer methods but of course it is possible to define own serialization to store data in kvlite databases. 
 
-A collection is a group of documents stored in kvlite, and it can be thought of as roughly the equivalent of a  table in a relational database.
+Terminology: 
+- A document is a string, list/tuple, dictionary or any structure which can be serialized by cPickle or JSON
+- A collection is a group of documents stored in kvlite. It can be thought of as roughly the equivalent of a table in a relational database.
 
 Installation
 ============
 
-To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it will be needed only if you need to have access to kvlite collections via console. Also kvlite-cli.py can be used as example how to use kvlite library.
+To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it's needed only if you need to have access to kvlite collections via console. Feel free to use kvlite-cli.py as example how to work with kvlite library.
 
 If `pip <http://www.pip-installer.org/>` installed in your system, you can install kvlite via
 
@@ -112,6 +114,12 @@ Serializer can be defined via open function
         `pickle <http://docs.python.org/library/pickle.html>`_ is the default,
         use ``None`` to store messages in plain text (suitable for strings,
         integers, etc)
+
+For using JSON as serialization
+
+    >>> collection = open('sqlite://test.kvlite:test', serializer=json)
+    >>>
+
 
 Another topics
 ==============

@@ -45,7 +45,14 @@ import sqlite3
 import binascii
 import cPickle as pickle
 
-__all__ = ['open', 'remove',]
+__all__ = [
+    'open', 'remove', 'get_uuid', 'dict2flat', 'docs_struct',
+    'BaseCollection', 'BaseCollectionManager',
+    'CollectionManager',
+    'CompressedJsonSerializer', 'cPickleSerializer',
+    'MysqlCollection', 'SqliteCollection',
+    'MysqlCollectionManager', 'SqliteCollectionManager',
+]
 
 try:
     import MySQLdb
@@ -95,18 +102,6 @@ SUPPORTED_VALUE_TYPES = {
     },
 }
 
-'''
-A collection is a group of documents stored in kvlite2, 
-and can be thought of as roughly the equivalent of a 
-table in a relational database.
-
-For using JSON as serialization
-
->>> import json
->>> collection = open('sqlite://test.sqlite:test', serializer=json)
->>>
-
-'''
 # -----------------------------------------------------------------
 # cPickleSerializer class
 # -----------------------------------------------------------------
