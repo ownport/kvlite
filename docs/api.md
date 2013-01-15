@@ -63,8 +63,6 @@ def open(uri, serializer=cPickleSerializer):
     use ``None`` to store messages in plain text (suitable for strings,
     integers, etc)
 ```
-Please note that there's no way to store which serializer was used for collection. The collision is possible when during putting data to collection was used one serializer but during getting data was used another one.
-
 For using JSON as serialization
 ```python
 >>> collection = open('sqlite://test.kvlite:test', serializer=CompressedJsonSerializer)
@@ -72,4 +70,7 @@ For using JSON as serialization
 ```
 
 To create custom serializer you need to create the class or module to serialize msgs with, must have methods or functions named `dumps(v)` and `loads(v)`
+
+Please note that there's no way to store which serializer was used for collection. The collision is possible when during putting data to collection was used one serializer but during getting data was used another one.
+
 
