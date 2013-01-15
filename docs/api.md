@@ -44,10 +44,10 @@ Sometimes it will needed to manage collections: create, check if exists, remove.
 
 ## Serializers
 
-- cPickleSerializer (by default)
+- cPickleSerializer (used by default)
 - CompressedJsonSerializer
 
-Serializer can be defined via open function
+Serializer can be defined for collection via open function. 
 ```python
 def open(uri, serializer=cPickleSerializer):
     ''' 
@@ -63,9 +63,13 @@ def open(uri, serializer=cPickleSerializer):
     use ``None`` to store messages in plain text (suitable for strings,
     integers, etc)
 ```
+Please note that there's no way to store which serializer was used for collection. The collision is possible when during putting data to collection was used one serializer but during getting data was used another one.
 
 For using JSON as serialization
 ```python
 >>> collection = open('sqlite://test.kvlite:test', serializer=json)
 >>>
 ```
+
+To create custom serializer you need to create new class with static methods: `dumps(v)` and `loads(v)`
+
