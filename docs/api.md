@@ -2,7 +2,7 @@
 
 ## Collection Utils
 
-- **open**(uri, serializer=cPickleSerializer)
+- **open(uri, serializer=cPickleSerializer)**
 
 open collection
 
@@ -15,14 +15,35 @@ cPickleSerializer is the default
 
 returns MysqlCollection or SqliteCollection object
     
-- **remove**(uri)
+- **remove(uri)**
 
 remove collection by uri
 
-- **get_uuid**(amount=100)
+- **get_uuid(amount=100)**
 
 return the list of uuids. By `amount` argument you can define how many UUIDs will be generated and returned. By default `get_uuid` returns 100 UUIDs
  
+- **dict2flat(root_name, source, removeEmptyFields=False)**
+
+returns a simplified "flat" form of the complex hierarchical dictionary
+
+Example of complex dictionary:
+```python
+>>> import kvlite
+>>> kvlite.dict2flat('dict',{'a': [1,2,3,4],'b':5,'c':{'d':1,'e':2}})
+{'dict.c.e': 2, 'dict.c.d': 1, 'dict.a': [1, 2, 3, 4], 'dict.b': 5}
+>>>
+```
+
+- **docs_struct(documents)**
+
+returns structure for all documents in the list
+
+As example you can build structure of documents in your kvlite database
+
+```
+>>> docs_struct(collection.get())
+```
 
 ## Collection
 
