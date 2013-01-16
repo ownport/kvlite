@@ -47,10 +47,27 @@ As example you can build structure of documents in your kvlite database
 
 ## Collection
 
-MysqlCollection and SqliteCollection have the same methods:
+Classes MysqlCollection and SqliteCollection inherited from BaseCollection class and have the same methods. No needs to create these classes directly, all access to required collection can be provided via `kvlite.open()` function. 
 
-- get_uuid()   - in case of mysql use, this function will be working faster than for sqlite
-- get(k)       - if k(key) is not defined, the function get() returns the list of all documents in collection. Otherwise key/value pair is returned for defined k(key)
+- **get_uuid()**
+
+return one uuid. 
+        
+By `amount` argument you can define how many UUIDs will be generated and stored in cache if it's empty. By default 100 UUIDs will be generated.
+        
+If mysql connection is available more fast way to use this method than global function - get_uuid()
+
+- **get(self, criteria=None, offset=None, limit=ITEMS_PER_REQUEST)**
+
+returns documents selected from collection by criteria. How to define searching criterias please read <https://github.com/ownport/kvlite/blob/v0.5/docs/search-criterias.md>
+        
+If the criteria is not defined, get() returns all documents.
+
+Hint: the combination `offset` and `limit` paramters can be used for pagination
+        
+`offset` - starts with this position in database
+`limit` - how many document will be returned
+
 - put(k,v)     - put key/value to storage. The key has limitation - only 40 bytes length. The value can be string, list or tuple, dictionary
 - delete(k)    - delete key/value pair
 - keys()       - returns the list of all keys in collection
