@@ -541,15 +541,19 @@ class BaseCollection(object):
 class MysqlCollection(BaseCollection):
     ''' Mysql Connection '''
 
-    def get_uuid(self):
+    def get_uuid(self, amount=100):
         """ 
+        return one uuid. 
+        
+        By `amount` argument you can define how many UUIDs will be generated and 
+        stored in cache if it's empty. By default 100 UUIDs will be generated.
+        
         if mysql connection is available more fast way to use this method 
         than global function - get_uuid()
-        
-        return id based on uuid """
+        """
 
         if not self._uuid_cache:
-            self._cursor.execute('SELECT %s;' % ','.join(['uuid()' for _ in range(100)]))
+            self._cursor.execute('SELECT %s;' % ','.join(['uuid()' for _ in range(int(amount))]))
             for uuid in self._cursor.fetchone():
                 u = uuid.split('-')
                 u.reverse()
