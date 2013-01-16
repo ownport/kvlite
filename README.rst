@@ -13,7 +13,7 @@ The format of ``uri`` (uniform resource identifier) for databases:
  * for mysql: 'mysql://username:password@hostname:port/database.collection_name'
  * for sqlite: 'sqlite://path-to-sqlite-file:collection_name' or 'sqlite://memory:collection_name'
  
-In case when sqlite is in use two variants of collection is possible: in file and in memory.
+In case when sqlite is in use two variants of collection is possible: store data in file or store data in memory.
 
 Installation
 ============
@@ -72,6 +72,7 @@ Examples of use
 Usage
 =====
  - Search criterias <https://github.com/ownport/kvlite/blob/v0.5/docs/search-criterias.md>
+ - Pagination
 
 Developer interface
 ===================
