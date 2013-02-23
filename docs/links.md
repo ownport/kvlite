@@ -20,3 +20,4 @@
  * [Whisper database (source)](http://bazaar.launchpad.net/~graphite-dev/graphite/main/view/head:/whisper/whisper.py)
  * [anandology/datastore](https://github.com/anandology/datastore) Datastore is a simple document database that runs on any relational database. It is built with good ideas from CouchDB, FriendFeed Datastore and Open Library datastore.
  * [eklitzke/schemaless](https://github.com/eklitzke/schemaless) Schemaless is a Python module that implements the pattern described by Bret Taylor in his post How FriendFeed uses MySQL to store schema-less data.
+ * [Kumofs](http://kumofs.sourceforge.net/) is a simple and fast distributed key-value store. You can use a memcached client library to set, get, CAS or delete values from/into kumofs. Backend storage is Tokyo Cabinet and it will give you great performance.
