@@ -3,9 +3,6 @@
 #
 #   Simple key-value datastore
 
-#   - support only mysql database
-#   - console support added
-#
 #   some ideas taked from PyMongo interface http://api.mongodb.org/python/current/index.html
 #   kvlite2 tutorial http://code.google.com/p/kvlite/wiki/kvlite2
 #
