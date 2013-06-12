@@ -69,6 +69,14 @@ Serializer is the class or module to serialize documents with, must have methods
     ```python
     >>> docs_struct(collection.get())
     ```
+- **tmp_name()**
+
+    generate temporary collection name
+    ```python
+    >>> kvlite.tmp_name()
+    'attjhhxv22'
+    >>>
+    ```
 
 ## Collection
 
