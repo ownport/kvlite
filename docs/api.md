@@ -1,5 +1,15 @@
 # Developer interface
 
+## URI
+
+The format of ``URI`` (uniform resource identifier) for databases:
+
+- for mysql: 'mysql://username:password@hostname:port/database.collection_name'
+- for sqlite: 'sqlite://path-to-sqlite-file:collection_name' or 'sqlite://memory:collection_name'
+ 
+In case when sqlite is in use two variants of collection is possible: store data in file or store data in memory.
+
+
 ## Serializers
 
 It used for serialization data in kvlite databases. Default serializer is cPickleSerializer. 
@@ -12,32 +22,32 @@ def open(uri, serializer=cPickleSerializer)
 
 - **class cPickleSerializer(object)**
 
-standard Python module `cPickle` is used for data serialization 
+    standard Python module `cPickle` is used for data serialization 
 
 - **class CompressedJsonSerializer(object)**
 
-JSON format, compressed by zlib module is used for data serialization
-
+    JSON format, compressed by zlib module is used for data serialization
 
 
 ## Collection Utils
 
 - **open(uri, serializer=cPickleSerializer)**
 
-open collection
-
-If collection does not exist, kvlite will try to create it.
+    open collection by URI, 
     
-In case of successful opening or creation new collection return Collection object
+    if collection does not exist kvlite will try to create it
     
-serializer: the class or module to serialize msgs with, must have methods or functions named `dumps` and `loads`, 
-cPickleSerializer is the default
+    in case of successful opening or creation new collection 
+    return Collection object
+    
+    serializer: the class or module to serialize msgs with, must have methods or 
+    functions named ``dumps`` and ``loads``, cPickleSerializer is the default,
 
-returns MysqlCollection or SqliteCollection object
+    returns MysqlCollection or SqliteCollection object    
     
 - **remove(uri)**
 
-remove collection by uri
+    remove collection by URI
 
 - **get_uuid(amount=100)**
 
