@@ -16,7 +16,7 @@ Note! If during installation mysql-python will be raised errors:
 
     sudo apt-get install libmysqlclient-dev
 
-- fatal error: Python.h: No such file or directory <http://www.cyberciti.biz/faq/debian-ubuntu-linux-python-h-file-not-found-error-solution/>. Please check that python-dev is installed
+- `fatal error: Python.h: No such file or directory` <http://www.cyberciti.biz/faq/debian-ubuntu-linux-python-h-file-not-found-error-solution/>. Please check that python-dev is installed
 
     sudo apt-get install python-dev
     
