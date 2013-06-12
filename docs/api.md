@@ -1,5 +1,25 @@
 # Developer interface
 
+## Serializers
+
+It used for serialization data in kvlite databases. Default serializer is cPickleSerializer. 
+Serializer is the class or module to serialize documents with, must have methods or functions named 
+``dumps`` and ``loads``. Select which serializer use in database can be defined via `open` function.
+
+```python
+def open(uri, serializer=cPickleSerializer)
+```
+
+- **class cPickleSerializer(object)**
+
+standard Python module `cPickle` is used for data serialization 
+
+- **class CompressedJsonSerializer(object)**
+
+JSON format, compressed by zlib module is used for data serialization
+
+
+
 ## Collection Utils
 
 - **open(uri, serializer=cPickleSerializer)**
