@@ -14,11 +14,7 @@ In case when sqlite is in use two variants of collection is possible: store data
 
 It used for serialization data in kvlite databases. Default serializer is cPickleSerializer. 
 Serializer is the class or module to serialize documents with, must have methods or functions named 
-``dumps`` and ``loads``. Select which serializer use in database can be defined via `open` function.
-
-```python
-def open(uri, serializer=cPickleSerializer)
-```
+``dumps`` and ``loads``. Select which serializer use in database can be defined via `open(uri, serializer=cPickleSerializer)` function
 
 - **class cPickleSerializer(object)**
 
