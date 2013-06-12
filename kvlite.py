@@ -58,6 +58,7 @@ except ImportError:
 
 # ITEMS_PER_REQUEST is used in Collection._get_many()
 ITEMS_PER_REQUEST = 100
+
 # the length of key 
 _KEY_LENGTH = 40
     
