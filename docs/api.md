@@ -33,13 +33,9 @@ Serializer is the class or module to serialize documents with, must have methods
     
     if collection does not exist kvlite will try to create it
     
-    in case of successful opening or creation new collection 
-    return Collection object
-    
-    serializer: the class or module to serialize msgs with, must have methods or 
-    functions named ``dumps`` and ``loads``, cPickleSerializer is the default,
+    serializer: cPickleSerializer is the default,
 
-    returns MysqlCollection or SqliteCollection object    
+    returns MysqlCollection or SqliteCollection object in case of successful opening or creation new collection 
     
 - **remove(uri)**
 
