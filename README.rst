@@ -15,15 +15,6 @@ The format of ``uri`` (uniform resource identifier) for databases:
  
 In case when sqlite is in use two variants of collection is possible: store data in file or store data in memory.
 
-Installation
-============
-
-To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it's needed only if you need to have access to kvlite collections via console. Feel free to use kvlite-cli.py as example how to work with kvlite library.
-
-If `pip <http://www.pip-installer.org/>` installed in your system, you can install kvlite via
-
-    pip install kvlite
-
 Examples of use
 ===============
 
@@ -68,6 +59,11 @@ Examples of use
     0
     >>> collection.close()
     >>>
+
+Installation
+============
+
+please check installation guideline <https://github.com/ownport/kvlite/blob/v0.5/docs/install.md>
 
 Usage
 =====
