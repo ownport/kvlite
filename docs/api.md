@@ -45,6 +45,11 @@ Please note that there's no way to store which serializer was used for collectio
 - **get_uuid(amount=100)**
 
     return the list of uuids. By `amount` argument you can define how many UUIDs will be generated and returned. By default `get_uuid` returns 100 UUIDs
+    ```python
+    >>> kvlite.get_uuid(3)
+    ['00000000ffb6a6d4995148c9999cda9aca4e5eb1', '000000006b4df4aad6034083a8197e0eec85d37e', '00000000a8f3a84c5b8a44598095f0f1f9de07a1']
+    >>>
+    ``` 
  
 - **dict2flat(root_name, source, removeEmptyFields=False)**
 
@@ -64,8 +69,20 @@ Please note that there's no way to store which serializer was used for collectio
 
     As example you can build structure of documents in your kvlite database
     ```python
-    >>> docs_struct(collection.get())
+    >>> import kvlite
+    >>> c = kvlite.open('sqlite://memory:test')
+    >>> c.put('01', {'a':1, 'b':2, 'c':3})
+    >>> c.put('02', {'a':4, 'b':5, 'c':6, 'd':7})
+    >>> c.put('03', {'a':8, 'b':9,})
+    >>> c.put('04', {'a':'a', 'b':'b',})
+    >>> pprint.pprint(kvlite.docs_struct(c.get()))
+    {'structure': [{'name': 'a', 'types': {'integer_type': 3, 'string_type': 1}},
+                   {'name': 'c', 'types': {'integer_type': 2}},
+                   {'name': 'b', 'types': {'integer_type': 3, 'string_type': 1}},
+                   {'name': 'd', 'types': {'integer_type': 1}}],
+     'total_documents': 4}
     ```
+    
 - **tmp_name()**
 
     generate temporary collection name
