@@ -82,6 +82,8 @@ Please note that there's no way to store which serializer was used for collectio
                    {'name': 'd', 'types': {'integer_type': 1}}],
      'total_documents': 4}
     ```
+    The structure shows the list of fields in documents, its names, types and amount of documents
+    with this field type. 
     
 - **tmp_name()**
 
