@@ -547,8 +547,7 @@ class MysqlCollection(BaseCollection):
         By `amount` argument you can define how many UUIDs will be generated and 
         stored in cache if it's empty. By default 100 UUIDs will be generated.
         
-        if mysql connection is available more fast way to use this method 
-        than global function - get_uuid()
+        For mysql connection, the generation of UUIDs is more fast than kvlite.get_uuid()
         """
 
         if not self._uuid_cache:
