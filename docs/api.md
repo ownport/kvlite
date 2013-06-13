@@ -24,6 +24,7 @@ Serializer is the class or module to serialize documents with, must have methods
 
     JSON format, compressed by zlib module is used for data serialization
 
+Please note that there's no way to store which serializer was used for collection. The collision is possible when during putting data to collection was used one serializer but during getting data was used another one.
 
 ## Collection Utils
 
@@ -115,36 +116,5 @@ Sometimes it will needed to manage collections: create, check if exists, remove.
 - collections()    - returns the list of collections in database
 - remove(name)     - remove collection
 - close()          - close connection to database
-
-## Serializers
-
-- cPickleSerializer (used by default)
-- CompressedJsonSerializer
-
-Serializer can be defined for collection via open function. 
-```python
-def open(uri, serializer=cPickleSerializer):
-    ''' 
-    open collection by URI, 
-    if collection does not exist kvlite will try to create it
-    
-    in case of successful opening or creation new collection 
-    return Collection object
-    
-    serializer: the class or module to serialize msgs with, must have
-    methods or functions named ``dumps`` and ``loads``,
-    `pickle <http://docs.python.org/library/pickle.html>`_ is the default,
-    use ``None`` to store messages in plain text (suitable for strings,
-    integers, etc)
-```
-For using JSON as serialization
-```python
->>> collection = kvlite.open('sqlite://test.kvlite:test', serializer=kvlite.CompressedJsonSerializer)
->>>
-```
-
-To create custom serializer you need to create the class or module to serialize msgs with, must have methods or functions named `dumps(v)` and `loads(v)`
-
-Please note that there's no way to store which serializer was used for collection. The collision is possible when during putting data to collection was used one serializer but during getting data was used another one.
 
 
