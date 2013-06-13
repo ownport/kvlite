@@ -57,7 +57,6 @@ Please note that there's no way to store which serializer was used for collectio
 
     Example of complex dictionary:
     ```python
-    >>> import kvlite
     >>> kvlite.dict2flat('dict',{'a': [1,2,3,4],'b':5,'c':{'d':1,'e':2}})
     {'dict.c.e': 2, 'dict.c.d': 1, 'dict.a': [1, 2, 3, 4], 'dict.b': 5}
     >>>
@@ -118,23 +117,60 @@ Classes MysqlCollection and SqliteCollection inherited from BaseCollection class
     `offset` - starts with this position in database
     `limit` - how many document will be returned
 
-- put(k,v)     - put key/value to storage. The key has limitation - only 40 bytes length. The value can be string, list or tuple, dictionary
-- delete(k)    - delete key/value pair
-- keys()       - returns the list of all keys in collection
-- count()      - returns the amount of documents in collection
-- commit()     - as kvlite based on transactional databases, commit() is used for commitment changes in collection
-- close()      - close connection to database
+- **put(k,v)**
+    
+    put key/value to storage. The key has limitation - only 40 bytes length. The value can be string, list or tuple, dictionary
+    
+- **delete(k)**
+    
+    delete key/value pair
+    
+- **keys()**
+    
+    returns the list of all keys in collection
+    
+- **count()**
+    
+    returns the amount of documents in collection
+    
+- **commit()**
+
+    as kvlite based on transactional databases, commit() is used for commitment changes in collection
+    
+- **close()**
+
+    close connection to database
 
 ## CollectionManager
 
 Sometimes it will needed to manage collections: create, check if exists, remove. For these operations you can use CollectionManager. This class has the next methods:
 
-- parse_uri(uri)   - depends on type of database, the function parse_uri() can returns deferent result based on which backend is used
-- create(name)     - create collection
-- connection       - returns refernce to database collection
-- collection_class - returns class MysqlCollection or SqliteCollection depend on backend parameter in URI
-- collections()    - returns the list of collections in database
-- remove(name)     - remove collection
-- close()          - close connection to database
+- **parse_uri(uri)**
+
+    depends on type of database, the function parse_uri() can returns deferent result based on which backend is used
+    
+- **create(name)**
+
+    create collection
+
+- **connection**
+
+    returns refernce to database collection
+
+- **collection_class**
+
+    returns class MysqlCollection or SqliteCollection depend on backend parameter in URI
+    
+- **collections()**
+
+    returns the list of collections in database
+    
+- **remove(name)**
+    
+    remove collection
+    
+- **close()**
+
+    close connection to database
 
 
