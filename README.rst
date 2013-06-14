@@ -64,27 +64,27 @@ Examples of use
 Installation
 ============
 
-please check installation guideline <https://github.com/ownport/kvlite/blob/v0.5/docs/install.md>
+please check installation guideline <https://github.com/ownport/kvlite/blob/master/docs/install.md>
 
 Usage
 =====
- - Search criterias <https://github.com/ownport/kvlite/blob/v0.5/docs/search-criterias.md>
+ - Search criterias <https://github.com/ownport/kvlite/blob/master/docs/search-criterias.md>
  - Pagination
 
 Developer interface
 ===================
- - Utils <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collection-utils>
- - Collection <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collection>
- - CollectionManager <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#collectionmanager>
- - Serializers <https://github.com/ownport/kvlite/blob/v0.5/docs/api.md#serializers>
- - kvlite diagram <https://raw.github.com/ownport/kvlite/v0.5/docs/kvlite.png>
+ - Utils <https://github.com/ownport/kvlite/blob/master/docs/api.md#collection-utils>
+ - Collection <https://github.com/ownport/kvlite/blob/master/docs/api.md#collection>
+ - CollectionManager <https://github.com/ownport/kvlite/blob/master/docs/api.md#collectionmanager>
+ - Serializers <https://github.com/ownport/kvlite/blob/master/docs/api.md#serializers>
+ - kvlite diagram <https://raw.github.com/ownport/kvlite/master/docs/kvlite.png>
 
 Articles
 ========
- - How FriendFeed uses MySQL to store schema-less data <https://github.com/ownport/kvlite/blob/v0.5/docs/articles/friendfeed-mysql-datastore.md>
+ - How FriendFeed uses MySQL to store schema-less data <https://github.com/ownport/kvlite/blob/master/docs/articles/friendfeed-mysql-datastore.md>
  
 Links
 =====
- - Links <https://github.com/ownport/kvlite/blob/v0.5/docs/links.md> 
+ - Links <https://github.com/ownport/kvlite/blob/master/docs/links.md> 
 
 

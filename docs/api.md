@@ -108,7 +108,7 @@ Classes MysqlCollection and SqliteCollection inherited from BaseCollection class
 
 - **get(self, criteria=None, offset=None, limit=ITEMS_PER_REQUEST)**
 
-    returns documents selected from collection by criteria. How to define searching criterias please read <https://github.com/ownport/kvlite/blob/v0.5/docs/search-criterias.md>
+    returns documents selected from collection by criteria. How to define searching criterias please read <https://github.com/ownport/kvlite/blob/master/docs/search-criterias.md>
             
     If the criteria is not defined, get() returns all documents.
 
