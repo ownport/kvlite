@@ -24,37 +24,38 @@ Examples of use
     <kvlite.SqliteCollection object at 0x14cb350>
     >>> collection.count
     0
-    >>> doc_key1 = '00dc4937d674754942b516a3a96d81415d'
+    >>> key1 = collection.get_uuid()
+    >>> key1
+    '00000000594d699229ac4f46b2deee895e5683dc'    
     >>> document1 = {'id': 1, 'name': 'Example1', 'description': 'First example of usage kvlite database',}
-    >>> collection.put(doc_key1, document1)
+    >>> collection.put(key1, document1)
     >>>
-    >>> doc_key2 = '00dc4937d674754942b516a3a96d81416e'
+    >>> key2 = collection.get_uuid()
     >>> document2 = {'id': 2, 'name': 'Example2', 'description': 'Second example of usage kvlite database',}
-    >>> collection.put(doc_key2, document2)
+    >>> collection.put(key2, document2)
     >>>
-    >>> doc_key3 = '00dc4937d674754942b516a3a96d81417f'
+    >>> key3 = collection.get_uuid()
     >>> document3 = {'id': 3, 'name': 'Example3', 'description': 'Third example of usage kvlite database',}
-    >>> collection.put(doc_key3, document3)
+    >>> collection.put(key3, document3)
     >>>
     >>> collection.count
     3
     >>>
     >>> for k,v in collection.get(): print k,v
     ... 
-    00dc4937d674754942b516a3a96d81415d {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
-    00dc4937d674754942b516a3a96d81416e {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
-    00dc4937d674754942b516a3a96d81417f {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}
+    00000000594d699229ac4f46b2deee895e5683dc {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
+    000000007dfb322f91a64e5eafe91b73d041be1c {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
+    00000000971b2b077bc244bcaf54960299aec500 {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}
     >>>
-    >>> collection.get({'_key': doc_key1})
-    ('00dc4937d674754942b516a3a96d81415d', {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1})
+    >>> collection.get({'_key': key1})
+    ('00000000594d699229ac4f46b2deee895e5683dc', {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1})
     >>>
-    >>> for k,v in collection.get({'_key': [doc_key1, doc_key2, doc_key3]}): print k,v
+    >>> for k,v in collection.get({'_key': [key1, key2, key3]}): print k,v
     ... 
-    00dc4937d674754942b516a3a96d81415d {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
-    00dc4937d674754942b516a3a96d81416e {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
-    00dc4937d674754942b516a3a96d81417f {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}
-    >>>
-    >>> for k in [doc_key1, doc_key2, doc_key3]: collection.delete(k)
+    00000000594d699229ac4f46b2deee895e5683dc {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
+    000000007dfb322f91a64e5eafe91b73d041be1c {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
+    00000000971b2b077bc244bcaf54960299aec500 {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}    >>>
+    >>> for k in [key1, key2, key3]: collection.delete(k)
     >>> collection.count
     0
     >>> collection.close()
