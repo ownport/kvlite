@@ -4,8 +4,8 @@
 #   kvlite console
 #
 #
-__author__ = 'Andrey Usov <http://devel.ownport.net>'
-__version__ = '0.2.1'
+__author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
+__version__ = '0.3'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -31,10 +31,6 @@ POSSIBILITY OF SUCH DAMAGE."""
 import cmd
 import kvlite
 import pprint
-
-# TODO check remove <collection>
-# TODO add autocomplition for command parameters
-# TODO add filter command
 
 # -----------------------------------------------------------------
 # Console class
@@ -73,7 +69,8 @@ class Console(cmd.Cmd):
             names = [
                 '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', '',
                 'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', '',
-                'do_hash', 'do_keys', 'do_items', 'do_get', 'do_put', 'do_delete', 'do_count', ''
+                'do_hash', 'do_items', 'do_get', 'do_put', 'do_delete', 
+                'do_count', 'do_scheme', 'do_index', ''
             ]
             for name in names:
                 if not name:
@@ -127,7 +124,6 @@ class Console(cmd.Cmd):
         '''   export <filename>\t\texport collection configurations to JSON file'''
         import json
         
-        # TODO check if file exists. If yes, import about it
         if not filename:
             print getattr(self, 'do_import').__doc__
             return
@@ -140,7 +136,7 @@ class Console(cmd.Cmd):
     def do_show(self, line):
         '''   show collections <details>\tlist of available collections (defined in settings.py)'''
         if line.startswith('collections'):
-            # TODO add handling 'collections details'
+
             for coll in self.__kvlite_colls:
                 print '   %s' % coll
         else:
@@ -207,6 +203,17 @@ class Console(cmd.Cmd):
             print 'Error! %s' % err
             return
 
+    def do_scheme(self, line):
+        '''   scheme\t\tshow structure of collection'''
+        if not self.__current_coll_name in self.__kvlite_colls:
+            print 'Error! Unknown collection: %s' % self.__current_coll_name
+            return
+        print 'Building ...'
+        doc_struct = kvlite.docs_struct(self.__current_coll.get())
+        if doc_struct:
+            pprint.pprint(doc_struct)
+        print 'Done'
+
     def do_hash(self, line):
         '''   hash [string]\tgenerate sha1 hash, random if string is not defined'''        
         import hashlib
@@ -218,21 +225,13 @@ class Console(cmd.Cmd):
             line = line.rstrip().lstrip()
             print 'sha1 hash:', hashlib.sha1(line).hexdigest()
         
-    def do_keys(self, line):
-        '''   keys\t\t\tlist of keys '''        
-        if not self.__current_coll_name in self.__kvlite_colls:
-            print 'Error! Unknown collection: %s' % self.__current_coll_name
-            return
-        for k,v in self.__current_coll.get():
-            print k
-
     def do_items(self, line):
         '''   items\t\tlist of collection's items '''        
         if not self.__current_coll_name in self.__kvlite_colls:
             print 'Error! Unknown collection: %s' % self.__current_coll_name
             return
         for k,v in self.__current_coll.get():
-            print k
+            print '_key:', k
             pprint.pprint(v)
             print
         
@@ -248,8 +247,8 @@ class Console(cmd.Cmd):
             return
         for key in [k for k in key.split(' ') if k <> '']:
             if self.__current_coll:
-                k, v = self.__current_coll.get(key)
-                print k
+                k, v = self.__current_coll.get({'_key': key})
+                print '_key:', k
                 pprint.pprint(v)
                 print
             else:
@@ -258,7 +257,7 @@ class Console(cmd.Cmd):
     
     def do_put(self, line):
         '''   put <key> <value>\tstore entry to collection'''
-        # TODO check different type of values
+
         try:
             k,v = [i for i in line.split(' ',1) if i <> '']
         except ValueError:
@@ -294,6 +293,12 @@ class Console(cmd.Cmd):
         except RuntimeError, err:
             print 'Error!', err
             return
+
+    def do_index(self, line):
+        '''   index <details>\tmake index for current collection'''
+        print 'Warning! This functionality is not implemented yet'
+        print line
+        print 'Done'
         
 # ----------------------------------
 #   main

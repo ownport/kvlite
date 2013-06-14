@@ -41,17 +41,6 @@ test-all:
 graph:
 	@ dot -T png docs/kvlite.gv -o docs/kvlite.png && eog docs/kvlite.png
 
-todo:
-	@ echo 
-	@ echo "*** TODOs for kvlite.py ***"
-	@ echo 
-	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite.py
-	@ echo 
-	@ echo "*** TODOs for kvlite-cli.py ***"
-	@ echo 
-	@ awk '/# TODO/ { gsub(/^ /, ""); print }' kvlite-cli.py
-	@ echo 
-
 distrib:
 	@ rm -R build/
 	@ rm -R dist/

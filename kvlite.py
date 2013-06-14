@@ -3,21 +3,11 @@
 #
 #   Simple key-value datastore
 
-#   - support only mysql database
-#   - console support added
-#
 #   some ideas taked from PyMongo interface http://api.mongodb.org/python/current/index.html
 #   kvlite2 tutorial http://code.google.com/p/kvlite/wiki/kvlite2
 #
-#   TODO autocommit for put()
-#   TODO synchronise documents between few datastores
-#   TODO add redis support
-#   TODO is it possible to merge hotqueue functionality with kvlite? Will it be useful?
-#   TODO to store binary data
-#
-#
-__author__ = 'Andrey Usov <http://devel.ownport.net>'
-__version__ = '0.4.5'
+__author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
+__version__ = '0.5'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -45,31 +35,71 @@ import sys
 import json
 import zlib
 import uuid
+import types
+import string
+import random
 import sqlite3
 import binascii
 import cPickle as pickle
 
-__all__ = ['open', 'remove',]
+__all__ = [
+    'open', 'remove', 'get_uuid', 'dict2flat', 'docs_struct',
+    'BaseCollection', 'BaseCollectionManager',
+    'CollectionManager',
+    'CompressedJsonSerializer', 'cPickleSerializer',
+    'MysqlCollection', 'SqliteCollection',
+    'MysqlCollectionManager', 'SqliteCollectionManager',
+]
 
 try:
     import MySQLdb
 except ImportError:
     pass
+
+# ITEMS_PER_REQUEST is used in Collection._get_many()
+ITEMS_PER_REQUEST = 100
+
+# the length of key 
+_KEY_LENGTH = 40
     
 SUPPORTED_BACKENDS = ['mysql', 'sqlite', ]
 
-'''
-A collection is a group of documents stored in kvlite2, 
-and can be thought of as roughly the equivalent of a 
-table in a relational database.
+SUPPORTED_VALUE_TYPES = {
+    types.NoneType: {
+        'name': 'none_type',
+    },
+    types.BooleanType: {
+        'name': 'boolean_type',
+    },
+    types.IntType: {
+        'name': 'integer_type',
+    },
+    types.LongType: {
+        'name': 'long_type',
+    },
+    types.FloatType: {
+        'name': 'float_type',
+    },
+    types.ComplexType: {
+        'name': 'complex_type',
+    },
+    types.StringType: {
+        'name': 'string_type',
+    },
+    types.UnicodeType: {
+        'name': 'unicode_type',
+    },
+    types.TupleType: {
+        'name': 'tuple_type',
+    },
+    types.ListType: {
+        'name': 'list_type',
+    },
+    types.DictType: {
+        'name': 'dict_type',
+    },
+}
 
-For using JSON as serialization
-
->>> import json
->>> collection = open('sqlite://test.sqlite:test', serializer=json)
->>>
-
-'''
 # -----------------------------------------------------------------
 # cPickleSerializer class
 # -----------------------------------------------------------------
@@ -95,8 +125,6 @@ class cPickleSerializer(object):
 
 class CompressedJsonSerializer(object):
     ''' CompressedJsonSerializer '''
-
-    # TODO issue: sqlite doesn't support binary values
 
     @staticmethod
     def dumps(v):
@@ -124,19 +152,17 @@ SERIALIZERS = {
 def open(uri, serializer=cPickleSerializer):
     ''' 
     open collection by URI, 
+    
     if collection does not exist kvlite will try to create it
-    
-    in case of successful opening or creation new collection 
-    return Collection object
-    
-    serializer: the class or module to serialize msgs with, must have
-    methods or functions named ``dumps`` and ``loads``,
-    `pickle <http://docs.python.org/library/pickle.html>`_ is the default,
-    use ``None`` to store messages in plain text (suitable for strings,
-    integers, etc)
+        
+    serializer: the class or module to serialize msgs with, must have methods or 
+    functions named ``dumps`` and ``loads``, cPickleSerializer is the default,
+
+    returns MysqlCollection or SqliteCollection object in case of successful 
+    opening or creation new collection    
     '''
-    # TODO save kvlite configuration in database
-    
+    # TODO use `None` for serializer to store messages in plain text, suitable for strings, integers, etc
+
     manager = CollectionManager(uri)
     params = manager.parse_uri(uri)
     if params['collection'] not in manager.collections():
@@ -155,14 +181,106 @@ def remove(uri):
 def get_uuid(amount=100):
     ''' return UUIDs '''
     
-    # TODO check another approach for generation UUIDs, more fast
-    # TODO get uuids from file as approach to speedup UUIDs generation
-    
     uuids = list()
     for _ in xrange(amount):
         u = str(uuid.uuid4()).replace('-', '')
         uuids.append(("%040s" % u).replace(' ','0'))
     return uuids
+
+def dict2flat(root_name, source, removeEmptyFields=False):
+    ''' returns a simplified "flat" form of the complex hierarchical dictionary '''
+    
+    def is_simple_elements(source):
+        ''' check if the source contains simple element types,
+        not lists, tuples, dicts
+        '''
+        for i in source:
+            if isinstance(i, (list, tuple, dict)):
+                return False
+        return True
+    
+    flat_dict = {}
+    if isinstance(source, (list, tuple)):
+        if not is_simple_elements(source):
+            for i,e in enumerate(source):
+                new_root_name = "%s[%d]" % (root_name,i)
+                for k,v in dict2flat(new_root_name,e).items():
+                    flat_dict[k] = v
+        else:
+            flat_dict[root_name] = source
+    elif isinstance(source, dict):
+        for k,v in source.items():
+            if root_name:
+                new_root_name = "%s.%s" % (root_name, k)
+            else:
+                new_root_name = "%s" % k
+            for kk, vv in dict2flat(new_root_name,v).items():
+                flat_dict[kk] = vv
+    else:
+        if source is not None:
+            flat_dict[root_name] = source
+    return flat_dict
+
+def docs_struct(documents):
+    ''' returns structure for all documents in the list '''
+    
+    def seq_struct(items):
+        struct = dict()
+        for item in items:
+            item_type = SUPPORTED_VALUE_TYPES[type(item)]['name']
+            
+            if item_type in struct:
+                struct[item_type] += 1
+            else:
+                struct[item_type] = 1
+        return struct
+    
+    def doc_struct(document):
+        struct = list()
+        for name, value in dict2flat('', document).items():
+            field = dict()
+            field['name'] = name
+            field_type = SUPPORTED_VALUE_TYPES[type(value)]['name']
+            field['types'] = { field_type: 1 }
+            
+            if field_type == 'list_type':
+                field['types'][field_type] = seq_struct(value)
+            if field_type == 'tuple_type':
+                field['types'][field_type] = seq_struct(value)
+            struct.append(field)
+        return struct
+    
+    struct = list()
+    total_documents = 0
+    for k,document in documents:
+        total_documents += 1
+
+        for s in doc_struct(document):
+            names = [f['name'] for f in struct]
+            if s['name'] in names:
+                idx = names.index(s['name'])
+                for t in s['types']:
+                    if t in struct[idx]['types']:
+                        if t == 'list_type':
+                            list_types = set(s['types'][t]) | set(struct[idx]['types'][t])
+                            for n in list_types:
+                                struct[idx]['types'][t][n] = struct[idx]['types'][t].get(n, 0) + s['types'][t].get(n,0)
+                        else:
+                            struct[idx]['types'][t] += s['types'][t]
+                    else:
+                        struct[idx]['types'][t] = s['types'][t]
+            else:
+                struct.append(s)
+    return { 
+        'total_documents': total_documents,
+        'structure': struct,
+    }
+
+def tmp_name(size = 10):
+    ''' generate temporary collection name '''
+    name = ''.join(random.choice(string.ascii_lowercase) for x in range(int(size * .8)))
+    name += ''.join(random.choice(string.digits) for x in range(int(size * .2))) 
+    return name
 
 # -----------------------------------------------------------------
 # CollectionManager class
@@ -383,6 +501,32 @@ class BaseCollection(object):
         self._cursor.execute('SELECT count(*) FROM %s;' % self._collection)
         return int(self._cursor.fetchone()[0])
 
+    def get(self, criteria=None, offset=None, limit=ITEMS_PER_REQUEST):
+        ''' 
+        returns documents selected from collection by criteria.
+        
+        - If the criteria is not defined, get() returns all documents.
+        - Hint: the combination `offset` and `limit` paramters can be 
+        used for pagination
+        
+        offset  - starts with this position in database
+        limit   - how many document will be returned
+        '''
+        if criteria is None:
+            if offset >=0 and limit > 0:
+                return self._get_paged(offset=offset, limit=limit)
+            else:
+                return self._get_all()
+            
+        if not isinstance(criteria, dict):
+            raise RuntimeError('Incorrect criteria format')
+        
+        if '_key' in criteria:
+            if isinstance(criteria['_key'], (str, unicode)):
+                return self._get_one(criteria['_key'])
+            elif isinstance(criteria['_key'], (list, tuple)):
+                return self._get_many(*criteria['_key'])
+
     def commit(self):
         self._conn.commit()
 
@@ -396,15 +540,18 @@ class BaseCollection(object):
 class MysqlCollection(BaseCollection):
     ''' Mysql Connection '''
 
-    def get_uuid(self):
+    def get_uuid(self, amount=100):
         """ 
-        if mysql connection is available more fast way to use this method 
-        than global function - get_uuid()
+        return one uuid. 
         
-        return id based on uuid """
+        By `amount` argument you can define how many UUIDs will be generated and 
+        stored in cache if it's empty. By default 100 UUIDs will be generated.
+        
+        For mysql connection, the generation of UUIDs is more fast than kvlite.get_uuid()
+        """
 
         if not self._uuid_cache:
-            self._cursor.execute('SELECT %s;' % ','.join(['uuid()' for _ in range(100)]))
+            self._cursor.execute('SELECT %s;' % ','.join(['uuid()' for _ in range(int(amount))]))
             for uuid in self._cursor.fetchone():
                 u = uuid.split('-')
                 u.reverse()
@@ -412,13 +559,53 @@ class MysqlCollection(BaseCollection):
                 self._uuid_cache.append(u)
         return self._uuid_cache.pop()
 
-    def _get_many(self):
+    def _get_one(self, _key):
+        ''' return document by _key '''
+        
+        if len(_key) > _KEY_LENGTH:
+            raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
+        SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
+        try:
+            self._cursor.execute(SQL + "%s", binascii.a2b_hex(_key))
+        except Exception, err:
+            raise RuntimeError(err)
+        result = self._cursor.fetchone()
+        if result:
+            try:
+                v = self._serializer.loads(result[1])
+            except Exception, err:
+                raise RuntimeError('key %s, %s' % (_key, err))
+            return (binascii.b2a_hex(result[0]), v)
+        else:
+            return (None, None)
+
+    def _get_many(self, *_keys):
+        ''' return docs by keys '''
+        
+        if _keys:
+            if isinstance(_keys, (list, tuple)):
+                bin_keys = [binascii.a2b_hex(k) for k in _keys]
+                SQL_SELECT_MANY = 'SELECT k,v FROM {} WHERE k IN ({})'
+                SQL_SELECT_MANY = SQL_SELECT_MANY.format(self._collection,','.join(['%s']*len(bin_keys)));
+                self._cursor.execute(SQL_SELECT_MANY, tuple(bin_keys))
+                result = self._cursor.fetchall()
+                if not result:
+                    return
+                for r in result:
+                    k = binascii.b2a_hex(r[0])
+                    try:
+                        v = self._serializer.loads(r[1])
+                    except Exception, err:
+                        raise RuntimeError('key %s, %s' % (k, err))
+                    yield (k, v)
+
+    def _get_all(self):
         ''' return all docs '''
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT __rowid__, k,v FROM %s WHERE __rowid__ > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %=  (self._collection, rowid)
-            self._cursor.execute(SQL_SELECT_MANY)
+            SQL_SELECT_ALL = 'SELECT __rowid__, k,v FROM %s WHERE __rowid__ > %d LIMIT %s;'
+            SQL_SELECT_ALL %=  (self._collection, rowid, ITEMS_PER_REQUEST)
+            self._cursor.execute(SQL_SELECT_ALL)
             result = self._cursor.fetchall()
             if not result:
                 break
@@ -431,34 +618,35 @@ class MysqlCollection(BaseCollection):
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
 
-    def get(self, k=None):
-        ''' 
-        return document by key from collection 
-        return documents if key is not defined
+    def _get_paged(self, offset=None, limit=ITEMS_PER_REQUEST):
+        ''' return docs by offset and limit
+        
+        offset and limit are used for pagination, for details 
+        see BaseCollection.get()
         '''
-        if k:
-            if len(k) > 40:
-                raise RuntimeError('The key length is more than 40 bytes')
-            SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
+        
+        if not offset and not limit:
+            return
+        
+        SQL_SELECT_MANY = 'SELECT k,v FROM %s LIMIT %d, %d ;'
+        SQL_SELECT_MANY %= (self._collection, int(offset), int(limit))
+        self._cursor.execute(SQL_SELECT_MANY)
+        result = self._cursor.fetchall()
+        if not result:
+            return
+        for r in result:
+            k = binascii.b2a_hex(r[0])
             try:
-                self._cursor.execute(SQL + "%s", binascii.a2b_hex(k))
+                v = self._serializer.loads(r[1])
             except Exception, err:
-                raise RuntimeError(err)
-            result = self._cursor.fetchone()
-            if result:
-                v = self._serializer.loads(result[1])
-                return (binascii.b2a_hex(result[0]), v)
-            else:
-                return (None, None)
-        else:
-            return self._get_many()            
+                raise RuntimeError('key %s, %s' % (k, err))
+            yield (k, v)
+
 
     def put(self, k, v):
         ''' put document in collection '''
         
-        # TODO many k/v in put()
-        
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than 40 bytes')
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (%s,%s) ON DUPLICATE KEY UPDATE v=%s;;'
@@ -467,26 +655,11 @@ class MysqlCollection(BaseCollection):
 
     def delete(self, k):
         ''' delete document by k '''
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than 40 bytes')
 
         SQL_DELETE = '''DELETE FROM %s WHERE k = ''' % self._collection
         self._cursor.execute(SQL_DELETE + "%s;", binascii.a2b_hex(k))
-
-    def keys(self):
-        ''' return document keys in collection'''
-        rowid = 0
-        while True:
-            SQL_SELECT_MANY = 'SELECT __rowid__, k FROM %s WHERE __rowid__ > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %= (self._collection, rowid)
-            self._cursor.execute(SQL_SELECT_MANY)
-            result = self._cursor.fetchall()
-            if not result:
-                break
-            for r in result:
-                rowid = r[0]
-                k = binascii.b2a_hex(r[1])
-                yield k
 
 # -----------------------------------------------------------------
 # SqliteCollection class
@@ -505,21 +678,72 @@ class SqliteCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection '''
         
-        # TODO many k/v in put()
-        
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than 40 bytes')
+        if len(k) % 2 == 1:
+            raise RuntimeError('Odd-length string')
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
         v = self._serializer.dumps(v)
         self._cursor.execute(SQL_INSERT, (k, v))
 
-    def _get_many(self):
-        ''' return all docs '''
+    def _get_one(self, _key):
+        ''' return document by _key '''
+        
+        if len(_key) > _KEY_LENGTH:
+            raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
+        if len(_key) % 2 == 1:
+            raise RuntimeError('Odd-length string')
+        SQL = 'SELECT k,v FROM %s WHERE k = ?;' % self._collection
+        try:
+            self._cursor.execute(SQL, (_key,))
+        except Exception, err:
+            raise RuntimeError(err)
+        result = self._cursor.fetchone()
+        if result:
+            try:
+                v = self._serializer.loads(result[1])
+            except Exception, err:
+                raise RuntimeError('key %s, %s' % (_key, err))
+            return (result[0], v)
+        else:
+            return (None, None)
+
+    def _get_many(self, *_keys):
+        ''' return docs by keys or all docs if keys are not defined '''
+        
+        if _keys:
+            if isinstance(_keys, (list, tuple)):
+                # check if keys are even
+                for key in _keys:
+                    if len(key) % 2 == 1:
+                        raise RuntimeError('Odd-length string')
+                SQL_SELECT_MANY = 'SELECT k,v FROM %s WHERE k IN ({seq})';
+                SQL_SELECT_MANY %= (self._collection)
+                SQL_SELECT_MANY = SQL_SELECT_MANY.format(seq=','.join(['?']*len(_keys)))
+                self._cursor.execute(SQL_SELECT_MANY, _keys)
+                result = self._cursor.fetchall()
+                if not result:
+                    return
+                for r in result:
+                    k = r[0]
+                    try:
+                        v = self._serializer.loads(r[1])
+                    except Exception, err:
+                        raise RuntimeError('key %s, %s' % (k, err))
+                    yield (k, v)
+
+    def _get_all(self):
+        ''' return all docs 
+        
+        offset and limit are used for pagination, for details 
+        see BaseCollection.get()
+        '''
+        
         rowid = 0
         while True:
-            SQL_SELECT_MANY = 'SELECT rowid, k,v FROM %s WHERE rowid > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %= (self._collection, rowid)
+            SQL_SELECT_MANY = 'SELECT rowid, k,v FROM %s WHERE rowid > %d LIMIT %d ;'
+            SQL_SELECT_MANY %= (self._collection, rowid, ITEMS_PER_REQUEST)
             self._cursor.execute(SQL_SELECT_MANY)
             result = self._cursor.fetchall()
             if not result:
@@ -533,50 +757,35 @@ class SqliteCollection(BaseCollection):
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
 
-    def get(self, k=None):
-        ''' 
-        return document by key from collection 
-        return documents if key is not defined
+    def _get_paged(self, offset=None, limit=ITEMS_PER_REQUEST):
+        ''' return docs by offset and limit
+        
+        offset and limit are used for pagination, for details 
+        see BaseCollection.get()
         '''
-        if k:
-            if len(k) > 40:
-                raise RuntimeError('The key length is more than 40 bytes')
-            SQL = 'SELECT k,v FROM %s WHERE k = ?;' % self._collection
+        
+        if not offset and not limit:
+            return
+        
+        SQL_SELECT_MANY = 'SELECT k,v FROM %s LIMIT %d, %d ;'
+        SQL_SELECT_MANY %= (self._collection, int(offset), int(limit))
+        self._cursor.execute(SQL_SELECT_MANY)
+        result = self._cursor.fetchall()
+        if not result:
+            return
+        for r in result:
+            k = r[0]
             try:
-                self._cursor.execute(SQL, (k,))
+                v = self._serializer.loads(r[1])
             except Exception, err:
-                raise RuntimeError(err)
-            result = self._cursor.fetchone()
-            if result:
-                try:
-                    v = self._serializer.loads(result[1])
-                except Exception, err:
-                    raise RuntimeError('key %s, %s' % (k, err))
-                return (result[0], v)
-            else:
-                return (None, None)
-        else:
-            return self._get_many()            
-
-    def keys(self):
-        ''' return document keys in collection'''
-        rowid = 0
-        while True:
-            SQL_SELECT_MANY = 'SELECT rowid, k FROM %s WHERE rowid > %d LIMIT 1000 ;'
-            SQL_SELECT_MANY %= (self._collection, rowid)
-            self._cursor.execute(SQL_SELECT_MANY)
-            result = self._cursor.fetchall()
-            if not result:
-                break
-            for r in result:
-                rowid = r[0]
-                yield r[1]
+                raise RuntimeError('key %s, %s' % (k, err))
+            yield (k, v)
 
     def delete(self, k):
         ''' delete document by k '''
-        if len(k) > 40:
+        if len(k) > _KEY_LENGTH:
             raise RuntimeError('The key length is more than 40 bytes')
         SQL_DELETE = '''DELETE FROM %s WHERE k = ?;''' % self._collection
         self._cursor.execute(SQL_DELETE, (k,))
                     
-
+        
