@@ -117,6 +117,20 @@ Classes MysqlCollection and SqliteCollection inherited from BaseCollection class
     `offset` - starts with this position in database
     `limit` - how many document will be returned
 
+    The pagination support when get all docs
+    ```python
+    PAGE_SIZE=100
+    for (k, v) in collection.get(offset=0,limit=PAGE_SIZE):
+        print k, v
+    ```
+    
+    if N is page number
+    ```python
+    PAGE_SIZE=100
+    for (k, v) in collection.get(offset=N*PAGE_SIZE,limit=PAGE_SIZE):
+        print k, v
+    ```
+
 - **put(k,v)**
     
     put key/value to storage. The key has limitation - only 40 bytes length. The value can be string, list or tuple, dictionary
