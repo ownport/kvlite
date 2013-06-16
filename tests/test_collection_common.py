@@ -7,6 +7,10 @@ import unittest
 
 class CommonCollectionTests(unittest.TestCase):
 
+    def setUp(self):
+        
+        self.URI = 'sqlite://tests/db/{}.kvlite:kvlite_test'
+
     def test_get_uuid(self):
         
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
