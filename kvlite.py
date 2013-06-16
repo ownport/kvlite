@@ -419,7 +419,7 @@ class MysqlCollectionManager(BaseCollectionManager):
                                 __rowid__ INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                 k BINARY(20) NOT NULL, 
                                 v MEDIUMBLOB,
-                                UNIQUE KEY (k) ) ENGINE=InnoDB;'''
+                                UNIQUE KEY (k) ) ENGINE=InnoDB DEFAULT CHARSET utf8;'''
                                 
         self._create(SQL_CREATE_TABLE, name)
 
