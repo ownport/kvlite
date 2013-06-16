@@ -1,9 +1,13 @@
 # TODO generate final testing report
 
 test-all:
+	@ rm tests/db/*.kvlite	
+	@ rm tests/db/*.sqlite
 	@ nosetests
 
 test-all-with-coverage:
+	@ rm tests/db/*.kvlite	
+	@ rm tests/db/*.sqlite
 	@ nosetests --with-coverage
 
 test-performance:
