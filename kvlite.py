@@ -385,7 +385,10 @@ class BaseCollectionManager(object):
     def close(self):
         ''' close connection to database 
         '''
-        self._conn.close()
+        try:
+            self._conn.close()
+        except:
+            pass
 
 # -----------------------------------------------------------------
 # MysqlCollectionManager class
@@ -561,7 +564,10 @@ class BaseCollection(object):
     def close(self):
         ''' close connection to database 
         '''
-        self._conn.close()
+        try:
+            self._conn.close()
+        except:
+            pass
     
 # -----------------------------------------------------------------
 # MysqlCollection class
