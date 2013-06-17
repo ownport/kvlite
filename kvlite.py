@@ -647,7 +647,7 @@ class MysqlCollection(BaseCollection):
         ''' put document in collection '''
         
         if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The length of key is more than 40 bytes')
+            raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (%s,%s) ON DUPLICATE KEY UPDATE v=%s;;'
         v = self._serializer.dumps(v)
@@ -656,7 +656,7 @@ class MysqlCollection(BaseCollection):
     def delete(self, k):
         ''' delete document by k '''
         if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The length of key is more than 40 bytes')
+            raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
 
         SQL_DELETE = '''DELETE FROM %s WHERE k = ''' % self._collection
         self._cursor.execute(SQL_DELETE + "%s;", binascii.a2b_hex(k))
@@ -679,7 +679,7 @@ class SqliteCollection(BaseCollection):
         ''' put document in collection '''
         
         if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The length of key is more than 40 bytes')
+            raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
         if len(k) % 2 == 1:
             raise RuntimeError('Odd-length string')
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
@@ -784,7 +784,7 @@ class SqliteCollection(BaseCollection):
     def delete(self, k):
         ''' delete document by k '''
         if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The key length is more than 40 bytes')
+            raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
         SQL_DELETE = '''DELETE FROM %s WHERE k = ?;''' % self._collection
         self._cursor.execute(SQL_DELETE, (k,))
                     
