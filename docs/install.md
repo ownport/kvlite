@@ -23,4 +23,23 @@ Note! If during mysql-python installation will be raised errors:
 - **fatal error: Python.h: No such file or directory** <http://www.cyberciti.biz/faq/debian-ubuntu-linux-python-h-file-not-found-error-solution/>. Please check that python-dev is installed
 
     `sudo apt-get install python-dev`
-    
+
+# MySQL environment
+
+kvlite library support as backend MySQL database. Please check that mysql server is installed and configured. 
+
+For Ubuntu OS you need:
+```
+$ sudo apt-get install mysql-server
+```
+
+for testing `make test-all` and `make test-all-with-coverage` you need create test database
+```sql
+/* create database */
+CREATE DATABASE IF NOT EXISTS kvlite_test;
+/* create user for kvlite_test */
+CREATE USER 'kvlite_test'@'localhost' IDENTIFIED BY 'eixaaghiequ6ZeiBahn0';
+/* add 'kvlite_test' user rights for 'kvlite_test' database */
+GRANT ALL ON kvlite_test.* TO 'kvlite_test'@'localhost';
+```
+
