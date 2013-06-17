@@ -1,11 +1,15 @@
 # TODO generate final testing report
 
 test-all:
+	@ touch tests/db/none.kvlite
+	@ touch tests/db/none.sqlite
 	@ rm tests/db/*.kvlite	
 	@ rm tests/db/*.sqlite
 	@ nosetests
 
 test-all-with-coverage:
+	@ touch tests/db/none.kvlite
+	@ touch tests/db/none.sqlite
 	@ rm tests/db/*.kvlite	
 	@ rm tests/db/*.sqlite
 	@ nosetests --with-coverage
