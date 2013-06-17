@@ -105,18 +105,21 @@ SUPPORTED_VALUE_TYPES = {
 # -----------------------------------------------------------------
 
 class cPickleSerializer(object):
-    ''' cPickleSerializer '''
+    ''' cPickleSerializer 
+    '''
 
     @staticmethod
     def dumps(v):
-        ''' dumps value '''
+        ''' dumps value 
+        '''
         if isinstance(v, unicode):
             v = str(v)
         return pickle.dumps(v)
 
     @staticmethod
     def loads(v):
-        ''' loads value  '''
+        ''' loads value  
+        '''
         return pickle.loads(v)
 
 # -----------------------------------------------------------------
@@ -124,16 +127,19 @@ class cPickleSerializer(object):
 # -----------------------------------------------------------------
 
 class CompressedJsonSerializer(object):
-    ''' CompressedJsonSerializer '''
+    ''' CompressedJsonSerializer 
+    '''
 
     @staticmethod
     def dumps(v):
-        ''' dumps value '''
+        ''' dumps value 
+        '''
         return zlib.compress(json.dumps(v))
 
     @staticmethod
     def loads(v):
-        ''' loads value  '''
+        ''' loads value  
+        '''
         return json.loads(zlib.decompress(v))
 
 # -----------------------------------------------------------------
@@ -150,8 +156,7 @@ SERIALIZERS = {
 # KVLite utils
 # -----------------------------------------------------------------
 def open(uri, serializer=cPickleSerializer):
-    ''' 
-    open collection by URI, 
+    ''' open collection by URI, 
     
     if collection does not exist kvlite will try to create it
         
@@ -170,8 +175,7 @@ def open(uri, serializer=cPickleSerializer):
     return manager.collection_class(manager.connection, params['collection'], serializer)
 
 def remove(uri):
-    '''
-    remove collection by URI
+    ''' remove collection by URI
     ''' 
     manager = CollectionManager(uri)
     params = manager.parse_uri(uri)
@@ -179,7 +183,8 @@ def remove(uri):
         manager.remove(params['collection'])
 
 def get_uuid(amount=100):
-    ''' return UUIDs '''
+    ''' return UUIDs 
+    '''
     
     uuids = list()
     for _ in xrange(amount):
@@ -188,7 +193,8 @@ def get_uuid(amount=100):
     return uuids
 
 def dict2flat(root_name, source, removeEmptyFields=False):
-    ''' returns a simplified "flat" form of the complex hierarchical dictionary '''
+    ''' returns a simplified "flat" form of the complex hierarchical dictionary 
+    '''
     
     def is_simple_elements(source):
         ''' check if the source contains simple element types,
@@ -222,7 +228,8 @@ def dict2flat(root_name, source, removeEmptyFields=False):
     return flat_dict
 
 def docs_struct(documents):
-    ''' returns structure for all documents in the list '''
+    ''' returns structure for all documents in the list 
+    '''
     
     def seq_struct(items):
         struct = dict()
@@ -277,7 +284,8 @@ def docs_struct(documents):
     }
 
 def tmp_name(size = 10):
-    ''' generate temporary collection name '''
+    ''' generate temporary collection name 
+    '''
     name = ''.join(random.choice(string.ascii_lowercase) for x in range(int(size * .8)))
     name += ''.join(random.choice(string.digits) for x in range(int(size * .2))) 
     return name
@@ -286,7 +294,8 @@ def tmp_name(size = 10):
 # CollectionManager class
 # -----------------------------------------------------------------
 class CollectionManager(object):
-    ''' Collection Manager'''
+    ''' Collection Manager
+    '''
     
     def __init__(self, uri):
     
@@ -304,29 +313,35 @@ class CollectionManager(object):
             raise RuntimeError('Unknown backend: {}'.format(backend))
 
     def parse_uri(self, uri):
-        ''' parse_uri '''
+        ''' parse_uri 
+        '''
         return self.backend_manager.parse_uri(uri)
 
     def create(self, name):
-        ''' create collection '''
+        ''' create collection 
+        '''
         self.backend_manager.create(name)
     
     @property
     def collection_class(self):
-        ''' return object MysqlCollection or SqliteCollection '''
+        ''' return object MysqlCollection or SqliteCollection 
+        '''
         return self.backend_manager.collection_class
     
     @property
     def connection(self):
-        ''' return reference to backend connection '''
+        ''' return reference to backend connection 
+        '''
         return self.backend_manager.connection
     
     def collections(self):
-        ''' return list of collections '''
+        ''' return list of collections 
+        '''
         return self.backend_manager.collections()
     
     def remove(self, name):
-        ''' remove collection '''
+        ''' remove collection 
+        '''
         self.backend_manager.remove(name)
 
 # -----------------------------------------------------------------
@@ -335,27 +350,32 @@ class CollectionManager(object):
 class BaseCollectionManager(object):
 
     def __init__(self, connection):
-        ''' init '''
+        ''' init 
+        '''
         self._conn = connection
         self._cursor = self._conn.cursor()
 
     @property
     def connection(self):
-        ''' return connection '''
+        ''' return connection 
+        '''
         return self._conn
     
     def _collections(self, sql):
-        ''' return collection list'''
+        ''' return collection list
+        '''
         self._cursor.execute(sql)
         return [t[0] for t in self._cursor.fetchall()]
 
     def _create(self, sql_create_table, name):
-        ''' create collection by name '''
+        ''' create collection by name 
+        '''
         self._cursor.execute(sql_create_table % name)
         self._conn.commit()
 
     def remove(self, name):
-        ''' remove collection '''
+        ''' remove collection 
+        '''
         if name in self.collections():
             self._cursor.execute('DROP TABLE %s;' % name)
             self._conn.commit()
@@ -363,15 +383,16 @@ class BaseCollectionManager(object):
             raise RuntimeError('No collection with name: {}'.format(name))
 
     def close(self):
-        ''' close connection to database '''
+        ''' close connection to database 
+        '''
         self._conn.close()
 
 # -----------------------------------------------------------------
 # MysqlCollectionManager class
 # -----------------------------------------------------------------
 class MysqlCollectionManager(BaseCollectionManager):
-    ''' MysqlCollectionManager '''
-    
+    ''' MysqlCollectionManager 
+    '''    
     def __init__(self, uri):
         
         params = self.parse_uri(uri) 
@@ -413,8 +434,8 @@ class MysqlCollectionManager(BaseCollectionManager):
         return parsed_uri
         
     def create(self, name):
-        ''' create collection '''
-
+        ''' create collection 
+        '''
         SQL_CREATE_TABLE = '''CREATE TABLE IF NOT EXISTS %s (
                                 __rowid__ INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                 k BINARY(20) NOT NULL, 
@@ -425,18 +446,21 @@ class MysqlCollectionManager(BaseCollectionManager):
 
     @property
     def collection_class(self):
-        ''' return MysqlCollection object'''
+        ''' return MysqlCollection object
+        '''
         return MysqlCollection
     
     def collections(self):
-        ''' return collection list'''
+        ''' return collection list
+        '''
         return self._collections('SHOW TABLES;')
 
 # -----------------------------------------------------------------
 # SqliteCollectionManager class
 # -----------------------------------------------------------------
 class SqliteCollectionManager(BaseCollectionManager):
-    ''' Sqlite Collection Manager '''
+    ''' Sqlite Collection Manager 
+    '''
     def __init__(self, uri):
         
         params = self.parse_uri(uri) 
@@ -448,7 +472,7 @@ class SqliteCollectionManager(BaseCollectionManager):
 
     @staticmethod
     def parse_uri(uri):
-        '''parse URI 
+        ''' parse URI 
         
         return driver, database, collection
         '''
@@ -465,29 +489,31 @@ class SqliteCollectionManager(BaseCollectionManager):
 
     @property
     def collection_class(self):
-        ''' return SqliteCollection object'''
+        ''' return SqliteCollection object
+        '''
         return SqliteCollection
 
     def collections(self):
-        ''' return collection list'''
-
+        ''' return collection list
+        '''
         return self._collections('SELECT name FROM sqlite_master WHERE type="table";')
 
     def create(self, name):
-        ''' create collection '''
-
+        ''' create collection 
+        '''
         SQL_CREATE_TABLE = '''CREATE TABLE IF NOT EXISTS %s (
                                 k NOT NULL, v, UNIQUE (k) );'''
         self._create(SQL_CREATE_TABLE, name)
-
 
 # -----------------------------------------------------------------
 # BaseCollection class
 # -----------------------------------------------------------------
 class BaseCollection(object):
-
+    ''' BaseCollection
+    '''
     def __init__(self, connection, collection_name, serializer=cPickleSerializer):
-
+        ''' __init__
+        '''
         self._conn = connection
         self._cursor = self._conn.cursor()
         self._collection = collection_name
@@ -497,13 +523,13 @@ class BaseCollection(object):
 
     @property
     def count(self):
-        ''' return amount of documents in collection'''
+        ''' return amount of documents in collection
+        '''
         self._cursor.execute('SELECT count(*) FROM %s;' % self._collection)
         return int(self._cursor.fetchone()[0])
 
     def get(self, criteria=None, offset=None, limit=ITEMS_PER_REQUEST):
-        ''' 
-        returns documents selected from collection by criteria.
+        ''' returns documents selected from collection by criteria.
         
         - If the criteria is not defined, get() returns all documents.
         - Hint: the combination `offset` and `limit` paramters can be 
@@ -528,27 +554,30 @@ class BaseCollection(object):
                 return self._get_many(*criteria['_key'])
 
     def commit(self):
+        ''' commit
+        '''
         self._conn.commit()
 
     def close(self):
-        ''' close connection to database '''
+        ''' close connection to database 
+        '''
         self._conn.close()
     
 # -----------------------------------------------------------------
 # MysqlCollection class
 # -----------------------------------------------------------------
 class MysqlCollection(BaseCollection):
-    ''' Mysql Connection '''
-
+    ''' Mysql Connection 
+    '''
     def get_uuid(self, amount=100):
-        """ 
+        ''' 
         return one uuid. 
         
         By `amount` argument you can define how many UUIDs will be generated and 
         stored in cache if it's empty. By default 100 UUIDs will be generated.
         
         For mysql connection, the generation of UUIDs is more fast than kvlite.get_uuid()
-        """
+        '''
 
         if not self._uuid_cache:
             self._cursor.execute('SELECT %s;' % ','.join(['uuid()' for _ in range(int(amount))]))
@@ -560,8 +589,8 @@ class MysqlCollection(BaseCollection):
         return self._uuid_cache.pop()
 
     def _get_one(self, _key):
-        ''' return document by _key '''
-        
+        ''' return document by _key 
+        '''        
         if len(_key) > _KEY_LENGTH:
             raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
         SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
@@ -580,8 +609,8 @@ class MysqlCollection(BaseCollection):
             return (None, None)
 
     def _get_many(self, *_keys):
-        ''' return docs by keys '''
-        
+        ''' return docs by keys 
+        '''        
         if _keys:
             if isinstance(_keys, (list, tuple)):
                 bin_keys = [binascii.a2b_hex(k) for k in _keys]
@@ -600,7 +629,8 @@ class MysqlCollection(BaseCollection):
                     yield (k, v)
 
     def _get_all(self):
-        ''' return all docs '''
+        ''' return all docs 
+        '''
         rowid = 0
         while True:
             SQL_SELECT_ALL = 'SELECT __rowid__, k,v FROM %s WHERE __rowid__ > %d LIMIT %s;'
@@ -644,8 +674,8 @@ class MysqlCollection(BaseCollection):
 
 
     def put(self, k, v):
-        ''' put document in collection '''
-        
+        ''' put document in collection 
+        '''        
         if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
@@ -654,7 +684,8 @@ class MysqlCollection(BaseCollection):
         self._cursor.execute(SQL_INSERT, (binascii.a2b_hex(k), v, v))
 
     def delete(self, k):
-        ''' delete document by k '''
+        ''' delete document by k 
+        '''
         if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
 
@@ -665,19 +696,19 @@ class MysqlCollection(BaseCollection):
 # SqliteCollection class
 # -----------------------------------------------------------------
 class SqliteCollection(BaseCollection):
-    ''' Sqlite Collection'''
-    
+    ''' Sqlite Collection
+    '''    
     def get_uuid(self):
-        """ return id based on uuid """
-
+        ''' return id based on uuid 
+        '''
         if not self._uuid_cache:
             for uuid in get_uuid():
                 self._uuid_cache.append(uuid)
         return self._uuid_cache.pop()
 
     def put(self, k, v):
-        ''' put document in collection '''
-        
+        ''' put document in collection 
+        '''        
         if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
         if len(k) % 2 == 1:
@@ -688,8 +719,8 @@ class SqliteCollection(BaseCollection):
         self._cursor.execute(SQL_INSERT, (k, v))
 
     def _get_one(self, _key):
-        ''' return document by _key '''
-        
+        ''' return document by _key 
+        '''        
         if len(_key) > _KEY_LENGTH:
             raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
         if len(_key) % 2 == 1:
@@ -710,8 +741,8 @@ class SqliteCollection(BaseCollection):
             return (None, None)
 
     def _get_many(self, *_keys):
-        ''' return docs by keys or all docs if keys are not defined '''
-        
+        ''' return docs by keys or all docs if keys are not defined 
+        '''        
         if _keys:
             if isinstance(_keys, (list, tuple)):
                 # check if keys are even
@@ -738,8 +769,7 @@ class SqliteCollection(BaseCollection):
         
         offset and limit are used for pagination, for details 
         see BaseCollection.get()
-        '''
-        
+        '''        
         rowid = 0
         while True:
             SQL_SELECT_MANY = 'SELECT rowid, k,v FROM %s WHERE rowid > %d LIMIT %d ;'
@@ -762,8 +792,7 @@ class SqliteCollection(BaseCollection):
         
         offset and limit are used for pagination, for details 
         see BaseCollection.get()
-        '''
-        
+        '''        
         if not offset and not limit:
             return
         
@@ -782,7 +811,8 @@ class SqliteCollection(BaseCollection):
             yield (k, v)
 
     def delete(self, k):
-        ''' delete document by k '''
+        ''' delete document by k 
+        '''
         if len(k) > _KEY_LENGTH:
             raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
         SQL_DELETE = '''DELETE FROM %s WHERE k = ?;''' % self._collection
