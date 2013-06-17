@@ -24,7 +24,7 @@ Note! If during mysql-python installation will be raised errors:
 
     `sudo apt-get install python-dev`
 
-# MySQL environment
+## MySQL environment
 
 kvlite library support as backend MySQL database. Please check that mysql server is installed and configured. 
 
