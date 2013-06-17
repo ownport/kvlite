@@ -60,7 +60,7 @@ class CommonCollectionTests(unittest.TestCase):
             collection.put(k, v)
             ks.append(k)
         
-        kvs = [kv[0] for kv in collection.get()]
+        kvs = [kv[0] for kv in collection]
         self.assertEqual(len(kvs), 100)
 
         self.assertEqual(collection.count, 100)
@@ -124,7 +124,7 @@ class CommonCollectionTests(unittest.TestCase):
 
         collection = kvlite.open(URI, serializer=kvlite.cPickleSerializer)
         with self.assertRaises(RuntimeError):
-            res = [(k,v) for k,v in collection.get()]
+            res = [(k,v) for k,v in collection]
 
         collection.put(u'11', u'diffser1')
         collection.put(u'22', u'diffser2')
@@ -134,6 +134,6 @@ class CommonCollectionTests(unittest.TestCase):
 
         collection = kvlite.open(URI, serializer=kvlite.CompressedJsonSerializer)        
         with self.assertRaises(RuntimeError):
-            res = [(k,v) for k,v in collection.get()]
+            res = [(k,v) for k,v in collection]
         collection.close()        
 

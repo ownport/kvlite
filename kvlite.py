@@ -653,6 +653,8 @@ class MysqlCollection(BaseCollection):
                 except Exception, err:
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
+                
+    __iter__ = _get_all
 
     def _get_paged(self, offset=None, limit=ITEMS_PER_REQUEST):
         ''' return docs by offset and limit
@@ -792,6 +794,8 @@ class SqliteCollection(BaseCollection):
                 except Exception, err:
                     raise RuntimeError('key %s, %s' % (k, err))
                 yield (k, v)
+
+    __iter__ = _get_all
 
     def _get_paged(self, offset=None, limit=ITEMS_PER_REQUEST):
         ''' return docs by offset and limit
