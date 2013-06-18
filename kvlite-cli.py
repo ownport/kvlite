@@ -5,7 +5,7 @@
 #
 #
 __author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
-__version__ = '0.3'
+__version__ = '0.3.1'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -70,7 +70,7 @@ class Console(cmd.Cmd):
                 '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', '',
                 'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', '',
                 'do_hash', 'do_items', 'do_get', 'do_put', 'do_delete', 
-                'do_count', 'do_scheme', 'do_index', ''
+                'do_count', 'do_scheme', 'do_index', 'do_copy', ''
             ]
             for name in names:
                 if not name:
