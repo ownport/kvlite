@@ -67,10 +67,13 @@ class Console(cmd.Cmd):
                 return
         else:
             names = [
-                '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', '',
-                'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', '',
+                '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', 
+                '',
+                'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', 'do_copy', 
+                '',
                 'do_hash', 'do_items', 'do_get', 'do_put', 'do_delete', 
-                'do_count', 'do_scheme', 'do_index', 'do_copy', ''
+                'do_count', 'do_scheme', 'do_index', 
+                ''
             ]
             for name in names:
                 if not name:
@@ -132,6 +135,30 @@ class Console(cmd.Cmd):
         json_file.write(json.dumps(self.__kvlite_colls))
         json_file.close()
         print 'Export completed to file: %s' % filename
+
+    def do_copy(self, line):
+        '''   copy <source> <target>\tcopy data from source kvlite database to target kvlite database
+                                <source> - reference name to source database
+                                <target> - reference name to target database
+                                for creating reference name, use `create` command
+        '''
+        try:
+            source_ref, target_ref = [param for param in line.split(' ') if param <> ''][:2]
+        except ValueError:
+            print 'Error! Please specify <source> and <target>'
+            return
+        if source_ref not in self.__kvlite_colls:
+            print 'Error! The source reference is not created, please use `create` command'
+            return
+        if target_ref not in self.__kvlite_colls:    
+            print 'Error! The target reference is not created, please use `create` command'
+            return
+
+        source = kvlite.open(self.__kvlite_colls[source_ref])
+        target = kvlite.open(self.__kvlite_colls[target_ref])
+        kvlite.copy(source, target)
+        source.close()
+        target.close()        
 
     def do_show(self, line):
         '''   show collections <details>\tlist of available collections (defined in settings.py)'''
@@ -300,10 +327,6 @@ class Console(cmd.Cmd):
         print line
         print 'Done'
 
-    def do_copy(self, line):
-        ''' copy data from source kvlite database to target kvlite database
-        '''
-        pass
         
         
 # ----------------------------------
