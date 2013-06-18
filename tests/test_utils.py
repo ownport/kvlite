@@ -8,6 +8,10 @@ import unittest
 
 class KvliteUtilsTests(unittest.TestCase):
 
+    def setUp(self):
+        
+        self.URI = 'sqlite://tests/db/{}.kvlite:kvlite_test'
+
     def test_get_uuid(self):
         
         uuids = kvlite.get_uuid(1000)
@@ -145,6 +149,23 @@ class KvliteUtilsTests(unittest.TestCase):
             if json.dumps(s) not in [json.dumps(r) for r in result]:
                 raise RuntimeError('Incorrect document structure')
 
+    def test_copy(self):
+        ''' test_copy
+        '''
+        
+        source_uri = self.URI.format(kvlite.tmp_name())
+        target_uri = self.URI.format(kvlite.tmp_name())
+        
+        source = kvlite.open(source_uri, kvlite.cPickleSerializer)
+        for k in range(10):
+            source.put('%02d' % k, 'value: %d' % k)
+        source.commit()
+        source.close()    
+            
+        kvlite.copy((source_uri, kvlite.cPickleSerializer), (target_uri, kvlite.cPickleSerializer))
+        
+        target = kvlite.open(target_uri, kvlite.cPickleSerializer)
+        self.assertEqual(target.count, 10)
         
 if __name__ == '__main__':
     unittest.main()        

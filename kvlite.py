@@ -182,6 +182,27 @@ def remove(uri):
     if params['collection'] in manager.collections():
         manager.remove(params['collection'])
 
+def copy(source, target):
+    ''' copy data from source to target
+    
+    where
+        source = (uri, serializer)
+        target = (uri, serializer)
+    '''
+    if not isinstance(source, (list, tuple)):
+        raise RuntimeError('The source should be list or tuple of URI and Serializer')
+    if not isinstance(target, (list, tuple)):
+        raise RuntimeError('The source should be list or tuple of URI and Serializer')
+    
+    source_coll = open(*source)
+    target_coll = open(*target)
+    for kv in source_coll:
+        target_coll.put(*kv)
+    target_coll.commit()
+    target_coll.close()
+    
+    source_coll.close()
+
 def get_uuid(amount=100):
     ''' return UUIDs 
     '''
