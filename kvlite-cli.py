@@ -299,6 +299,12 @@ class Console(cmd.Cmd):
         print 'Warning! This functionality is not implemented yet'
         print line
         print 'Done'
+
+    def do_copy(self, line):
+        ''' copy data from source kvlite database to target kvlite database
+        '''
+        pass
+        
         
 # ----------------------------------
 #   main
