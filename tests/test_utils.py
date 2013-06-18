@@ -154,18 +154,21 @@ class KvliteUtilsTests(unittest.TestCase):
         '''
         
         source_uri = self.URI.format(kvlite.tmp_name())
-        target_uri = self.URI.format(kvlite.tmp_name())
-        
         source = kvlite.open(source_uri, kvlite.cPickleSerializer)
+
+        target_uri = self.URI.format(kvlite.tmp_name())        
+        target = kvlite.open(target_uri, kvlite.cPickleSerializer)
+
         for k in range(10):
             source.put('%02d' % k, 'value: %d' % k)
         source.commit()
-        source.close()    
             
-        kvlite.copy((source_uri, kvlite.cPickleSerializer), (target_uri, kvlite.cPickleSerializer))
+        kvlite.copy(source, target)
         
-        target = kvlite.open(target_uri, kvlite.cPickleSerializer)
         self.assertEqual(target.count, 10)
+        
+        source.close()    
+        target.close()
         
 if __name__ == '__main__':
     unittest.main()        

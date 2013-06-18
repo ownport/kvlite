@@ -186,22 +186,17 @@ def copy(source, target):
     ''' copy data from source to target
     
     where
-        source = (uri, serializer)
-        target = (uri, serializer)
+        source = Collection object to source
+        target = Collection object to target
     '''
-    if not isinstance(source, (list, tuple)):
-        raise RuntimeError('The source should be list or tuple of URI and Serializer')
-    if not isinstance(target, (list, tuple)):
-        raise RuntimeError('The source should be list or tuple of URI and Serializer')
+    if not isinstance(source, (MysqlCollection, SqliteCollection)):
+        raise RuntimeError('The source should be MysqlCollection or SqliteCollection object, not %s', type(source))
+    if not isinstance(target, (MysqlCollection, SqliteCollection)):
+        raise RuntimeError('The source should be MysqlCollection or SqliteCollection object, not %s', type(target))
     
-    source_coll = open(*source)
-    target_coll = open(*target)
-    for kv in source_coll:
-        target_coll.put(*kv)
-    target_coll.commit()
-    target_coll.close()
-    
-    source_coll.close()
+    for kv in source:
+        target.put(*kv)
+    target.commit()
 
 def get_uuid(amount=100):
     ''' return UUIDs 
