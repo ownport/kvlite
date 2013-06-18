@@ -140,8 +140,7 @@ class Console(cmd.Cmd):
         '''   copy <source> <target>\tcopy data from source kvlite database to target kvlite database
                                 <source> - reference name to source database
                                 <target> - reference name to target database
-                                for creating reference name, use `create` command
-        '''
+                                for creating reference name, use `create` command'''
         try:
             source_ref, target_ref = [param for param in line.split(' ') if param <> ''][:2]
         except ValueError:
@@ -171,6 +170,10 @@ class Console(cmd.Cmd):
     
     def do_use(self, collection_name):
         '''   use <collection_name>\tuse the collection as the default (current) collection'''
+        if self.__current_coll:
+            self.__current_coll.close()
+            self.__current_coll = None
+            
         if collection_name in self.__kvlite_colls:
             self.prompt = '%s>' % collection_name
             self.__current_coll_name = collection_name
