@@ -194,8 +194,12 @@ def copy(source, target):
     if not isinstance(target, (MysqlCollection, SqliteCollection)):
         raise RuntimeError('The source should be MysqlCollection or SqliteCollection object, not %s', type(target))
     
+    count = 0
     for kv in source:
         target.put(*kv)
+        count += 1
+        if count % ITEMS_PER_REQUEST == 0:
+            target.commit()
     target.commit()
 
 def get_uuid(amount=100):

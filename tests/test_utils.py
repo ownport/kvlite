@@ -153,19 +153,21 @@ class KvliteUtilsTests(unittest.TestCase):
         ''' test_copy
         '''
         
+        COPIED_ITEMS = 250
+        
         source_uri = self.URI.format(kvlite.tmp_name())
         source = kvlite.open(source_uri, kvlite.cPickleSerializer)
 
         target_uri = self.URI.format(kvlite.tmp_name())        
         target = kvlite.open(target_uri, kvlite.cPickleSerializer)
 
-        for k in range(10):
-            source.put('%02d' % k, 'value: %d' % k)
+        for k in range(COPIED_ITEMS):
+            source.put('%04d' % k, 'value: %d' % k)
         source.commit()
             
         kvlite.copy(source, target)
         
-        self.assertEqual(target.count, 10)
+        self.assertEqual(target.count, COPIED_ITEMS)
         
         source.close()    
         target.close()
