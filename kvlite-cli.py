@@ -128,7 +128,7 @@ class Console(cmd.Cmd):
         import json
         
         if not filename:
-            print getattr(self, 'do_import').__doc__
+            print getattr(self, 'do_export').__doc__
             return
         filename = filename.rstrip().lstrip()
         json_file = open(filename, 'w')
@@ -146,6 +146,7 @@ class Console(cmd.Cmd):
         except ValueError:
             print 'Error! Please specify <source> and <target>'
             return
+            
         if source_ref not in self.__kvlite_colls:
             print 'Error! The source reference is not created, please use `create` command'
             return
