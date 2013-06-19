@@ -790,9 +790,6 @@ class SqliteCollection(BaseCollection):
 
     def _get_all(self):
         ''' return all docs 
-        
-        offset and limit are used for pagination, for details 
-        see BaseCollection.get()
         '''        
         rowid = 0
         while True:
