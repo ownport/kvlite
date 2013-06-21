@@ -28,6 +28,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE."""
 
+import os
 import cmd
 import json
 import kvlite
@@ -115,7 +116,7 @@ class Console(cmd.Cmd):
         if not filename:
             print getattr(self, 'do_import').__doc__
             return
-        filename = filename.rstrip().lstrip()
+        filename = filename.strip()
         
         if os.path.isfile(filename):
             for k, v in json.loads(open(filename).read()).items():
@@ -126,13 +127,27 @@ class Console(cmd.Cmd):
 
     def do_export(self, filename):
         '''   export <filename>\t\texport collection configurations to JSON file'''
+
         import json
+        
+        filename = filename.rstrip().lstrip()
         
         if not filename:
             print getattr(self, 'do_export').__doc__
             return
-        filename = filename.rstrip().lstrip()
-        json_file = open(filename, 'w')
+            
+        if os.path.isfile(filename):
+            answer = raw_input('Do you want to replace existing file: %s (y/n)' % filename)
+            answer = answer.strip()
+            answer.lower()
+            if answer not in ['Y', 'y']:
+                print 'Warning! The changes was not saved in %s' % filename
+                return
+        try:
+            json_file = open(filename, 'w')
+        except IOError, err:
+            print err
+            return
         json_file.write(json.dumps(self.__kvlite_colls))
         json_file.close()
         print 'Export completed to file: %s' % filename
