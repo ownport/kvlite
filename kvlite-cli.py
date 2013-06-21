@@ -29,6 +29,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE."""
 
 import cmd
+import json
 import kvlite
 import pprint
 
@@ -287,10 +288,11 @@ class Console(cmd.Cmd):
                 return
     
     def do_put(self, line):
-        '''   put <key> <value>\tstore entry to collection'''
+        '''   put <key> <value>\tstore entry to collection, where <value> is data in JSON format'''
 
         try:
             k,v = [i for i in line.split(' ',1) if i <> '']
+            v = json.loads(v)
         except ValueError:
             print getattr(self, 'do_put').__doc__
             return
