@@ -753,8 +753,9 @@ class SqliteCollection(BaseCollection):
         '''        
         if len(k) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
-        if len(k) % 2 == 1:
-            raise RuntimeError('Odd-length string')
+        if len(k) < _KEY_LENGTH:
+            key_template = '%%%ds' % _KEY_LENGTH
+            k = key_template % k
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
         v = self._serializer.dumps(v)
