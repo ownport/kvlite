@@ -179,9 +179,9 @@ class Console(cmd.Cmd):
     def do_show(self, line):
         '''   show collections <details>\tlist of available collections (defined in settings.py)'''
         if line.startswith('collections'):
-
+            
             for coll in self.__kvlite_colls:
-                print '   %s' % coll
+                print '   %s\t%s' % (coll, self.__kvlite_colls[coll])
         else:
             print 'Unknown argument: %s' % line
     
