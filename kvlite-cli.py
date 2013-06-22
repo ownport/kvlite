@@ -177,7 +177,7 @@ class Console(cmd.Cmd):
         target.close()        
 
     def do_show(self, line):
-        '''   show collections <details>\tlist of available collections (defined in settings.py)'''
+        '''   show collections <details>\tlist of available collections'''
         if line.startswith('collections'):
             
             for coll in self.__kvlite_colls:
