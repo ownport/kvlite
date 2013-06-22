@@ -545,6 +545,20 @@ class BaseCollection(object):
         self._uuid_cache = list()
 
     @property
+    def meta(self):
+        ''' return meta information from '0000000000000000000000000000000000000000' key
+        '''
+        return self.get({'_key': '0000000000000000000000000000000000000000'})[1]
+
+    @meta.setter
+    def meta(self, info):
+        ''' set metadata to '0000000000000000000000000000000000000000' key
+        '''
+        if not isinstance(info, dict):
+            raise RuntimeError('Metadata should be dictionary')
+        self.put('0000000000000000000000000000000000000000', info)
+
+    @property
     def count(self):
         ''' return amount of documents in collection
         '''
