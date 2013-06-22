@@ -318,7 +318,7 @@ class Console(cmd.Cmd):
                 self.__current_coll.commit()
                 print 'Done'
                 return
-            except WronKeyValue, err:
+            except Exception, err:
                 print 'Error! Incorrect key/value,', err
                 return 
         else:
