@@ -80,11 +80,15 @@ class CommonCollectionTests(unittest.TestCase):
     
         collection.close()
 
-    def test_incorrect_key(self):
-        ''' incorrect key, the key length is odd'''
-
+    def test_diff_key_length(self):
+        ''' test for different key length
+        '''
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
-        self.assertRaises(RuntimeError, collection.get, {'_key':'12345'})
+        collection.put(0, 'key-00')
+        self.assertEqual(collection.get({'_key': '0'}), ('0'.zfill(kvlite._KEY_LENGTH), 'key-00'))
+        self.assertEqual(collection.get({'_key': '00'}), ('0'.zfill(kvlite._KEY_LENGTH), 'key-00'))
+        self.assertEqual(collection.get({'_key': '000'}), ('0'.zfill(kvlite._KEY_LENGTH), 'key-00'))
+        
         collection.close()
 
     def test_absent_key(self):

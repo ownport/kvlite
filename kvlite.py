@@ -310,6 +310,18 @@ def tmp_name(size = 10):
     name += ''.join(random.choice(string.digits) for x in range(int(size * .2))) 
     return name
 
+def _prepare_key(key):
+    ''' prepare key
+    
+    - convert key to string
+    - zero fill key
+    '''
+    if isinstance(key, int):
+        key = str(key)
+    if len(key) > _KEY_LENGTH:
+        raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
+    return key.zfill(_KEY_LENGTH)
+    
 # -----------------------------------------------------------------
 # CollectionManager class
 # -----------------------------------------------------------------
@@ -543,20 +555,21 @@ class BaseCollection(object):
         self._serializer = serializer
 
         self._uuid_cache = list()
+        self._ZEROS_KEY = _prepare_key(0)
 
     @property
     def meta(self):
-        ''' return meta information from '0000000000000000000000000000000000000000' key
+        ''' return meta information from zero's key
         '''
-        return self.get({'_key': '0000000000000000000000000000000000000000'})[1]
+        return self.get({'_key': self._ZEROS_KEY})[1]
 
     @meta.setter
     def meta(self, info):
-        ''' set metadata to '0000000000000000000000000000000000000000' key
+        ''' set metadata to zero'skey
         '''
         if not isinstance(info, dict):
             raise RuntimeError('Metadata should be dictionary')
-        self.put('0000000000000000000000000000000000000000', info)
+        self.put(self._ZEROS_KEY, info)
 
     @property
     def count(self):
@@ -586,8 +599,9 @@ class BaseCollection(object):
         
         if '_key' in criteria:
             if isinstance(criteria['_key'], (str, unicode)):
-                return self._get_one(criteria['_key'])
+                return self._get_one(_prepare_key(criteria['_key']))
             elif isinstance(criteria['_key'], (list, tuple)):
+                criteria['_key'] = map(_prepare_key, criteria['_key'])
                 return self._get_many(*criteria['_key'])
 
     def commit(self):
@@ -718,8 +732,7 @@ class MysqlCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection 
         '''        
-        if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
+        k = _prepare_key(k)
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (%s,%s) ON DUPLICATE KEY UPDATE v=%s;;'
         v = self._serializer.dumps(v)
@@ -751,11 +764,7 @@ class SqliteCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection 
         '''        
-        if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
-        if len(k) < _KEY_LENGTH:
-            key_template = '%%%ds' % _KEY_LENGTH
-            k = key_template % k
+        k = _prepare_key(k)
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
         v = self._serializer.dumps(v)
