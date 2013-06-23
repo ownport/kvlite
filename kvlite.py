@@ -741,11 +741,9 @@ class MysqlCollection(BaseCollection):
     def delete(self, k):
         ''' delete document by k 
         '''
-        if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
-
+        _key = self.prepare_key(k)
         SQL_DELETE = '''DELETE FROM %s WHERE k = ''' % self._collection
-        self._cursor.execute(SQL_DELETE + "%s;", binascii.a2b_hex(k))
+        self._cursor.execute(SQL_DELETE + "%s;", binascii.a2b_hex(_key))
 
 # -----------------------------------------------------------------
 # SqliteCollection class
@@ -861,9 +859,8 @@ class SqliteCollection(BaseCollection):
     def delete(self, k):
         ''' delete document by k 
         '''
-        if len(k) > _KEY_LENGTH:
-            raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
+        _key = self.prepare_key(k)
         SQL_DELETE = '''DELETE FROM %s WHERE k = ?;''' % self._collection
-        self._cursor.execute(SQL_DELETE, (k,))
+        self._cursor.execute(SQL_DELETE, (_key,))
                     
         
