@@ -309,18 +309,6 @@ def tmp_name(size = 10):
     name = ''.join(random.choice(string.ascii_lowercase) for x in range(int(size * .8)))
     name += ''.join(random.choice(string.digits) for x in range(int(size * .2))) 
     return name
-
-def _prepare_key(key):
-    ''' prepare key
-    
-    - convert key to string
-    - zero fill key
-    '''
-    if isinstance(key, int):
-        key = str(key)
-    if len(key) > _KEY_LENGTH:
-        raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
-    return key.zfill(_KEY_LENGTH)
     
 # -----------------------------------------------------------------
 # CollectionManager class
@@ -555,7 +543,20 @@ class BaseCollection(object):
         self._serializer = serializer
 
         self._uuid_cache = list()
-        self._ZEROS_KEY = _prepare_key(0)
+        self._ZEROS_KEY = self.prepare_key(0)
+
+    @staticmethod
+    def prepare_key(key):
+        ''' prepare key
+        
+        - convert key to string if it's integer
+        - zero fill key
+        '''
+        if isinstance(key, int):
+            key = str(key)
+        if len(key) > _KEY_LENGTH:
+            raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
+        return key.zfill(_KEY_LENGTH)
 
     @property
     def meta(self):
@@ -599,9 +600,9 @@ class BaseCollection(object):
         
         if '_key' in criteria:
             if isinstance(criteria['_key'], (str, unicode)):
-                return self._get_one(_prepare_key(criteria['_key']))
+                return self._get_one(self.prepare_key(criteria['_key']))
             elif isinstance(criteria['_key'], (list, tuple)):
-                criteria['_key'] = map(_prepare_key, criteria['_key'])
+                criteria['_key'] = map(self.prepare_key, criteria['_key'])
                 return self._get_many(*criteria['_key'])
 
     def commit(self):
@@ -645,7 +646,7 @@ class MysqlCollection(BaseCollection):
     def _get_one(self, _key):
         ''' return document by _key 
         '''        
-        _key = _prepare_key(_key)
+        _key = self.prepare_key(_key)
         SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
         try:
             self._cursor.execute(SQL + "%s", binascii.a2b_hex(_key))
@@ -731,7 +732,7 @@ class MysqlCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection 
         '''        
-        k = _prepare_key(k)
+        k = self.prepare_key(k)
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (%s,%s) ON DUPLICATE KEY UPDATE v=%s;;'
         v = self._serializer.dumps(v)
@@ -763,7 +764,7 @@ class SqliteCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection 
         '''        
-        k = _prepare_key(k)
+        k = self.prepare_key(k)
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
         v = self._serializer.dumps(v)
@@ -772,7 +773,7 @@ class SqliteCollection(BaseCollection):
     def _get_one(self, _key):
         ''' return document by _key 
         '''        
-        _key = _prepare_key(_key)
+        _key = self.prepare_key(_key)
         SQL = 'SELECT k,v FROM %s WHERE k = ?;' % self._collection
         try:
             self._cursor.execute(SQL, (_key,))
