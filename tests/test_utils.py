@@ -157,12 +157,12 @@ class KvliteUtilsTests(unittest.TestCase):
         COPIED_ITEMS = 250
         
         source_uri = self.URI.format(kvlite.tmp_name())
-        source = kvlite.open(source_uri, kvlite.cPickleSerializer)
+        source = kvlite.open(source_uri, serializer_name='pickle')
 
         target_uri = self.URI.format(kvlite.tmp_name())        
-        target = kvlite.open(target_uri, kvlite.cPickleSerializer)
+        target = kvlite.open(target_uri, serializer_name='pickle')
 
-        for k in range(COPIED_ITEMS):
+        for k in range(1,COPIED_ITEMS+1):
             source.put('%04d' % k, 'value: %d' % k)
         source.commit()
             

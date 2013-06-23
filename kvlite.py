@@ -145,7 +145,9 @@ class CompressedJsonSerializer(object):
 # -----------------------------------------------------------------
 # SERIALIZERS 
 # -----------------------------------------------------------------
-
+''' the name of class or module to serialize msgs with, must have methods or 
+functions named ``dumps`` and ``loads``, cPickleSerializer is the default
+'''
 SERIALIZERS = {
     'pickle': cPickleSerializer,
     'completed_json': CompressedJsonSerializer,
@@ -155,13 +157,12 @@ SERIALIZERS = {
 # -----------------------------------------------------------------
 # KVLite utils
 # -----------------------------------------------------------------
-def open(uri, serializer=cPickleSerializer):
+def open(uri, serializer_name='pickle'):
     ''' open collection by URI, 
     
     if collection does not exist kvlite will try to create it
         
-    serializer: the class or module to serialize msgs with, must have methods or 
-    functions named ``dumps`` and ``loads``, cPickleSerializer is the default,
+    serializer_name: see details in SERIALIZERS section
 
     returns MysqlCollection or SqliteCollection object in case of successful 
     opening or creation new collection    
@@ -172,7 +173,17 @@ def open(uri, serializer=cPickleSerializer):
     params = manager.parse_uri(uri)
     if params['collection'] not in manager.collections():
         manager.create(params['collection'])
-    return manager.collection_class(manager.connection, params['collection'], serializer)
+        
+    collection = manager.collection_class(manager.connection, 
+                                        params['collection'], 
+                                        SERIALIZERS[serializer_name])
+    if collection.meta is None:
+        collection.meta = {
+            'name': params['collection'],
+            'serializer': serializer_name,
+            'kvlite-version': __version__,
+        } 
+    return collection
 
 def remove(uri):
     ''' remove collection by URI
@@ -552,11 +563,12 @@ class BaseCollection(object):
         - convert key to string if it's integer
         - zero fill key
         '''
-        if isinstance(key, int):
-            key = str(key)
-        if len(key) > _KEY_LENGTH:
+        _key = key
+        if isinstance(_key, int):
+            _key = str(key)
+        if len(_key) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
-        return key.zfill(_KEY_LENGTH)
+        return _key.zfill(_KEY_LENGTH)
 
     @property
     def meta(self):
@@ -576,7 +588,8 @@ class BaseCollection(object):
     def count(self):
         ''' return amount of documents in collection
         '''
-        self._cursor.execute('SELECT count(*) FROM %s;' % self._collection)
+        SQL = 'SELECT count(*) FROM %s' % self._collection
+        self._cursor.execute(SQL + ' WHERE k <> ?;', (self._ZEROS_KEY,))
         return int(self._cursor.fetchone()[0])
 
     def get(self, criteria=None, offset=None, limit=ITEMS_PER_REQUEST):
@@ -667,7 +680,7 @@ class MysqlCollection(BaseCollection):
         '''        
         if _keys:
             if isinstance(_keys, (list, tuple)):
-                bin_keys = [binascii.a2b_hex(k) for k in _keys]
+                bin_keys = [binascii.a2b_hex(k) for k in _keys if k <> self._ZEROS_KEY]
                 SQL_SELECT_MANY = 'SELECT k,v FROM {} WHERE k IN ({})'
                 SQL_SELECT_MANY = SQL_SELECT_MANY.format(self._collection,','.join(['%s']*len(bin_keys)));
                 self._cursor.execute(SQL_SELECT_MANY, tuple(bin_keys))
@@ -696,6 +709,8 @@ class MysqlCollection(BaseCollection):
             for r in result:
                 rowid = r[0]
                 k = binascii.b2a_hex(r[1])
+                if k == self._ZEROS_KEY:
+                    continue
                 try:
                     v = self._serializer.loads(r[2])
                 except Exception, err:
@@ -714,14 +729,16 @@ class MysqlCollection(BaseCollection):
         if not offset and not limit:
             return
         
-        SQL_SELECT_MANY = 'SELECT k,v FROM %s LIMIT %d, %d ;'
+        SQL_SELECT_MANY = 'SELECT k,v FROM %s WHERE k <> ? LIMIT %d, %d ;'
         SQL_SELECT_MANY %= (self._collection, int(offset), int(limit))
-        self._cursor.execute(SQL_SELECT_MANY)
+        self._cursor.execute(SQL_SELECT_MANY, (self._ZEROS_KEY, ))
         result = self._cursor.fetchall()
         if not result:
             return
         for r in result:
             k = binascii.b2a_hex(r[0])
+            if k == self._ZEROS_KEY:
+                continue
             try:
                 v = self._serializer.loads(r[1])
             except Exception, err:
@@ -735,13 +752,18 @@ class MysqlCollection(BaseCollection):
         k = self.prepare_key(k)
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (%s,%s) ON DUPLICATE KEY UPDATE v=%s;;'
-        v = self._serializer.dumps(v)
+        if k == self._ZEROS_KEY:
+            v = cPickleSerializer.dumps(v)
+        else:
+            v = self._serializer.dumps(v)
         self._cursor.execute(SQL_INSERT, (binascii.a2b_hex(k), v, v))
 
     def delete(self, k):
         ''' delete document by k 
         '''
         _key = self.prepare_key(k)
+        if _key == self._ZEROS_KEY:
+            raise RuntimeError('Metadata cannot be deleted')
         SQL_DELETE = '''DELETE FROM %s WHERE k = ''' % self._collection
         self._cursor.execute(SQL_DELETE + "%s;", binascii.a2b_hex(_key))
 
@@ -765,7 +787,10 @@ class SqliteCollection(BaseCollection):
         k = self.prepare_key(k)
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
-        v = self._serializer.dumps(v)
+        if k == self._ZEROS_KEY:
+            v = cPickleSerializer.dumps(v)
+        else:
+            v = self._serializer.dumps(v)
         self._cursor.execute(SQL_INSERT, (k, v))
 
     def _get_one(self, _key):
@@ -780,7 +805,10 @@ class SqliteCollection(BaseCollection):
         result = self._cursor.fetchone()
         if result:
             try:
-                v = self._serializer.loads(result[1])
+                if _key == self._ZEROS_KEY:
+                    v = cPickleSerializer.loads(result[1])
+                else:
+                    v = self._serializer.loads(result[1])
             except Exception, err:
                 raise RuntimeError('key %s, %s' % (_key, err))
             return (result[0], v)
@@ -794,8 +822,9 @@ class SqliteCollection(BaseCollection):
             if isinstance(_keys, (list, tuple)):
                 # check if keys are even
                 for key in _keys:
-                    if len(key) % 2 == 1:
-                        raise RuntimeError('Odd-length string')
+                    if key == self._ZEROS_KEY:
+                        continue
+                    key = self.prepare_key(key)
                 SQL_SELECT_MANY = 'SELECT k,v FROM %s WHERE k IN ({seq})';
                 SQL_SELECT_MANY %= (self._collection)
                 SQL_SELECT_MANY = SQL_SELECT_MANY.format(seq=','.join(['?']*len(_keys)))
@@ -805,6 +834,8 @@ class SqliteCollection(BaseCollection):
                     return
                 for r in result:
                     k = r[0]
+                    if k == self._ZEROS_KEY:
+                        continue
                     try:
                         v = self._serializer.loads(r[1])
                     except Exception, err:
@@ -825,6 +856,8 @@ class SqliteCollection(BaseCollection):
             for r in result:
                 rowid = r[0]
                 k = r[1]
+                if k == self._ZEROS_KEY:
+                    continue
                 try:
                     v = self._serializer.loads(r[2])
                 except Exception, err:
@@ -842,14 +875,16 @@ class SqliteCollection(BaseCollection):
         if not offset and not limit:
             return
         
-        SQL_SELECT_MANY = 'SELECT k,v FROM %s LIMIT %d, %d ;'
+        SQL_SELECT_MANY = 'SELECT k,v FROM %s WHERE k <> ? LIMIT %d, %d ;'
         SQL_SELECT_MANY %= (self._collection, int(offset), int(limit))
-        self._cursor.execute(SQL_SELECT_MANY)
+        self._cursor.execute(SQL_SELECT_MANY, (self._ZEROS_KEY, ))
         result = self._cursor.fetchall()
         if not result:
             return
         for r in result:
             k = r[0]
+            if k == self._ZEROS_KEY:
+                continue
             try:
                 v = self._serializer.loads(r[1])
             except Exception, err:
@@ -860,6 +895,8 @@ class SqliteCollection(BaseCollection):
         ''' delete document by k 
         '''
         _key = self.prepare_key(k)
+        if _key == self._ZEROS_KEY:
+            raise RuntimeError('Metadata cannot be deleted')
         SQL_DELETE = '''DELETE FROM %s WHERE k = ?;''' % self._collection
         self._cursor.execute(SQL_DELETE, (_key,))
                     

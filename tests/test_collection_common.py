@@ -60,9 +60,6 @@ class CommonCollectionTests(unittest.TestCase):
             collection.put(k, v)
             ks.append(k)
         
-        kvs = [kv[0] for kv in collection]
-        self.assertEqual(len(kvs), 100)
-
         self.assertEqual(collection.count, 100)
         for k in ks:
             collection.delete(k)
@@ -119,14 +116,14 @@ class CommonCollectionTests(unittest.TestCase):
     def test_use_different_serializators_for_many(self):
 
         URI = self.URI.format(kvlite.tmp_name())
-        collection = kvlite.open(URI, serializer=kvlite.CompressedJsonSerializer)
+        collection = kvlite.open(URI, serializer_name='completed_json')
         collection.put(u'11', u'diffser1')
         collection.put(u'22', u'diffser2')
         collection.put(u'33', u'diffser3')
         collection.commit()
         collection.close()
 
-        collection = kvlite.open(URI, serializer=kvlite.cPickleSerializer)
+        collection = kvlite.open(URI, serializer_name='pickle')
         with self.assertRaises(RuntimeError):
             res = [(k,v) for k,v in collection]
 
@@ -136,8 +133,24 @@ class CommonCollectionTests(unittest.TestCase):
         collection.commit()
         collection.close()
 
-        collection = kvlite.open(URI, serializer=kvlite.CompressedJsonSerializer)        
+        collection = kvlite.open(URI, serializer_name='completed_json')        
         with self.assertRaises(RuntimeError):
             res = [(k,v) for k,v in collection]
         collection.close()        
 
+    def test_metadata(self):
+        ''' test metadata
+        '''
+        URI = self.URI.format(kvlite.tmp_name())
+        collection = kvlite.open(URI, serializer_name='pickle')
+        self.assertEqual(
+            collection.meta, 
+            {
+                'name': 'kvlite_test',
+                'kvlite-version': kvlite.__version__,
+                'serializer': 'pickle',
+            })
+        collection.close()
+        
+        
+        
