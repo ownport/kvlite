@@ -645,8 +645,7 @@ class MysqlCollection(BaseCollection):
     def _get_one(self, _key):
         ''' return document by _key 
         '''        
-        if len(_key) > _KEY_LENGTH:
-            raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
+        _key = _prepare_key(_key)
         SQL = 'SELECT k,v FROM %s WHERE k = ' % self._collection
         try:
             self._cursor.execute(SQL + "%s", binascii.a2b_hex(_key))
@@ -773,10 +772,7 @@ class SqliteCollection(BaseCollection):
     def _get_one(self, _key):
         ''' return document by _key 
         '''        
-        if len(_key) > _KEY_LENGTH:
-            raise RuntimeError('The key length is more than %d bytes' % (_KEY_LENGTH))
-        if len(_key) % 2 == 1:
-            raise RuntimeError('Odd-length string')
+        _key = _prepare_key(_key)
         SQL = 'SELECT k,v FROM %s WHERE k = ?;' % self._collection
         try:
             self._cursor.execute(SQL, (_key,))
