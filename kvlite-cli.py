@@ -181,7 +181,13 @@ class Console(cmd.Cmd):
         if line.startswith('collections'):
             
             for coll in self.__kvlite_colls:
-                print '   %s\t%s' % (coll, self.__kvlite_colls[coll])
+                print 'Database: %s' %  coll
+                print 'URI: %s' % self.__kvlite_colls[coll]
+                coll = kvlite.open(self.__kvlite_colls[coll])
+                for k,v in coll.meta.items():
+                    print '%s: %s' % (k,v)
+                coll.close()
+                print
         else:
             print 'Unknown argument: %s' % line
     
