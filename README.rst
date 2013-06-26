@@ -69,9 +69,8 @@ please check installation guideline <https://github.com/ownport/kvlite/blob/mast
 
 Usage
 =====
- - Migration data <https://github.com/ownport/kvlite/blob/v0.5.1/docs/search-criterias.md>
+ - Examples <https://github.com/ownport/kvlite/blob/v0.5.1/docs/examples.md> 
  - Search criterias <https://github.com/ownport/kvlite/blob/master/docs/search-criterias.md>
- - Pagination
 
 Developer interface
 ===================
