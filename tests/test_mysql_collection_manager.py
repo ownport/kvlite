@@ -4,7 +4,7 @@ if '' not in sys.path:
 
 import unittest
 
-from kvlite import MysqlCollectionManager
+from kvlite.managers import MysqlCollectionManager
 
 class KvliteMysqlCollectionManagerTests(unittest.TestCase):
 

@@ -5,7 +5,7 @@ if '' not in sys.path:
 
 import unittest
 
-from kvlite import SqliteCollectionManager
+from kvlite.managers import SqliteCollectionManager
 
 class KvliteSqliteCollectionManagerTests(unittest.TestCase):
 
