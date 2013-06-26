@@ -566,14 +566,24 @@ class BaseCollection(object):
             raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
         return _key.zfill(_KEY_LENGTH)
     
-    def prepare_kv(self, k, v):
+    def prepare_kv(self, k, v, backend='sqlite'):
+        ''' prepare key/value pair before insert to database
+        
+        backend can be 'mysql' or 'sqlite'
+        '''
         
         k = self.prepare_key(k)
         if k == self._ZEROS_KEY:
             v = cPickleSerializer.dumps(v)
         else:
             v = self._serializer.dumps(v)
-        return (k,v) 
+        
+        if backend == 'sqlite':
+            return (k,v) 
+        elif backend == 'mysql':
+            return (binascii.a2b_hex(k), v, v)
+        else:
+            raise RuntimeError('Uknown backend: %s' % backend)
                 
     @property
     def meta(self):
@@ -754,14 +764,31 @@ class MysqlCollection(BaseCollection):
     def put(self, k, v):
         ''' put document in collection 
         '''        
+        kv_insert = list()
+        if not isinstance(kv, (list,tuple)):
+            raise RuntimeError('key/value should be packed in the list or tuple')
+        
+        # put([(k1,v1), (k2,v2)])
+        if len(kv) == 1 \
+            and isinstance(kv[0], (list, tuple)):
+            
+            kv_insert = [self.prepare_kv(*kvs, backend='mysql') for kvs in kv[0]]
+
+        # put(k,v)
+        elif len(kv) == 2 \
+            and not isinstance(kv[0], (list, tuple)) \
+            and not isinstance(kv[1], (list, tuple)):
+            
+            kv_insert.append(self.prepare_kv(*kv, backend='mysql'))
+
+        else:
+            raise RuntimeError('Incorrect format of key/values, %s' % kv)
+
         k = self.prepare_key(k)
         SQL_INSERT = 'INSERT INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (%s,%s) ON DUPLICATE KEY UPDATE v=%s;;'
-        if k == self._ZEROS_KEY:
-            v = cPickleSerializer.dumps(v)
-        else:
-            v = self._serializer.dumps(v)
-        self._cursor.execute(SQL_INSERT, (binascii.a2b_hex(k), v, v))
+
+        self._cursor.execute(SQL_INSERT, kv_insert)
 
     def delete(self, k):
         ''' delete document by k 
@@ -797,26 +824,22 @@ class SqliteCollection(BaseCollection):
         if not isinstance(kv, (list,tuple)):
             raise RuntimeError('key/value should be packed in the list or tuple')
         
-        print 'type: %s, len(kv): %d, kv: %s' % (type(kv), len(kv), kv)
-
         # put([(k1,v1), (k2,v2)])
         if len(kv) == 1 \
             and isinstance(kv[0], (list, tuple)):
             
-            kv_insert = [self.prepare_kv(*kvs) for kvs in kv[0]]
+            kv_insert = [self.prepare_kv(*kvs, backend='sqlite') for kvs in kv[0]]
 
         # put(k,v)
         elif len(kv) == 2 \
             and not isinstance(kv[0], (list, tuple)) \
             and not isinstance(kv[1], (list, tuple)):
             
-            kv_insert.append(self.prepare_kv(*kv))
+            kv_insert.append(self.prepare_kv(*kv, backend='sqlite'))
 
         else:
             raise RuntimeError('Incorrect format of key/values, %s' % kv)
 
-        print 'kv_insert: %s' % kv_insert
-                  
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
         self._cursor.executemany(SQL_INSERT, kv_insert)
