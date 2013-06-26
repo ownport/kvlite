@@ -50,6 +50,9 @@ digraph pyservice {
     BaseCollection [
                     label="<top>       class BaseCollection() |\
                            <init>           - __init__(uri) |\
+                           <meta>           - meta |\
+                           <prepare_key>    - prepare_key(key) |\
+                           <prepare_kv>     - prepare_kv(k,v, backend='sqlite') |\
                            <get>            - get(k) |\
                            <count>          - count() |\
                            <commit>         - commit() |\
