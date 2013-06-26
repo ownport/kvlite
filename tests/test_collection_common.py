@@ -32,12 +32,17 @@ class CommonCollectionTests(unittest.TestCase):
         collection.commit()
         collection.close()
 
+    def test_put_wrong_oldformat_kv(self):
+        
+        collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
+        collection.put(collection.get_uuid(), 'value')
+        collection.close()
+        
     def test_get_many_by_keys(self):
         
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
         kvs = [(collection.get_uuid(), 'test') for _ in range(10)]
-        for kv in kvs:
-            collection.put(*kv)
+        collection.put(kvs)
         collection.commit()
         
         # keys are in database
@@ -53,16 +58,12 @@ class CommonCollectionTests(unittest.TestCase):
     def test_put_get_delete_count_many(self):
         
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
-        ks = list()
-        for i in xrange(100):
-            k = collection.get_uuid()
-            v = 'test_{}'.format(i)
-            collection.put(k, v)
-            ks.append(k)
+        ks = [(collection.get_uuid(), 'test_{}'.format(i)) for i in xrange(100)]
+        collection.put(ks)
         
         self.assertEqual(collection.count, 100)
         for k in ks:
-            collection.delete(k)
+            collection.delete(k[0])
         self.assertEqual(collection.count, 0)
         collection.commit()
         collection.close()
@@ -81,10 +82,10 @@ class CommonCollectionTests(unittest.TestCase):
         ''' test for different key length
         '''
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
-        collection.put(0, 'key-00')
-        self.assertEqual(collection.get({'_key': '0'}), ('0'.zfill(kvlite._KEY_LENGTH), 'key-00'))
-        self.assertEqual(collection.get({'_key': '00'}), ('0'.zfill(kvlite._KEY_LENGTH), 'key-00'))
-        self.assertEqual(collection.get({'_key': '000'}), ('0'.zfill(kvlite._KEY_LENGTH), 'key-00'))
+        collection.put(1, 'key-01')
+        self.assertEqual(collection.get({'_key': '1'}), ('1'.zfill(kvlite._KEY_LENGTH), 'key-01'))
+        self.assertEqual(collection.get({'_key': '01'}), ('1'.zfill(kvlite._KEY_LENGTH), 'key-01'))
+        self.assertEqual(collection.get({'_key': '001'}), ('1'.zfill(kvlite._KEY_LENGTH), 'key-01'))
         
         collection.close()
 
@@ -99,8 +100,7 @@ class CommonCollectionTests(unittest.TestCase):
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
         PAGE_SIZE=10
         kvs = [(collection.get_uuid(), 'test') for _ in range(100)]
-        for kv in kvs:
-            collection.put(*kv)
+        collection.put(kvs)
         # first page
         result = [kv for kv in collection.get(offset=0,limit=PAGE_SIZE)] 
         self.assertEqual(len(result), len(kvs[0:PAGE_SIZE]))

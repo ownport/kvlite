@@ -205,12 +205,8 @@ def copy(source, target):
     if not isinstance(target, (MysqlCollection, SqliteCollection)):
         raise RuntimeError('The source should be MysqlCollection or SqliteCollection object, not %s', type(target))
     
-    count = 0
-    for kv in source:
-        target.put(*kv)
-        count += 1
-        if count % ITEMS_PER_REQUEST == 0:
-            target.commit()
+    data = [kv for kv in source]
+    target.put(data)
     target.commit()
 
 def get_uuid(amount=100):
@@ -569,7 +565,16 @@ class BaseCollection(object):
         if len(_key) > _KEY_LENGTH:
             raise RuntimeError('The length of key is more than %d bytes' % (_KEY_LENGTH))
         return _key.zfill(_KEY_LENGTH)
-
+    
+    def prepare_kv(self, k, v):
+        
+        k = self.prepare_key(k)
+        if k == self._ZEROS_KEY:
+            v = cPickleSerializer.dumps(v)
+        else:
+            v = self._serializer.dumps(v)
+        return (k,v) 
+                
     @property
     def meta(self):
         ''' return meta information from zero's key
@@ -781,17 +786,40 @@ class SqliteCollection(BaseCollection):
                 self._uuid_cache.append(uuid)
         return self._uuid_cache.pop()
 
-    def put(self, k, v):
-        ''' put document in collection 
-        '''        
-        k = self.prepare_key(k)
+    def put(self, *kv):
+        ''' put document(s) in collection 
+        
+        kv is list of key/value
+        
+        put(k,v) or put([(k1,v1), (k2,v2)])
+        '''
+        kv_insert = list()
+        if not isinstance(kv, (list,tuple)):
+            raise RuntimeError('key/value should be packed in the list or tuple')
+        
+        print 'type: %s, len(kv): %d, kv: %s' % (type(kv), len(kv), kv)
+
+        # put([(k1,v1), (k2,v2)])
+        if len(kv) == 1 \
+            and isinstance(kv[0], (list, tuple)):
+            
+            kv_insert = [self.prepare_kv(*kvs) for kvs in kv[0]]
+
+        # put(k,v)
+        elif len(kv) == 2 \
+            and not isinstance(kv[0], (list, tuple)) \
+            and not isinstance(kv[1], (list, tuple)):
+            
+            kv_insert.append(self.prepare_kv(*kv))
+
+        else:
+            raise RuntimeError('Incorrect format of key/values, %s' % kv)
+
+        print 'kv_insert: %s' % kv_insert
+                  
         SQL_INSERT = 'INSERT OR REPLACE INTO %s (k,v) ' % self._collection
         SQL_INSERT += 'VALUES (?,?)'
-        if k == self._ZEROS_KEY:
-            v = cPickleSerializer.dumps(v)
-        else:
-            v = self._serializer.dumps(v)
-        self._cursor.execute(SQL_INSERT, (k, v))
+        self._cursor.executemany(SQL_INSERT, kv_insert)
 
     def _get_one(self, _key):
         ''' return document by _key 
