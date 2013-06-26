@@ -12,7 +12,7 @@ setup (
     long_description = open('README.rst').read(),
     license = "BSD",
     keywords = "key-value python database mysql sqlite",
-    py_modules = ['kvlite', 'kvlite-cli'],
+    py_modules = ['kvlite',],
     classifiers = [
         'Programming Language :: Python',
         'Intended Audience :: Developers',
