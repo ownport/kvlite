@@ -69,7 +69,7 @@ please check installation guideline <https://github.com/ownport/kvlite/blob/mast
 
 Usage
 =====
- - Examples <https://github.com/ownport/kvlite/blob/v0.5.1/docs/examples.md> 
+ - Examples <https://github.com/ownport/kvlite/blob/master/docs/examples.md> 
  - Search criterias <https://github.com/ownport/kvlite/blob/master/docs/search-criterias.md>
 
 Developer interface
