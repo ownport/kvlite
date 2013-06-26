@@ -133,7 +133,7 @@ Classes MysqlCollection and SqliteCollection inherited from BaseCollection class
 
 - **put(k,v)**
     
-    put key/value to storage. The key has limitation - only 40 bytes length. The value can be string, list or tuple, dictionary
+    put key/value to storage. The key has limitation - only 40 bytes length. The value can be string, list or tuple, dictionary. The method put() allows to add many key/value pairs per one call: collection.put([(k1,v1),(k2,v2),(k3,v3)])
     
 - **delete(k)**
     

@@ -29,3 +29,6 @@ pip-log.txt
 # sqlite databases
 *.sqlite
 
+# kvlite databases
+*.kvlite
+

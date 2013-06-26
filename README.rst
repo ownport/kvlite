@@ -41,7 +41,7 @@ Examples of use
     >>> collection.count
     3
     >>>
-    >>> for k,v in collection.get(): print k,v
+    >>> for k,v in collection: print k,v
     ... 
     00000000594d699229ac4f46b2deee895e5683dc {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
     000000007dfb322f91a64e5eafe91b73d041be1c {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
@@ -54,7 +54,8 @@ Examples of use
     ... 
     00000000594d699229ac4f46b2deee895e5683dc {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
     000000007dfb322f91a64e5eafe91b73d041be1c {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
-    00000000971b2b077bc244bcaf54960299aec500 {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}    >>>
+    00000000971b2b077bc244bcaf54960299aec500 {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}    
+    >>>
     >>> for k in [key1, key2, key3]: collection.delete(k)
     >>> collection.count
     0
@@ -68,8 +69,8 @@ please check installation guideline <https://github.com/ownport/kvlite/blob/mast
 
 Usage
 =====
+ - Examples <https://github.com/ownport/kvlite/blob/master/docs/examples.md> 
  - Search criterias <https://github.com/ownport/kvlite/blob/master/docs/search-criterias.md>
- - Pagination
 
 Developer interface
 ===================

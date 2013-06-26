@@ -5,7 +5,7 @@
 #
 #
 __author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
-__version__ = '0.3'
+__version__ = '0.3.1'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -28,7 +28,9 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE."""
 
+import os
 import cmd
+import json
 import kvlite
 import pprint
 
@@ -67,10 +69,13 @@ class Console(cmd.Cmd):
                 return
         else:
             names = [
-                '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', '',
-                'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', '',
+                '', 'do_help', 'do_version', 'do_licence', 'do_history', 'do_exit', 
+                '',
+                'do_create', 'do_use', 'do_show', 'do_remove', 'do_import', 'do_export', 'do_copy', 
+                '',
                 'do_hash', 'do_items', 'do_get', 'do_put', 'do_delete', 
-                'do_count', 'do_scheme', 'do_index', ''
+                'do_count', 'do_scheme', 'do_index', 
+                ''
             ]
             for name in names:
                 if not name:
@@ -111,7 +116,7 @@ class Console(cmd.Cmd):
         if not filename:
             print getattr(self, 'do_import').__doc__
             return
-        filename = filename.rstrip().lstrip()
+        filename = filename.strip()
         
         if os.path.isfile(filename):
             for k, v in json.loads(open(filename).read()).items():
@@ -122,28 +127,76 @@ class Console(cmd.Cmd):
 
     def do_export(self, filename):
         '''   export <filename>\t\texport collection configurations to JSON file'''
+
         import json
         
-        if not filename:
-            print getattr(self, 'do_import').__doc__
-            return
         filename = filename.rstrip().lstrip()
-        json_file = open(filename, 'w')
+        
+        if not filename:
+            print getattr(self, 'do_export').__doc__
+            return
+            
+        if os.path.isfile(filename):
+            answer = raw_input('Do you want to replace existing file: %s (y/n)' % filename)
+            answer = answer.strip()
+            answer.lower()
+            if answer not in ['Y', 'y']:
+                print 'Warning! The changes was not saved in %s' % filename
+                return
+        try:
+            json_file = open(filename, 'w')
+        except IOError, err:
+            print err
+            return
         json_file.write(json.dumps(self.__kvlite_colls))
         json_file.close()
         print 'Export completed to file: %s' % filename
 
-    def do_show(self, line):
-        '''   show collections <details>\tlist of available collections (defined in settings.py)'''
-        if line.startswith('collections'):
+    def do_copy(self, line):
+        '''   copy <source> <target>\tcopy data from source kvlite database to target kvlite database
+                                <source> - reference name to source database
+                                <target> - reference name to target database
+                                for creating reference name, use `create` command'''
+        try:
+            source_ref, target_ref = [param for param in line.split(' ') if param <> ''][:2]
+        except ValueError:
+            print 'Error! Please specify <source> and <target>'
+            return
+            
+        if source_ref not in self.__kvlite_colls:
+            print 'Error! The source reference is not created, please use `create` command'
+            return
+        if target_ref not in self.__kvlite_colls:    
+            print 'Error! The target reference is not created, please use `create` command'
+            return
 
+        source = kvlite.open(self.__kvlite_colls[source_ref])
+        target = kvlite.open(self.__kvlite_colls[target_ref])
+        kvlite.copy(source, target)
+        source.close()
+        target.close()        
+
+    def do_show(self, line):
+        '''   show collections <details>\tlist of available collections'''
+        if line.startswith('collections'):
+            
             for coll in self.__kvlite_colls:
-                print '   %s' % coll
+                print 'Database: %s' %  coll
+                print 'URI: %s' % self.__kvlite_colls[coll]
+                coll = kvlite.open(self.__kvlite_colls[coll])
+                for k,v in coll.meta.items():
+                    print '%s: %s' % (k,v)
+                coll.close()
+                print
         else:
             print 'Unknown argument: %s' % line
     
     def do_use(self, collection_name):
         '''   use <collection_name>\tuse the collection as the default (current) collection'''
+        if self.__current_coll:
+            self.__current_coll.close()
+            self.__current_coll = None
+            
         if collection_name in self.__kvlite_colls:
             self.prompt = '%s>' % collection_name
             self.__current_coll_name = collection_name
@@ -256,10 +309,11 @@ class Console(cmd.Cmd):
                 return
     
     def do_put(self, line):
-        '''   put <key> <value>\tstore entry to collection'''
+        '''   put <key> <value>\tstore entry to collection, where <value> is data in JSON format'''
 
         try:
             k,v = [i for i in line.split(' ',1) if i <> '']
+            v = json.loads(v)
         except ValueError:
             print getattr(self, 'do_put').__doc__
             return
@@ -270,7 +324,7 @@ class Console(cmd.Cmd):
                 self.__current_coll.commit()
                 print 'Done'
                 return
-            except WronKeyValue, err:
+            except Exception, err:
                 print 'Error! Incorrect key/value,', err
                 return 
         else:
@@ -299,6 +353,8 @@ class Console(cmd.Cmd):
         print 'Warning! This functionality is not implemented yet'
         print line
         print 'Done'
+
+        
         
 # ----------------------------------
 #   main

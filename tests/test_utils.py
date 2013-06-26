@@ -8,6 +8,10 @@ import unittest
 
 class KvliteUtilsTests(unittest.TestCase):
 
+    def setUp(self):
+        
+        self.URI = 'sqlite://tests/db/{}.kvlite:kvlite_test'
+
     def test_get_uuid(self):
         
         uuids = kvlite.get_uuid(1000)
@@ -15,13 +19,14 @@ class KvliteUtilsTests(unittest.TestCase):
 
     def test_sqlite_open(self):
         
+        _key = kvlite.get_uuid(1)[0]
         collection = kvlite.open('sqlite://tests/db/testdb.sqlite:kvlite_test')
-        collection.put('a0',1)
+        collection.put(_key,1)
         self.assertEqual(collection.count,1)
-        self.assertEqual(collection.get({'_key': 'a0'}), ('a0',1))
-        collection.delete('a0')
+        self.assertEqual(collection.get({'_key': _key}), (_key,1))
+        collection.delete(_key)
         self.assertEqual(collection.count,0)
-        self.assertEqual(collection.get({'_key': 'a0'}), (None,None))
+        self.assertEqual(collection.get({'_key': _key}), (None,None))
         collection.close()
     
     def test_sqlite_remove(self):
@@ -145,6 +150,28 @@ class KvliteUtilsTests(unittest.TestCase):
             if json.dumps(s) not in [json.dumps(r) for r in result]:
                 raise RuntimeError('Incorrect document structure')
 
+    def test_copy(self):
+        ''' test_copy
+        '''
+        
+        COPIED_ITEMS = 250
+        
+        source_uri = self.URI.format(kvlite.tmp_name())
+        source = kvlite.open(source_uri, serializer_name='pickle')
+
+        target_uri = self.URI.format(kvlite.tmp_name())        
+        target = kvlite.open(target_uri, serializer_name='pickle')
+
+        kv = [(k, 'value: %d' % k) for k in range(1,COPIED_ITEMS+1)]
+        source.put(kv)
+        source.commit()
+            
+        kvlite.copy(source, target)
+        
+        self.assertEqual(target.count, COPIED_ITEMS)
+        
+        source.close()    
+        target.close()
         
 if __name__ == '__main__':
     unittest.main()        

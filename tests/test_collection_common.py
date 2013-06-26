@@ -7,6 +7,10 @@ import unittest
 
 class CommonCollectionTests(unittest.TestCase):
 
+    def setUp(self):
+        
+        self.URI = 'sqlite://tests/db/{}.kvlite:kvlite_test'
+
     def test_get_uuid(self):
         
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
@@ -28,12 +32,17 @@ class CommonCollectionTests(unittest.TestCase):
         collection.commit()
         collection.close()
 
+    def test_put_wrong_oldformat_kv(self):
+        
+        collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
+        collection.put(collection.get_uuid(), 'value')
+        collection.close()
+        
     def test_get_many_by_keys(self):
         
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
         kvs = [(collection.get_uuid(), 'test') for _ in range(10)]
-        for kv in kvs:
-            collection.put(*kv)
+        collection.put(kvs)
         collection.commit()
         
         # keys are in database
@@ -49,19 +58,12 @@ class CommonCollectionTests(unittest.TestCase):
     def test_put_get_delete_count_many(self):
         
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
-        ks = list()
-        for i in xrange(100):
-            k = collection.get_uuid()
-            v = 'test_{}'.format(i)
-            collection.put(k, v)
-            ks.append(k)
+        ks = [(collection.get_uuid(), 'test_{}'.format(i)) for i in xrange(100)]
+        collection.put(ks)
         
-        kvs = [kv[0] for kv in collection.get()]
-        self.assertEqual(len(kvs), 100)
-
         self.assertEqual(collection.count, 100)
         for k in ks:
-            collection.delete(k)
+            collection.delete(k[0])
         self.assertEqual(collection.count, 0)
         collection.commit()
         collection.close()
@@ -76,11 +78,15 @@ class CommonCollectionTests(unittest.TestCase):
     
         collection.close()
 
-    def test_incorrect_key(self):
-        ''' incorrect key, the key length is odd'''
-
+    def test_diff_key_length(self):
+        ''' test for different key length
+        '''
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
-        self.assertRaises(RuntimeError, collection.get, {'_key':'12345'})
+        collection.put(1, 'key-01')
+        self.assertEqual(collection.get({'_key': '1'}), ('1'.zfill(kvlite._KEY_LENGTH), 'key-01'))
+        self.assertEqual(collection.get({'_key': '01'}), ('1'.zfill(kvlite._KEY_LENGTH), 'key-01'))
+        self.assertEqual(collection.get({'_key': '001'}), ('1'.zfill(kvlite._KEY_LENGTH), 'key-01'))
+        
         collection.close()
 
     def test_absent_key(self):
@@ -94,8 +100,7 @@ class CommonCollectionTests(unittest.TestCase):
         collection = kvlite.open(self.URI.format(kvlite.tmp_name()))
         PAGE_SIZE=10
         kvs = [(collection.get_uuid(), 'test') for _ in range(100)]
-        for kv in kvs:
-            collection.put(*kv)
+        collection.put(kvs)
         # first page
         result = [kv for kv in collection.get(offset=0,limit=PAGE_SIZE)] 
         self.assertEqual(len(result), len(kvs[0:PAGE_SIZE]))
@@ -111,16 +116,16 @@ class CommonCollectionTests(unittest.TestCase):
     def test_use_different_serializators_for_many(self):
 
         URI = self.URI.format(kvlite.tmp_name())
-        collection = kvlite.open(URI, serializer=kvlite.CompressedJsonSerializer)
+        collection = kvlite.open(URI, serializer_name='completed_json')
         collection.put(u'11', u'diffser1')
         collection.put(u'22', u'diffser2')
         collection.put(u'33', u'diffser3')
         collection.commit()
         collection.close()
 
-        collection = kvlite.open(URI, serializer=kvlite.cPickleSerializer)
+        collection = kvlite.open(URI, serializer_name='pickle')
         with self.assertRaises(RuntimeError):
-            res = [(k,v) for k,v in collection.get()]
+            res = [(k,v) for k,v in collection]
 
         collection.put(u'11', u'diffser1')
         collection.put(u'22', u'diffser2')
@@ -128,8 +133,24 @@ class CommonCollectionTests(unittest.TestCase):
         collection.commit()
         collection.close()
 
-        collection = kvlite.open(URI, serializer=kvlite.CompressedJsonSerializer)        
+        collection = kvlite.open(URI, serializer_name='completed_json')        
         with self.assertRaises(RuntimeError):
-            res = [(k,v) for k,v in collection.get()]
+            res = [(k,v) for k,v in collection]
         collection.close()        
 
+    def test_metadata(self):
+        ''' test metadata
+        '''
+        URI = self.URI.format(kvlite.tmp_name())
+        collection = kvlite.open(URI, serializer_name='pickle')
+        self.assertEqual(
+            collection.meta, 
+            {
+                'name': 'kvlite_test',
+                'kvlite-version': kvlite.__version__,
+                'serializer': 'pickle',
+            })
+        collection.close()
+        
+        
+        
