@@ -1,9 +1,5 @@
 # Installation
 
-## Manual installation
-
-To install kvlite you just need to copy two files: kvlite.py and kvlite-cli.py. Second one is optional and it's needed only if you need to have access to kvlite collections via console. Feel free to use kvlite-cli.py as example how to work with kvlite library.
-
 ## Installation via pip
 
 If [pip](http://www.pip-installer.org/) installed in your system, you can install kvlite via

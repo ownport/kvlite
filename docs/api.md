@@ -10,7 +10,7 @@ The format of ``URI`` (uniform resource identifier) for databases:
 In case when sqlite is in use two variants of collection is possible: store data in file or store data in memory.
 
 
-## Serializers
+## Serializers (serializers.py)
 
 It used for serialization data in kvlite databases. Default serializer is cPickleSerializer. 
 Serializer is the class or module to serialize documents with, must have methods or functions named 
@@ -26,7 +26,7 @@ Serializer is the class or module to serialize documents with, must have methods
 
 Please note that there's no way to store which serializer was used for collection. The collision is possible when during putting data to collection was used one serializer but during getting data was used another one.
 
-## Collection Utils
+## Collection Utils (utils.py)
 
 - **open(uri, serializer=cPickleSerializer)**
 
@@ -93,7 +93,7 @@ Please note that there's no way to store which serializer was used for collectio
     >>>
     ```
 
-## Collection
+## Collection (collections.py)
 
 Classes MysqlCollection and SqliteCollection inherited from BaseCollection class and have the same methods. No needs to create these classes directly, all access to required collection can be provided via `kvlite.open()` function. 
 
@@ -155,7 +155,7 @@ Classes MysqlCollection and SqliteCollection inherited from BaseCollection class
 
     close connection to database
 
-## CollectionManager
+## CollectionManager (managers.py)
 
 Sometimes it will needed to manage collections: create, check if exists, remove. For these operations you can use CollectionManager. This class has the next methods:
 

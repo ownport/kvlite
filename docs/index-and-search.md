@@ -1,6 +1,6 @@
 # Index and search in kvlite
 
-New in version 0.4.6
+**Note!** Not implemented yet
 
 ideas was taken from [MongoDB Indexing Overview](http://docs.mongodb.org/manual/core/indexes/)
 
