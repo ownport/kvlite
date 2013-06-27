@@ -4,8 +4,8 @@ if '' not in sys.path:
 
 import unittest
 
-from kvlite import cPickleSerializer as cps
-from kvlite import CompressedJsonSerializer as cjs
+from kvlite.serializers import cPickleSerializer as cps
+from kvlite.serializers import CompressedJsonSerializer as cjs
 
 class KvliteSerializersTests(unittest.TestCase):
 
