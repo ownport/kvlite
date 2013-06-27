@@ -4,7 +4,7 @@ if '' not in sys.path:
 
 import unittest
 
-from kvlite import CollectionManager
+from kvlite.managers import CollectionManager
 
 class KvliteCollectionManagerTests(unittest.TestCase):
 

@@ -16,7 +16,7 @@ class KvliteSqliteTests(test_collection_common.CommonCollectionTests):
     def tearDownClass(self):
         
         # delete all temporary tables after tests
-        manager = kvlite.CollectionManager(self.URI)
+        manager = kvlite.managers.CollectionManager(self.URI)
         for collection in manager.collections():
             manager.remove(collection)
         

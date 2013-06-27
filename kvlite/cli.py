@@ -111,7 +111,6 @@ class Console(cmd.Cmd):
     def do_import(self, filename):
         '''   import <filename>\t\timport collection configuration from JSON file'''
         import os
-        import json
         
         if not filename:
             print getattr(self, 'do_import').__doc__
@@ -128,8 +127,6 @@ class Console(cmd.Cmd):
     def do_export(self, filename):
         '''   export <filename>\t\texport collection configurations to JSON file'''
 
-        import json
-        
         filename = filename.rstrip().lstrip()
         
         if not filename:
@@ -218,7 +215,7 @@ class Console(cmd.Cmd):
             print "If it's needed please change collection name"
             return
         try:
-            manager = kvlite.CollectionManager(uri)
+            manager = kvlite.managers.CollectionManager(uri)
             params = manager.parse_uri(uri)
             if params['collection'] in manager.collections():
                 self.__kvlite_colls[name] = uri
@@ -243,7 +240,7 @@ class Console(cmd.Cmd):
             return
         try:
             uri = self.__kvlite_colls[name]
-            manager = kvlite.CollectionManager(uri)
+            manager = kvlite.managers.CollectionManager(uri)
             params = manager.parse_uri(uri)
             if params['collection'] in manager.collections():
                 manager.remove(params['collection'])
@@ -314,8 +311,9 @@ class Console(cmd.Cmd):
         try:
             k,v = [i for i in line.split(' ',1) if i <> '']
             v = json.loads(v)
-        except ValueError:
+        except ValueError, err:
             print getattr(self, 'do_put').__doc__
+            print '   Error! %s' % err
             return
 
         if self.__current_coll:
@@ -336,7 +334,7 @@ class Console(cmd.Cmd):
         '''   delete <key>\t\tdelete entry by key '''
         key = key.rstrip().lstrip()
         try:
-            if self.__current_coll.get(key) <> (None, None):
+            if self.__current_coll.get({'_key': key}) <> (None, None):
                 self.__current_coll.delete(key)
                 self.__current_coll.commit()
                 print 'Done'

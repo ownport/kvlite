@@ -6,6 +6,8 @@ import pprint
 import kvlite
 import unittest
 
+from kvlite.settings import SUPPORTED_VALUE_TYPES
+
 class KvliteUtilsTests(unittest.TestCase):
 
     def setUp(self):
@@ -94,17 +96,17 @@ class KvliteUtilsTests(unittest.TestCase):
         list_value = [1,2,3]
         dict_value = {'a':1,'b':2,'c':3}
                 
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(none_value)]['name'], 'none_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(boolean_value)]['name'], 'boolean_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(integer_value)]['name'], 'integer_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(longinteger_value)]['name'], 'long_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(float_value)]['name'], 'float_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(complex_value)]['name'], 'complex_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(string_value)]['name'], 'string_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(unicode_value)]['name'], 'unicode_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(tuple_value)]['name'], 'tuple_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(list_value)]['name'], 'list_type')
-        self.assertEqual(kvlite.SUPPORTED_VALUE_TYPES[type(dict_value)]['name'], 'dict_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(none_value)]['name'], 'none_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(boolean_value)]['name'], 'boolean_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(integer_value)]['name'], 'integer_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(longinteger_value)]['name'], 'long_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(float_value)]['name'], 'float_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(complex_value)]['name'], 'complex_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(string_value)]['name'], 'string_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(unicode_value)]['name'], 'unicode_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(tuple_value)]['name'], 'tuple_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(list_value)]['name'], 'list_type')
+        self.assertEqual(SUPPORTED_VALUE_TYPES[type(dict_value)]['name'], 'dict_type')
 
     def test_docs_struct(self):
         
@@ -156,17 +158,17 @@ class KvliteUtilsTests(unittest.TestCase):
         
         COPIED_ITEMS = 250
         
-        source_uri = self.URI.format(kvlite.tmp_name())
+        source_uri = self.URI.format(kvlite.utils.tmp_name())
         source = kvlite.open(source_uri, serializer_name='pickle')
 
-        target_uri = self.URI.format(kvlite.tmp_name())        
+        target_uri = self.URI.format(kvlite.utils.tmp_name())        
         target = kvlite.open(target_uri, serializer_name='pickle')
 
         kv = [(k, 'value: %d' % k) for k in range(1,COPIED_ITEMS+1)]
         source.put(kv)
         source.commit()
             
-        kvlite.copy(source, target)
+        kvlite.utils.copy(source, target)
         
         self.assertEqual(target.count, COPIED_ITEMS)
         

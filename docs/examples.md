@@ -1,5 +1,43 @@
 # Examples
 
+## kvlite.cli
+
+`kvlite.cli` module is used for get access to kvlite databases via console
+
+```
+$ python -m kvlite.cli
+kvlite>
+kvlite> ?
+
+   help <command>	show <command> help
+   version		show kvlite version
+   licence		show licence
+   history		show commands history 
+   exit			exit from console 
+
+   create <name> <uri>		    create new collection (if not exists)
+   use <collection_name>	    use the collection as the default (current) collection
+   show collections <details>	list of available collections
+   remove <collection_name>	    remove collection
+   import <filename>		    import collection configuration from JSON file
+   export <filename>		    export collection configurations to JSON file
+   copy <source> <target>	    copy data from source kvlite database to target kvlite database
+                                <source> - reference name to source database
+                                <target> - reference name to target database
+                                for creating reference name, use `create` command
+
+   hash [string]	    generate sha1 hash, random if string is not defined
+   items		        list of collection's items 
+   get <key>		    show collection entry by key
+   put <key> <value>	store entry to collection, where <value> is data in JSON format
+   delete <key>		    delete entry by key 
+   count		        show the amount of entries in collection 
+   scheme		        show structure of collection
+   index <details>	    make index for current collection
+
+kvlite> 
+```
+
 ## Bulk put()
 
 When you need to insert many documents to kvlite database
