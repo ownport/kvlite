@@ -2,6 +2,7 @@
 #   Settings
 #
 import os
+import kvlite
 
 # During early development, the debug mode can be very helpful.
 # In this mode, Bottle is much more verbose and provides helpful 
@@ -25,10 +26,10 @@ WEBUI_PORT = 8080
 DEBUG_MODE = True
 
 # The absolute path to the directory where static files are located
-STATIC_PATH = os.path.join(os.getcwd(), 'static')
-
-# The absolute path to the directory where template files (*.tpl) are located
-TEMPLATE_PATH = os.path.join(os.getcwd(), 'templates')
+STATIC_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(kvlite.__file__)), 
+    'webui/static'
+)
 
 # The absolute path to the logfile
 WEBUI_LOGFILE = os.path.join(os.getcwd(), 'log/kvlite-webui.log')
