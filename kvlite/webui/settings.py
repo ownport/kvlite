@@ -37,3 +37,8 @@ WEBUI_LOGFILE = os.path.join(os.getcwd(), 'log/kvlite-webui.log')
 # The absolute path to the pidfile. It's required when kvlite-webui is running as service
 WEBUI_PIDFILE = os.path.join(os.getcwd(), 'run/kvlite-webui.pid')
 
+# Collections list
+COLLECTIONS = {
+    'test-sqlite': 'sqlite://tests/db-webui/test-sqlite.kvlite:test',
+    'test-sqlite-memory': 'sqlite://memory:test',
+}
