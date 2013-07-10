@@ -8,20 +8,75 @@
     <meta name="description" content="Web frontend for kvlite python library">
     <meta name="author" content="Andrey Usov <https://github.com/ownport/kvlite>">
     
-    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+
+      @media (max-width: 980px) {
+        /* Enable use of floated navbar text */
+        .navbar-text.pull-right {
+          float: none;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+    </style>
+    <link href="/css/bootstrap-responsive.css" rel="stylesheet" />
     
 </head>
 
 <body>
 
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container-fluid">  
+                <a class="brand" href="#">kvlite web frontend</a>  
+                <ul class="nav">
+                    <li class="divider-vertical"></li>
+                    <li> 
+                        <p class="navbar-text" id="current-collection">Collection is not selected</p>
+                    </li>
+                    <li class="divider-vertical"></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+                            Collections<b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu" id="collections-list"></ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+                            Items/page<b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a role="menuitem" tabindex="-1" href="#">10</a><li>
+                            <li><a role="menuitem" tabindex="-1" href="#">20</a><li>
+                            <li><a role="menuitem" tabindex="-1" href="#">50</a><li>
+                        </ul>
+                    </li>
+                    <li>
+                        <form class="navbar-search pull-left">
+                            <input type="text" class="search-query" placeholder="Search in collection (not implemented yet)">
+                        </form>
+                    </li>
+                </ul>
+            </div> <!-- class="container-fluid" -->            
+        </div> <!-- class="navbar-inner" -->
+    </div> <!-- class="navbar navbar-fixed-top" -->
+    
     <div class="container">
-        <h1>kvlite web frontend</h1>
-        
+        <div id="collection-data"> </div>
     </div> <!-- container -->
     
     <script src="/js/jquery.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/json2.js"></script>
+    <script src="/js/kvlite.js"></script>
 </body>
 
 </html>
