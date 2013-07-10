@@ -18,4 +18,6 @@ returns first page of data
 returns collection's data for specific page
 
 
+## Links
 
+- [JSON JS library](https://github.com/douglascrockford/JSON-js) 
