@@ -2,7 +2,9 @@ import os
 import bottle
 import kvlite
 
+from math import ceil
 from kvlite.webui import settings
+
 
 #
 #   Service commands
@@ -46,16 +48,22 @@ def collections_list():
     '''
     return {'collections': settings.COLLECTIONS.keys() }
 
-@bottle.route('/collection/<name>/')
-def get(name):
+@bottle.route('/collection/<name>/page/<page>')
+def get(name, page):
     ''' return collection data 
     '''
+    page = int(page)
     try:
         collection_uri = settings.COLLECTIONS[name]
     except KeyError:
         return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
     collection = kvlite.open(collection_uri)
-    return {'error': '', 'status': 'OK', 'data': [kv for kv in collection.get()]}
+    return {
+                'error': '', 
+                'status': 'OK', 
+                'last_page': int(ceil(collection.count / float(settings.ITEMS_PER_PAGE))),
+                'data': [kv for kv in collection.get(offset=page, limit=settings.ITEMS_PER_PAGE)]
+    }
 
 if __name__ == '__main__':
     
