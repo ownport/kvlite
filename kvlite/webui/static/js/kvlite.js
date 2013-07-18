@@ -69,6 +69,9 @@ function show_data_as_grid(data) {
     $("#collection-data").append(content);
 };
 
+/* 
+function show_data_as_collapse(data)
+*/
 function show_data_as_collapse(data) {
     
     $("#collection-data").empty();
@@ -77,14 +80,29 @@ function show_data_as_collapse(data) {
         content += "<div class=\"accordion-group\">";
         content += "<div class=\"accordion-heading\">";
         content += "<a class=\"accordion-toggle\" data-toggle=\"collapse\" ";
-        content += "data-parent=\"#collection-data-accordion\" href=\"#" + this[0] +"\">";
-        content += this[0] + "</a> </div>";
+        content += "data-parent=\"#collection-data-accordion\"";
+        content += "href=\"#" + this[0] +"\">" + this[0] + "</a>";
+        content += "</div>"; // <div class="accordion-heading">
         content += "<div id=\"" + this[0] + "\" class=\"accordion-body collapse\">";
         content += "<div class=\"accordion-inner\">";
-        content += JSON.stringify(this[1]) + "</div> </div> </div>";                
+        content += JSON.stringify(this[1])
+        content += "<p><div class=\"btn-group\">";
+        content += "<button class=\"btn item-edit\" value=\"" + this[0];
+        content += "\" data-toggle=\"modal\" data-target=\"#modal-edit-form\">Edit</button>";
+        content += "<button class=\"btn item-delete\" value=\"" + this[0] + "\">Delete</button>";
+        content += "</div></p>"; // <div class="btn-group">
+        content += "</div>"; // <div class="accordion-inner">
+        content += "</div>"; // <div class="accordion-body collapse">
+        content += "</div>"; // <div class="accordion-group">              
     });
-    content += "</div>";
+    content += "</div>"; // <div class="accordion" id="collection-data-accordion">
     $("#collection-data").append(content);
+    $(".item-edit").click(function () {
+        show_edit_form(this.value);
+    });
+    $(".item-delete").click(function () {
+        console.debug(this.value);
+    });
 };
 
 function show_pagination(page, last_page) {
@@ -140,3 +158,22 @@ function show_pagination(page, last_page) {
         get_data(current_collection, selected_page);
     });
 };
+
+function show_edit_form(key) {
+
+    var current_collection = $("#current-collection").text();
+    
+    $.getJSON("/collection/" + current_collection + "/item/" + key).done(function(json) {
+        $("h4#ModalEditFormLabel").empty();
+        $("h4#ModalEditFormLabel").append("Key: " + json.item.key);
+    
+        $("div#item-editor").remove();
+        $("div.modal-body").append("<div id=\"item-editor\"></div>");
+        $("div#item-editor").append(JSON.stringify(json.item.value, null, 4));
+        
+        var item_editor = ace.edit("item-editor");
+        item_editor.setTheme("ace/theme/clouds");
+        item_editor.getSession().setMode("ace/mode/json");
+    });
+};
+    

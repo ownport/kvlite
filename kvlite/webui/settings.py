@@ -41,4 +41,10 @@ WEBUI_PIDFILE = os.path.join(os.getcwd(), 'run/kvlite-webui.pid')
 COLLECTIONS = {
     'test-sqlite': 'sqlite://tests/db-webui/test-sqlite.kvlite:test',
     'test-sqlite-memory': 'sqlite://memory:test',
+    'fs.ua-updates': 'sqlite://tests/db-webui/fs.ua-updates.kvlite:contents',
+    'fs.ua-items': 'sqlite://tests/db-webui/fs.ua-items.kvlite:contents',
 }
+
+# How many items will be published on page
+ITEMS_PER_PAGE = 50
+

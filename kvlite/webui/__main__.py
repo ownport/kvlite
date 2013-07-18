@@ -58,13 +58,31 @@ def get(name, page):
     except KeyError:
         return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
     collection = kvlite.open(collection_uri)
+    last_page = int(ceil(collection.count / float(settings.ITEMS_PER_PAGE)))
+    data = [kv for kv in collection.get(offset=page, limit=settings.ITEMS_PER_PAGE)]
+    collection.close()
     return {
-                'error': '', 
                 'status': 'OK', 
-                'last_page': int(ceil(collection.count / float(settings.ITEMS_PER_PAGE))),
-                'data': [kv for kv in collection.get(offset=page, limit=settings.ITEMS_PER_PAGE)]
+                'last_page': last_page,
+                'data': data,
     }
 
+@bottle.route('/collection/<name>/item/<item_key>')
+def get(name, item_key):
+    ''' return collection data 
+    '''
+    try:
+        collection_uri = settings.COLLECTIONS[name]
+    except KeyError:
+        return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
+    collection = kvlite.open(collection_uri)
+    k,v = collection.get({'_key': item_key})
+    collection.close()
+    return {
+                'status': 'OK', 
+                'item': {'key': k, 'value': v},
+    }
+    
 if __name__ == '__main__':
     
     bottle.run(
