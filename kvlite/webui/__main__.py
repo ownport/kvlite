@@ -46,7 +46,20 @@ def get_static_js_files(filename):
 def collections_list():
     ''' returns the list of collections
     '''
-    return {'collections': settings.COLLECTIONS.keys() }
+    return {
+                'status': 'OK',
+                'collections': settings.COLLECTIONS.keys() }
+
+@bottle.route('/key')
+def get_key():
+    ''' return generated key 
+    '''
+    import hashlib
+    import datetime
+    
+    str_now = str(datetime.datetime.now())
+    key = hashlib.sha1(str_now).hexdigest()
+    return { 'status': 'OK',  'key': key, }
 
 @bottle.route('/collection/<name>/page/<page>')
 def get(name, page):
@@ -58,8 +71,9 @@ def get(name, page):
     except KeyError:
         return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
     collection = kvlite.open(collection_uri)
-    last_page = int(ceil(collection.count / float(settings.ITEMS_PER_PAGE)))
-    data = [kv for kv in collection.get(offset=page, limit=settings.ITEMS_PER_PAGE)]
+    last_page = collection.count / settings.ITEMS_PER_PAGE
+    #last_page = int(ceil(collection.count / float(settings.ITEMS_PER_PAGE)))
+    data = [kv for kv in collection.get(offset=page * settings.ITEMS_PER_PAGE, limit=settings.ITEMS_PER_PAGE)]
     collection.close()
     return {
                 'status': 'OK', 

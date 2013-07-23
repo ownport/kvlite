@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8">
     <title>kvlite web frontend</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Web frontend for kvlite python library">
-    <meta name="author" content="Andrey Usov <https://github.com/ownport/kvlite>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Web frontend for kvlite python library" />
+    <meta name="author" content="Andrey Usov <https://github.com/ownport/kvlite>" />
     
     <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen" />
     <link href="/css/bootstrap-responsive.css" rel="stylesheet" />
@@ -21,16 +21,18 @@
                 <a class="brand" href="#">kvlite web frontend</a>  
                 <ul class="nav">
                     <li class="divider-vertical"></li>
-                    <li> 
-                        <p class="navbar-text" id="current-collection">Collection is not selected</p>
-                    </li>
-                    <li class="divider-vertical"></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-                            Collections<b class="caret"></b>
-                        </a>
+                    <li class="dropdown" id="collection-selector">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Collections<b class="caret"></b></a>
                         <ul class="dropdown-menu" id="collections-list"></ul>
                     </li>
+                    <li class="divider-vertical"></li>
+                    <li class="dropdown"> 
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="current-collection"> 
+                            Collection is not selected</b>
+                        </a>
+                        <ul class="dropdown-menu" id="current-collection-menu"></ul>
+                    </li>
+                    <li class="divider-vertical"></li>
                     <li>
                         <form class="navbar-search pull-left">
                             <input type="text" class="search-query" placeholder="Search in collection (not implemented yet)">
@@ -42,6 +44,7 @@
     </div> <!-- class="navbar navbar-fixed-top" -->
     
     <div class="container">
+    
         <div class="collection-data-pages text-center"></div>
         <div id="collection-data"> </div>
         <div class="collection-data-pages text-center"></div>
@@ -49,12 +52,13 @@
         <div id="modal-edit-form" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="ModalEditFormLabel" aria-hidden="true">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 id="ModalEditFormLabel">Edit</h4>
+                <div id="edit-form-key-label" style="float:left; font-weight: bold">Key: </div> 
+                <div id="edit-form-key"></div>
             </div>
-            <div class="modal-body"> </div>
+            <div class="modal-body"></div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button class="btn btn-primary">Save changes</button>
+                <button class="btn btn-primary" id="submit-item-changes">Save changes</button>
             </div>
         </div> <!-- modal-edit-form --> 
     </div> <!-- container -->

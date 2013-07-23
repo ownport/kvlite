@@ -6,18 +6,32 @@ function get_collections(page) {
 
     $.getJSON("/collections").done(function(json) {
         if (json.collections.length > 0) {
+            
             $('#collections-list').empty();
             $.each(json.collections, function() {
-                var collection = "<li><a class=\"collection-name\" role=\"menuitem\" tabindex=\"-1\" href=\"#\">"
-                collection += this + "</a></li>"
+                var collection = "<li><a class=\"collection-name\" role=\"menuitem\" tabindex=\"-1\" href=\"#\">";
+                collection += this + "</a></li>";
                 $("#collections-list").append(collection);
             });
-            $(".collection-name").click(function(){
-                var collection_name = this.text
-                $("#current-collection").text(collection_name);
-                get_data(collection_name, page)
+                        
+            $(".collection-name").click(function() {
+            
+                var collection_name = this.text;
+
+                $("#current-collection-menu").empty();
+                $("#current-collection-menu").append(
+                    "<li><a role=\"menuitem\" tabindex=\"-1\" href=\"#\" id=\"create-new-item\" data-toggle=\"modal\" data-target=\"#modal-edit-form\">New item</a></li>"
+                );                
+                $("#create-new-item").click(function() {
+                
+                    show_edit_form("NEW");
+                
+                });
+
+                $("#current-collection").html(collection_name + "<b class=\"caret\">");
+                get_data(collection_name, page);
             });
-        };
+        }
     });
 
 };
@@ -26,7 +40,7 @@ function get_data(collection_name, page) {
 
     $.getJSON("/collection/" + collection_name + "/page/" + page).done(function(json) {
 
-        $("#collection-data-pages").empty();
+        $(".collection-data-pages").empty();
         $("#collection-data").empty();
 
         if (json.status == "OK") {
@@ -39,34 +53,6 @@ function get_data(collection_name, page) {
             console.debug(json)
         };
     });
-};
-
-function show_data_as_table(data) {
-
-    $("#collection-data").empty();
-    var content = "<table class=\"table table-stripped\">"
-    content += "<tr> <th>Key</th> <th>Value</th> </tr>";
-    $.each(data, function() {
-        content += "<tr> <td>" + this[0] + "</td>";
-        content += "<td>" + JSON.stringify(this[1]) + "</td> </tr>";
-    });
-    content += "</table>";
-    $("#collection-data").append(content);
-};
-
-function show_data_as_grid(data) {
-
-    $("#collection-data").empty();
-    var content = "<div class=\"row\">";
-    content += "<div class=\"span4\">Key</div> <div class=\"span5\">Value</div>";
-    content += "</div>";
-    $.each(data, function() {
-        content += "<div class=\"row\">"
-        content += "<div class=\"span4\">" + this[0] + "</div>";
-        content += "<div class=\"span5\">" + JSON.stringify(this[1]) + "</div>";
-        content += "</div>";
-    });
-    $("#collection-data").append(content);
 };
 
 /* 
@@ -97,9 +83,11 @@ function show_data_as_collapse(data) {
     });
     content += "</div>"; // <div class="accordion" id="collection-data-accordion">
     $("#collection-data").append(content);
+    
     $(".item-edit").click(function () {
         show_edit_form(this.value);
     });
+    
     $(".item-delete").click(function () {
         console.debug(this.value);
     });
@@ -109,7 +97,7 @@ function show_pagination(page, last_page) {
 
     var left_edge = 3;
     var right_edge = 3;
-    var page = parseInt(page);
+    page = parseInt(page);
     var last_page = parseInt(last_page);
     var pagination = "<div class=\"pagination\"><ul>";
     
@@ -131,7 +119,7 @@ function show_pagination(page, last_page) {
         end_page = left_edge + right_edge;
     };
         
-    for (i = begin_page; i < end_page; i++) {
+    for (i = begin_page; i <= end_page; i++) {
         if (i == page) {
             pagination += "<li class=\"active\">";
         } else {
@@ -163,17 +151,39 @@ function show_edit_form(key) {
 
     var current_collection = $("#current-collection").text();
     
-    $.getJSON("/collection/" + current_collection + "/item/" + key).done(function(json) {
-        $("h4#ModalEditFormLabel").empty();
-        $("h4#ModalEditFormLabel").append("Key: " + json.item.key);
+    $("#edit-form-key").empty();
+    $("div#item-editor").remove();
+    $("div.modal-body").append("<div id=\"item-editor\"> </div>");
+
+    var item_editor = ace.edit("item-editor");
+    item_editor.setTheme("ace/theme/clouds");
+    item_editor.getSession().setMode("ace/mode/json");
+    item_editor.getSession().setUseWrapMode(true);  
     
-        $("div#item-editor").remove();
-        $("div.modal-body").append("<div id=\"item-editor\"></div>");
-        $("div#item-editor").append(JSON.stringify(json.item.value, null, 4));
+    if (key == "NEW") {
         
-        var item_editor = ace.edit("item-editor");
-        item_editor.setTheme("ace/theme/clouds");
-        item_editor.getSession().setMode("ace/mode/json");
+        $.getJSON("/key").done( function(json) {
+            if (json.status == "OK") {
+                $("#edit-form-key").append(json.key);            
+            }
+        });
+        
+    } else {
+        $.getJSON("/collection/" + current_collection + "/item/" + key).done( function(json) {
+        
+            $("#edit-form-key").append(json.item.key);        
+            // $("div#item-editor").append(JSON.stringify(json.item.value, null, 4));
+            item_editor.getSession().setValue(JSON.stringify(json.item.value, null, 4));
+        });    
+    };
+    
+    $("#submit-item-changes").click(function() {
+        
+        console.debug("submit, key: " + $("#edit-form-key").text());
+        console.debug("submit, value: " + item_editor.getSession().getValue());
+        // Hide the modal
+        $("#modal-edit-form").modal('hide');
     });
+    
 };
     

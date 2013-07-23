@@ -20,6 +20,10 @@ body {
     width: 800px;
 }
 
+div.modal {
+    margin-left: -400px;
+}
+
 div.modal-body {
     height: 500px;
 }
