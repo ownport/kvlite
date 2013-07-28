@@ -20,6 +20,10 @@ body {
     width: 800px;
 }
 
+#edit-form-key-label {
+    float:left; 
+    font-weight: bold;
+}
 div.modal {
     margin-left: -400px;
 }

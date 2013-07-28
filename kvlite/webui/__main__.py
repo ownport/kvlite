@@ -62,8 +62,8 @@ def get_key():
     return { 'status': 'OK',  'key': key, }
 
 @bottle.route('/collection/<name>/page/<page>')
-def get(name, page):
-    ''' return collection data 
+def get_page(name, page):
+    ''' return collection data for specific page
     '''
     page = int(page)
     try:
@@ -81,22 +81,32 @@ def get(name, page):
                 'data': data,
     }
 
-@bottle.route('/collection/<name>/item/<item_key>')
-def get(name, item_key):
-    ''' return collection data 
+@bottle.route('/collection/<name>/item/<item_key>', method="GET")
+@bottle.route('/collection/<name>/item/<item_key>', method="POST")
+def get_item(name, item_key):
+    ''' return item data 
     '''
     try:
         collection_uri = settings.COLLECTIONS[name]
+        collection = kvlite.open(collection_uri)
     except KeyError:
         return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
-    collection = kvlite.open(collection_uri)
-    k,v = collection.get({'_key': item_key})
-    collection.close()
-    return {
-                'status': 'OK', 
-                'item': {'key': k, 'value': v},
-    }
-    
+
+    item_value = bottle.request.POST.get('value', '')     
+    if item_value:
+        print 'key: ' + item_key
+        print 'value: ' + item_value 
+        return {
+                    'status': 'OK', 
+        }
+    else:        
+        item_key, item_value = collection.get({'_key': item_key})
+        collection.close()
+        return {
+                    'status': 'OK', 
+                    'item': {'key': item_key, 'value': item_value},
+        }
+
 if __name__ == '__main__':
     
     bottle.run(

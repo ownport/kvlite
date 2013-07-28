@@ -135,7 +135,7 @@ function show_pagination(page, last_page) {
     pagination += "</ul></div>";
 
     $(".collection-data-pages").append(pagination);
-    $(".selected-page").click(function() {
+    $(".selected-page").click( function() {
         var current_collection = $("#current-collection").text();
         var selected_page = this.text;
         if (selected_page == "First") {
@@ -147,13 +147,19 @@ function show_pagination(page, last_page) {
     });
 };
 
+function clear_edit_form() {
+    // clear edit form
+    
+    $("#edit-form-key").empty();
+    $("div#item-editor").remove();
+    $("div.modal-body").append("<div id=\"item-editor\"> </div>");    
+};
+
 function show_edit_form(key) {
 
     var current_collection = $("#current-collection").text();
     
-    $("#edit-form-key").empty();
-    $("div#item-editor").remove();
-    $("div.modal-body").append("<div id=\"item-editor\"> </div>");
+    clear_edit_form();
 
     var item_editor = ace.edit("item-editor");
     item_editor.setTheme("ace/theme/clouds");
@@ -177,13 +183,18 @@ function show_edit_form(key) {
         });    
     };
     
-    $("#submit-item-changes").click(function() {
+    $("#submit-item-changes").click( function() {
         
-        console.debug("submit, key: " + $("#edit-form-key").text());
-        console.debug("submit, value: " + item_editor.getSession().getValue());
+        var key = $("#edit-form-key").text();
+        var value = item_editor.getSession().getValue();
+        
+        //console.debug("submit, key: " + key);
+        //console.debug("submit, value: " + value );
+        $.post("/collection/" + current_collection + "/item/" + key, {"value": value});
+        
         // Hide the modal
         $("#modal-edit-form").modal('hide');
+        clear_edit_form();
     });
-    
 };
     
