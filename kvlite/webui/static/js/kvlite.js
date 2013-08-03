@@ -1,5 +1,26 @@
 $(document).ready( function() {
     get_collections(0);
+    
+    // clear item form after hide modal
+    $("#close-item-form").click( function(event) {
+        clear_edit_form();
+    });
+    
+    
+    // handle submit modal edit form
+    $("#submit-item-changes").click( function(event) {
+        
+        var current_collection = $("#current-collection").text();
+        var key = $("#edit-form-key").text();
+        var value = item_editor.getSession().getValue();
+        
+        $.post("/collection/" + current_collection + "/item/" + key, {"value": value});
+        
+        // Hide the modal
+        $("#modal-edit-form").modal('hide');
+        clear_edit_form();
+    });
+    
 });
 
 function get_collections(page) {
@@ -73,8 +94,7 @@ function show_data_as_collapse(data) {
         content += "<div class=\"accordion-inner\">";
         content += JSON.stringify(this[1])
         content += "<p><div class=\"btn-group\">";
-        content += "<button class=\"btn item-edit\" value=\"" + this[0];
-        content += "\" data-toggle=\"modal\" data-target=\"#modal-edit-form\">Edit</button>";
+        content += "<button class=\"btn item-edit\" value=\"" + this[0] + "\" >Edit</button>";
         content += "<button class=\"btn item-delete\" value=\"" + this[0] + "\">Delete</button>";
         content += "</div></p>"; // <div class="btn-group">
         content += "</div>"; // <div class="accordion-inner">
@@ -89,7 +109,7 @@ function show_data_as_collapse(data) {
     });
     
     $(".item-delete").click(function () {
-        console.debug(this.value);
+        console.debug("on-click item-delete, value: " + this.value );
     });
 };
 
@@ -151,50 +171,31 @@ function clear_edit_form() {
     // clear edit form
     
     $("#edit-form-key").empty();
-    $("div#item-editor").remove();
-    $("div.modal-body").append("<div id=\"item-editor\"> </div>");    
+    item_editor.getSession().setValue("");
 };
 
 function show_edit_form(key) {
 
     var current_collection = $("#current-collection").text();
-    
-    clear_edit_form();
-
-    var item_editor = ace.edit("item-editor");
-    item_editor.setTheme("ace/theme/clouds");
-    item_editor.getSession().setMode("ace/mode/json");
-    item_editor.getSession().setUseWrapMode(true);  
-    
+        
     if (key == "NEW") {
         
         $.getJSON("/key").done( function(json) {
             if (json.status == "OK") {
                 $("#edit-form-key").append(json.key);            
-            }
-        });
+            };
+            $("#modal-edit-form").modal("show");
+        });        
         
     } else {
-        $.getJSON("/collection/" + current_collection + "/item/" + key).done( function(json) {
+        var url = "/collection/" + current_collection + "/item/" + key;
+        $.getJSON(url).done( function(json) {
         
+            clear_edit_form();
             $("#edit-form-key").append(json.item.key);        
-            // $("div#item-editor").append(JSON.stringify(json.item.value, null, 4));
             item_editor.getSession().setValue(JSON.stringify(json.item.value, null, 4));
+            $("#modal-edit-form").modal("show");
         });    
     };
-    
-    $("#submit-item-changes").click( function() {
-        
-        var key = $("#edit-form-key").text();
-        var value = item_editor.getSession().getValue();
-        
-        //console.debug("submit, key: " + key);
-        //console.debug("submit, value: " + value );
-        $.post("/collection/" + current_collection + "/item/" + key, {"value": value});
-        
-        // Hide the modal
-        $("#modal-edit-form").modal('hide');
-        clear_edit_form();
-    });
 };
     

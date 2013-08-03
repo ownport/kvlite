@@ -49,17 +49,20 @@
         <div id="collection-data"> </div>
         <div class="collection-data-pages text-center"></div>
 
-        <div id="modal-edit-form" class="modal hide fade" role="dialog" aria-hidden="true">
+        <!-- div id="modal-edit-form" class="modal hide fade" role="dialog" aria-hidden="true" -->
+        <div class="modal hide fade" id="modal-edit-form">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 <div id="edit-form-key-label">Key: </div> 
                 <div id="edit-form-key"></div>
             </div>
-            <div class="modal-body"></div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button class="btn btn-primary" id="submit-item-changes">Save changes</button>
+            <div class="modal-body">
+                <div id="item-editor"></div>
             </div>
+            <div class="modal-footer">
+                <button class="btn" id="close-item-form" data-dismiss="modal" aria-hidden="true">Close</button>
+                <button class="btn btn-primary" id="submit-item-changes">Save changes</button>
+            </div> 
         </div> <!-- modal-edit-form --> 
     </div> <!-- container -->
     
@@ -68,6 +71,13 @@
     <script src="/js/json2.js"></script>
     <script src="/js/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="/js/kvlite.js"></script>
+    
+    <script type="text/javascript">
+        var item_editor = ace.edit("item-editor");
+        item_editor.setTheme("ace/theme/clouds");
+        item_editor.getSession().setMode("ace/mode/json");
+        item_editor.getSession().setUseWrapMode(true);  
+    </script>
 </body>
 
 </html>
