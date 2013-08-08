@@ -1,4 +1,5 @@
 import os
+import json
 import bottle
 import kvlite
 
@@ -81,31 +82,75 @@ def get_page(name, page):
                 'data': data,
     }
 
-@bottle.route('/collection/<name>/item/<item_key>', method="GET")
-@bottle.route('/collection/<name>/item/<item_key>', method="POST")
-def get_item(name, item_key):
-    ''' return item data 
+def create_update_item(collection, k, v):
+    ''' create or update item
     '''
     try:
-        collection_uri = settings.COLLECTIONS[name]
+        collection_uri = settings.COLLECTIONS[collection]
         collection = kvlite.open(collection_uri)
     except KeyError:
         return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
 
-    item_value = bottle.request.POST.get('value', '')     
-    if item_value:
-        print 'key: ' + item_key
-        print 'value: ' + item_value 
-        return {
-                    'status': 'OK', 
-        }
-    else:        
-        item_key, item_value = collection.get({'_key': item_key})
+    if v:
+        try:
+            collection.put(k, json.loads(v))
+            collection.commit()
+            collection.close()
+            return { 'status': 'OK', }
+        except Exception, err:
+            return {
+                'status': 'Error',
+                'message': err, 
+            }
+
+def get_item(collection, k):
+    ''' get item details   
+    '''
+    try:
+        collection_uri = settings.COLLECTIONS[collection]
+        collection = kvlite.open(collection_uri)
+    except KeyError:
+        return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
+    
+    k, v = collection.get({'_key': k})
+    collection.close()
+    return { 'status': 'OK', 'item': {'key': k, 'value': v}, }
+    
+def delete_item(collection, k):
+    ''' delete item by key
+    '''
+    try:
+        collection_uri = settings.COLLECTIONS[collection]
+        collection = kvlite.open(collection_uri)
+    except KeyError:
+        return {'error': 'The collection %s is not found' % name, 'status': 'NOT OK'}
+
+    try:
+        collection.delete(k)
+        collection.commit()
         collection.close()
-        return {
-                    'status': 'OK', 
-                    'item': {'key': item_key, 'value': item_value},
-        }
+        return { 'status': 'OK', }
+    except:
+        return { 'status': 'Error', 'message': 'Cannot delete the item by key', }
+    
+
+@bottle.route('/collection/<collection_name>/item/<item_key>', method="GET")
+@bottle.route('/collection/<collection_name>/item/<item_key>', method="POST")
+@bottle.route('/collection/<collection_name>/item/<item_key>', method="DELETE")
+def handle_item(collection_name, item_key):
+    ''' handle item and return result 
+    '''
+    if bottle.request.method == 'GET':    
+        return get_item(collection_name, item_key)
+
+    elif bottle.request.method == 'POST':
+        return create_update_item(collection_name, item_key, bottle.request.POST.get('value', ''))
+        
+    elif bottle.request.method == 'DELETE':    
+        return delete_item(collection_name, item_key)        
+    
+    else:        
+        return { 'status': 'Error', 'message': 'Unknown method %s' % bottle.request.method, }
 
 if __name__ == '__main__':
     

@@ -2,11 +2,10 @@ $(document).ready( function() {
     get_collections(0);
     
     // clear item form after hide modal
-    $("#close-item-form").click( function(event) {
+    $("#modal-edit-form").on("hidden", function(event) {
         clear_edit_form();
     });
-    
-    
+        
     // handle submit modal edit form
     $("#submit-item-changes").click( function(event) {
         
@@ -14,14 +13,43 @@ $(document).ready( function() {
         var key = $("#edit-form-key").text();
         var value = item_editor.getSession().getValue();
         
-        $.post("/collection/" + current_collection + "/item/" + key, {"value": value});
+        $.post("/collection/" + current_collection + "/item/" + key, {"value": value})
+        .done(function(json) { 
+            if (json.status != "OK") {
+                console.debug(json.message);
+                show_alert(json.message);            
+            } else {
+                // Hide the modal
+                $("#modal-edit-form").modal('hide');
+                clear_edit_form();            
+            };
+            var active_page = 0;
+            if ($("#active-page").length != 0) {
+                active_page = parseInt($("#active-page").text());
+            };
+            get_data(current_collection, active_page);
+        });
         
-        // Hide the modal
-        $("#modal-edit-form").modal('hide');
-        clear_edit_form();
     });
     
 });
+
+function clear_edit_form() {
+    // clear edit form
+    
+    $("#edit-form-key").empty();
+    $(".alert").remove();
+    item_editor.getSession().setValue("");
+};
+
+function show_alert(message) {
+    
+    if ($("#edit-form-alert").length == 0) {
+        $("#modal-edit-form").append("<div class=\"alert\" id=\"edit-form-alert\"></div>");            
+    };
+    $("#edit-form-alert").empty();
+    $("#edit-form-alert").append(message);
+};
 
 function get_collections(page) {
 
@@ -109,7 +137,7 @@ function show_data_as_collapse(data) {
     });
     
     $(".item-delete").click(function () {
-        console.debug("on-click item-delete, value: " + this.value );
+        delete_item(this.value);
     });
 };
 
@@ -125,6 +153,9 @@ function show_pagination(page, last_page) {
     var end_page = last_page;
     
     $(".collection-data-pages").empty();
+    if (last_page == 0) {
+        return;  
+    };
     
     if ((page - left_edge) > 0) {
         pagination += "<li><a class=\"selected-page\" href=\"#\">First</a></li>";    
@@ -141,7 +172,7 @@ function show_pagination(page, last_page) {
         
     for (i = begin_page; i <= end_page; i++) {
         if (i == page) {
-            pagination += "<li class=\"active\">";
+            pagination += "<li class=\"active\" id=\"active-page\">";
         } else {
             pagination += "<li>";
         };
@@ -156,6 +187,7 @@ function show_pagination(page, last_page) {
 
     $(".collection-data-pages").append(pagination);
     $(".selected-page").click( function() {
+    
         var current_collection = $("#current-collection").text();
         var selected_page = this.text;
         if (selected_page == "First") {
@@ -165,13 +197,6 @@ function show_pagination(page, last_page) {
         };
         get_data(current_collection, selected_page);
     });
-};
-
-function clear_edit_form() {
-    // clear edit form
-    
-    $("#edit-form-key").empty();
-    item_editor.getSession().setValue("");
 };
 
 function show_edit_form(key) {
@@ -197,5 +222,26 @@ function show_edit_form(key) {
             $("#modal-edit-form").modal("show");
         });    
     };
+};
+
+function delete_item(key) {
+
+    var current_collection = $("#current-collection").text();
+
+    $.ajax({
+        type: "DELETE", 
+        url: "/collection/" + current_collection + "/item/" + key,
+        success: function(data, textStatus, jqXHR) {
+            alert("Item deleted successfully");
+        },
+		error: function(jqXHR, textStatus, errorThrown) {
+		    alert("deleteWine error"); 
+		}
+    });
+    var active_page = 0;
+    if ($("#active-page").length != 0) {
+        active_page = parseInt($("#active-page").text());
+    };
+    get_data(current_collection, active_page);
 };
     
