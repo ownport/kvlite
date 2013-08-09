@@ -1,5 +1,53 @@
 # Examples
 
+## kvlite as library
+
+```python
+>>> import kvlite
+>>> collection = kvlite.open('sqlite://memory:test')
+>>> collection
+<kvlite.SqliteCollection object at 0x14cb350>
+>>> collection.count
+0
+>>> key1 = collection.get_uuid()
+>>> key1
+'00000000594d699229ac4f46b2deee895e5683dc'    
+>>> document1 = {'id': 1, 'name': 'Example1', 'description': 'First example of usage kvlite database',}
+>>> collection.put(key1, document1)
+>>>
+>>> key2 = collection.get_uuid()
+>>> document2 = {'id': 2, 'name': 'Example2', 'description': 'Second example of usage kvlite database',}
+>>> collection.put(key2, document2)
+>>>
+>>> key3 = collection.get_uuid()
+>>> document3 = {'id': 3, 'name': 'Example3', 'description': 'Third example of usage kvlite database',}
+>>> collection.put(key3, document3)
+>>>
+>>> collection.count
+3
+>>>
+>>> for k,v in collection: print k,v
+... 
+00000000594d699229ac4f46b2deee895e5683dc {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
+000000007dfb322f91a64e5eafe91b73d041be1c {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
+00000000971b2b077bc244bcaf54960299aec500 {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}
+>>>
+>>> collection.get({'_key': key1})
+('00000000594d699229ac4f46b2deee895e5683dc', {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1})
+>>>
+>>> for k,v in collection.get({'_key': [key1, key2, key3]}): print k,v
+... 
+00000000594d699229ac4f46b2deee895e5683dc {'description': 'First example of usage kvlite database', 'name': 'Example1', 'id': 1}
+000000007dfb322f91a64e5eafe91b73d041be1c {'description': 'Second example of usage kvlite database', 'name': 'Example2', 'id': 2}
+00000000971b2b077bc244bcaf54960299aec500 {'description': 'Third example of usage kvlite database', 'name': 'Example3', 'id': 3}    
+>>>
+>>> for k in [key1, key2, key3]: collection.delete(k)
+>>> collection.count
+0
+>>> collection.close()
+>>>
+```
+
 ## kvlite.cli
 
 `kvlite.cli` module is used for get access to kvlite databases via console
@@ -37,6 +85,19 @@ kvlite> ?
 
 kvlite> 
 ```
+
+## kvlite.webui
+
+`kvlite.webui` module is used for get access to kvlite databases via web interface
+
+```
+$ python -m kvlite.webui
+Bottle v0.11.6 server starting up (using WSGIRefServer())...
+Listening on http://127.0.0.1:8080/
+Hit Ctrl-C to quit.
+
+```
+then open url `http://127.0.0.1:8080` in your browser
 
 ## Bulk put()
 
