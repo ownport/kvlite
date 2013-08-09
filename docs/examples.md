@@ -113,7 +113,7 @@ collection.commit()
 
 ## Pagination
 
-To be described later
+The examples how to use pagination with kvlite please see code for `webui`
 
 ## Migration data
 
