@@ -11,7 +11,7 @@ setup (
     description = ("key-value database wrapper for SQL database (MySQL, SQLite) "),
     long_description = open('README.rst').read(),
     license = "BSD",
-    keywords = "key-value python database mysql sqlite",
+    keywords = "key-value python database mysql sqlite wrapper",
     py_modules = ['kvlite',],
     classifiers = [
         'Programming Language :: Python',

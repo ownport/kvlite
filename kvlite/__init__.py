@@ -40,7 +40,7 @@ from kvlite.utils import get_uuid
 from kvlite.utils import dict2flat
 from kvlite.utils import docs_struct
 
-__version__ = 'v0.6.0'
+__version__ = 'v0.6.1'
 
 __all__ = [
     'open', 'remove', 'get_uuid', 'dict2flat', 'docs_struct',
