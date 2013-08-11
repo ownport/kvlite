@@ -1,9 +1,13 @@
-from setuptools import setup
+import sys
 import kvlite
 
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-setup (
-    name = "kvlite",
+setup(
+    name = 'kvlite',
     version = kvlite.__version__,
     author = 'Andrey Usov',
     author_email = 'ownport@gmail.com',
@@ -12,13 +16,15 @@ setup (
     long_description = open('README.rst').read(),
     license = "BSD",
     keywords = "key-value python database mysql sqlite wrapper",
-    py_modules = ['kvlite',],
+    packages = ['kvlite', 'kvlite.webui'],
+    include_package_data = True,
     classifiers = [
-        'Programming Language :: Python',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: POSIX',
         'Operating System :: POSIX :: Linux',
         'Topic :: Software Development :: Libraries :: Python Modules'
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
     ],
 )

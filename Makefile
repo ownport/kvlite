@@ -24,6 +24,6 @@ distrib:
 	@ rm -R build/
 	@ rm -R dist/
 	@ rm -R kvlite.egg-info/
-	@ python setup.py sdist bdist
+	@ python setup.py sdist
 
 
