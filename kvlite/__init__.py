@@ -7,7 +7,7 @@
 #   kvlite2 tutorial http://code.google.com/p/kvlite/wiki/kvlite2
 #
 __author__ = 'Andrey Usov <https://github.com/ownport/kvlite>'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 __license__ = """
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -39,8 +39,6 @@ from kvlite.utils import remove
 from kvlite.utils import get_uuid
 from kvlite.utils import dict2flat
 from kvlite.utils import docs_struct
-
-__version__ = 'v0.6.1'
 
 __all__ = [
     'open', 'remove', 'get_uuid', 'dict2flat', 'docs_struct',
