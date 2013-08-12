@@ -4,18 +4,6 @@
 import os
 import kvlite
 
-# During early development, the debug mode can be very helpful.
-# In this mode, Bottle is much more verbose and provides helpful 
-# debugging information whenever an error occurs. It also 
-# disables some optimisations that might get in your way and adds 
-# some checks that warn you about possible misconfiguration.
-# Here is an incomplete list of things that change in debug mode:
-#
-# - The default error page shows a traceback.
-# - Templates are not cached.
-# - Plugins are applied immediately.
-#
-
 # Web UI host
 WEBUI_HOST = '127.0.0.1'
 
@@ -39,10 +27,6 @@ WEBUI_PIDFILE = os.path.join(os.getcwd(), 'run/kvlite-webui.pid')
 
 # Collections list
 COLLECTIONS = {
-    'test-sqlite': 'sqlite://tests/db-webui/test-sqlite.kvlite:test',
-    'test-sqlite-memory': 'sqlite://memory:test',
-    'fs.ua-updates': 'sqlite://tests/db-webui/fs.ua-updates.kvlite:contents',
-    'fs.ua-items': 'sqlite://tests/db-webui/fs.ua-items.kvlite:contents',
 }
 
 # How many items will be published on page
