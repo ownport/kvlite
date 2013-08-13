@@ -15,6 +15,13 @@ The format of ``uri`` (uniform resource identifier) for databases:
  
 In case when sqlite is in use two variants of collection is possible: store data in file or store data in memory.
 
+There's two ways how to simplify access to kvlite's data: command line and web interface. Command line:
+
+    python -mkvlite.console
+    
+Web interface:
+
+    python -mkvlite.webui 
 
 Installation
 ============
