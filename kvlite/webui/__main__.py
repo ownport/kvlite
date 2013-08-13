@@ -153,6 +153,24 @@ def handle_item(collection_name, item_key):
         return { 'status': 'Error', 'message': 'Unknown method %s' % bottle.request.method, }
 
 if __name__ == '__main__':
+
+    import sys
+    import imp
+    
+    SETTING_PARAMS = [
+        'COLLECTIONS', 'DEBUG_MODE', 'ITEMS_PER_PAGE', 
+        'STATIC_PATH', 'WEBUI_HOST', 'WEBUI_LOGFILE', 
+        'WEBUI_PIDFILE', 'WEBUI_PORT'
+    ]
+    
+    if len(sys.argv) == 1:
+        print 'usage: python -mkvlite.webui your_settings.py' 
+        sys.exit()
+     
+    custom_settings = imp.load_source('settings', sys.argv[1])
+    for param in SETTING_PARAMS:
+        if param in dir(custom_settings):
+            settings.__dict__[param] = custom_settings.__dict__[param]
     
     bottle.run(
                 host=settings.WEBUI_HOST, 
