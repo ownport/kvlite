@@ -219,7 +219,7 @@ class Console(cmd.Cmd):
             params = manager.parse_uri(uri)
             if params['collection'] in manager.collections():
                 self.__kvlite_colls[name] = uri
-                print 'Connection exists, the reference added to collection list'
+                print 'Collection exists, the reference added to collection list'
                 return
             else:
                 manager.create(params['collection'])
