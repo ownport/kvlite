@@ -26,6 +26,28 @@ class cPickleSerializer(object):
         return pickle.loads(v)
 
 # -----------------------------------------------------------------
+# cPickleZipSerializer class
+# -----------------------------------------------------------------
+
+class cPickleZipSerializer(object):
+    ''' cPickleZipSerializer 
+    '''
+
+    @staticmethod
+    def dumps(v):
+        ''' dumps value 
+        '''
+        if isinstance(v, unicode):
+            v = str(v)
+        return zlib.compress(pickle.dumps(v))
+
+    @staticmethod
+    def loads(v):
+        ''' loads value  
+        '''
+        return pickle.loads(zlib.decompress(v))
+
+# -----------------------------------------------------------------
 # CompressedJsonSerializer class
 # -----------------------------------------------------------------
 

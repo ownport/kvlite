@@ -1,6 +1,7 @@
 import types
 
 from kvlite.serializers import cPickleSerializer
+from kvlite.serializers import cPickleZipSerializer
 from kvlite.serializers import CompressedJsonSerializer
 
 # ITEMS_PER_REQUEST is used in Collection._get_many()
@@ -55,6 +56,7 @@ functions named ``dumps`` and ``loads``, cPickleSerializer is the default
 '''
 SERIALIZERS = {
     'pickle': cPickleSerializer,
+    'zip_pickle': cPickleZipSerializer,
     'completed_json': CompressedJsonSerializer,
 }
 
