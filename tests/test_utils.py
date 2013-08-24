@@ -2,11 +2,11 @@ import sys
 if '' not in sys.path:
     sys.path.append('')
 
-import pprint
 import kvlite
 import unittest
 
 from kvlite.settings import SUPPORTED_VALUE_TYPES
+
 
 class KvliteUtilsTests(unittest.TestCase):
 
