@@ -110,7 +110,6 @@ class Console(cmd.Cmd):
 
     def do_import(self, filename):
         '''   import <filename>\t\timport collection configuration from JSON file'''
-        import os
         
         if not filename:
             print getattr(self, 'do_import').__doc__
