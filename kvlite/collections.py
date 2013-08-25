@@ -1,10 +1,13 @@
 import kvlite
+import binascii
 
 from kvlite.settings import KEY_LENGTH
+from kvlite.settings import SERIALIZERS
 from kvlite.settings import ITEMS_PER_REQUEST
 
 from kvlite.serializers import cPickleSerializer
-from kvlite.serializers import CompressedJsonSerializer
+#from kvlite.serializers import cPickleZipSerializer
+#from kvlite.serializers import CompressedJsonSerializer
 
 # -----------------------------------------------------------------
 # BaseCollection class
@@ -12,16 +15,23 @@ from kvlite.serializers import CompressedJsonSerializer
 class BaseCollection(object):
     ''' BaseCollection
     '''
-    def __init__(self, connection, collection_name, serializer=cPickleSerializer):
+    def __init__(self, connection, collection_name, serializer_name='pickle'):
         ''' __init__
         '''
         self._conn = connection
         self._cursor = self._conn.cursor()
         self._collection = collection_name
-        self._serializer = serializer
+        self._serializer = SERIALIZERS[serializer_name]
 
         self._uuid_cache = list()
         self._ZEROS_KEY = self.prepare_key(0)
+
+        if self.meta is None:
+            self.meta = {
+                'name': collection_name,
+                'serializer': serializer_name,
+                'kvlite-version': kvlite.__version__,
+            } 
 
     @staticmethod
     def prepare_key(key):
@@ -69,6 +79,7 @@ class BaseCollection(object):
         if not isinstance(info, dict):
             raise RuntimeError('Metadata should be dictionary')
         self.put(self._ZEROS_KEY, info)
+        self.commit()
 
     @property
     def count(self):
