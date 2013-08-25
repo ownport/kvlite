@@ -245,7 +245,7 @@ class MysqlCollection(BaseCollection):
             yield (k, v)
 
 
-    def put(self, k, v):
+    def put(self, kv):
         ''' put document in collection 
         '''        
         kv_insert = list()
