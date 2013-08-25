@@ -39,9 +39,11 @@ from kvlite.utils import remove
 from kvlite.utils import get_uuid
 from kvlite.utils import dict2flat
 from kvlite.utils import docs_struct
+from kvlite.utils import copy
+
 
 __all__ = [
-    'open', 'remove', 'get_uuid', 'dict2flat', 'docs_struct',
+    'open', 'remove', 'get_uuid', 'dict2flat', 'docs_struct', 'copy',
 ]
 
 
