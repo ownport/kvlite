@@ -56,9 +56,16 @@ def copy(source, target):
     if not isinstance(target, (MysqlCollection, SqliteCollection)):
         raise RuntimeError('The source should be MysqlCollection or SqliteCollection object, not %s', type(target))
     
-    data = [kv for kv in source]
-    target.put(data)
-    target.commit()
+    page = 0
+    items_per_page = 250
+    while True:
+        data = [kv for kv in source.get(offset=page * items_per_page, limit=items_per_page)]
+        if data:
+            target.put(data)
+            target.commit()
+        else:
+            break
+        page += 1
 
 def get_uuid(amount=100):
     ''' return UUIDs 
