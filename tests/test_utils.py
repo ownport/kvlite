@@ -156,7 +156,7 @@ class KvliteUtilsTests(unittest.TestCase):
         ''' test_copy
         '''
         
-        COPIED_ITEMS = 250
+        COPIED_ITEMS = 1200
         
         source_uri = self.URI.format(kvlite.utils.tmp_name())
         source = kvlite.open(source_uri, serializer_name='pickle')
