@@ -63,7 +63,7 @@ kvlite> ?
    history		show commands history 
    exit			exit from console 
 
-   create <name> <uri>		    create new collection (if not exists)
+   create <name> <uri> <serializer_name>    create new collection (if not exists)
    use <collection_name>	    use the collection as the default (current) collection
    show collections <details>	list of available collections
    remove <collection_name>	    remove collection
