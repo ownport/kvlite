@@ -26,11 +26,11 @@ class cPickleSerializer(object):
         return pickle.loads(v)
 
 # -----------------------------------------------------------------
-# cPickleZipSerializer class
+# CompressedPickleSerializer class
 # -----------------------------------------------------------------
 
-class cPickleZipSerializer(object):
-    ''' cPickleZipSerializer 
+class CompressedPickleSerializer(object):
+    ''' CompressedPickleSerializer 
     '''
 
     @staticmethod

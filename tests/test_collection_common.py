@@ -116,7 +116,7 @@ class CommonCollectionTests(unittest.TestCase):
     def test_use_different_serializators_for_many(self):
 
         URI = self.URI.format(kvlite.utils.tmp_name())
-        collection = kvlite.open(URI, serializer_name='completed_json')
+        collection = kvlite.open(URI, serializer_name='compressed_json')
         collection.put(u'11', u'diffser1')
         collection.put(u'22', u'diffser2')
         collection.put(u'33', u'diffser3')
@@ -133,7 +133,7 @@ class CommonCollectionTests(unittest.TestCase):
         collection.commit()
         collection.close()
 
-        collection = kvlite.open(URI, serializer_name='completed_json')        
+        collection = kvlite.open(URI, serializer_name='compressed_json')        
         with self.assertRaises(RuntimeError):
             res = [(k,v) for k,v in collection]
         collection.close()        
