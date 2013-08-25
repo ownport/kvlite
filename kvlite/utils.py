@@ -33,13 +33,7 @@ def open(uri, serializer_name='pickle'):
         
     collection = manager.collection_class(manager.connection, 
                                         params['collection'], 
-                                        SERIALIZERS[serializer_name])
-    if collection.meta is None:
-        collection.meta = {
-            'name': params['collection'],
-            'serializer': serializer_name,
-            'kvlite-version': kvlite.__version__,
-        } 
+                                        serializer_name)
     return collection
 
 def remove(uri):
