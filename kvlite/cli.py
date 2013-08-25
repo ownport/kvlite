@@ -34,6 +34,8 @@ import json
 import kvlite
 import pprint
 
+from settings import SERIALIZERS
+
 # -----------------------------------------------------------------
 # Console class
 # -----------------------------------------------------------------
@@ -202,9 +204,9 @@ class Console(cmd.Cmd):
             print 'Error! Unknown collection: %s' % collection_name
 
     def do_create(self, line):
-        '''   create <name> <uri>\t\tcreate new collection (if not exists)'''
+        '''   create <name> <uri> <serializer_name>\tcreate new collection (if not exists)'''
         try:
-            name, uri = [i for i in line.split(' ') if i <> '']
+            name, uri, serializer_name = [i for i in line.split(' ') if i <> '']
         except ValueError:
             print getattr(self, 'do_create').__doc__
             return
@@ -222,11 +224,14 @@ class Console(cmd.Cmd):
                 return
             else:
                 manager.create(params['collection'])
+                collection = manager.collection_class(manager.connection, 
+                                                    params['collection'], 
+                                                    serializer_name)
                 self.__kvlite_colls[name] = uri
                 print 'Collection created and added to collection list'
                 return
         except Exception, err:
-            print 'Error! Incorrect URI: %s' % uri
+            print 'Error! Incorrect URI: %s, %s' % (uri, err)
             return
         except ConnectionError, err:
             print 'Connection Error! Please check URI, %s' % str(err)
