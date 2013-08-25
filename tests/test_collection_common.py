@@ -113,6 +113,7 @@ class CommonCollectionTests(unittest.TestCase):
             self.assertIn(res, kvs[2*PAGE_SIZE:2*PAGE_SIZE+PAGE_SIZE])
         collection.close()
 
+
     def test_use_different_serializators_for_many(self):
 
         URI = self.URI.format(kvlite.utils.tmp_name())
@@ -123,20 +124,17 @@ class CommonCollectionTests(unittest.TestCase):
         collection.commit()
         collection.close()
 
+        # in version v0.6.3 you cannot re-define serializer in open() which was 
+        # assigned during first collection creation  
         collection = kvlite.open(URI, serializer_name='pickle')
-        with self.assertRaises(RuntimeError):
-            res = [(k,v) for k,v in collection]
-
-        collection.put(u'11', u'diffser1')
-        collection.put(u'22', u'diffser2')
-        collection.put(u'33', u'diffser3')
-        collection.commit()
+        res = [(k,v) for k,v in collection]
+        self.assertEqual(res, [
+            ('11'.zfill(kvlite.settings.KEY_LENGTH), u'diffser1'),
+            ('22'.zfill(kvlite.settings.KEY_LENGTH), u'diffser2'),
+            ('33'.zfill(kvlite.settings.KEY_LENGTH), u'diffser3'),
+        ])
         collection.close()
 
-        collection = kvlite.open(URI, serializer_name='compressed_json')        
-        with self.assertRaises(RuntimeError):
-            res = [(k,v) for k,v in collection]
-        collection.close()        
 
     def test_metadata(self):
         ''' test metadata
@@ -152,5 +150,19 @@ class CommonCollectionTests(unittest.TestCase):
             })
         collection.close()
         
+    def test_diff_serializers(self):
+        ''' test for checking different serializers
+        create collection with one serializers and check that you can open items
+        without definition the serializer again
+        '''
+        URI = self.URI.format(kvlite.utils.tmp_name())
         
+        collection = kvlite.open(URI, serializer_name='compressed_json')
+        collection.put(1, {'k1': 'v1'})
+        collection.commit()
+        collection.close()
+        
+        collection = kvlite.open(URI)
+        self.assertEqual(collection.get({'_key': 1}), ('1'.zfill(kvlite.settings.KEY_LENGTH), {'k1': 'v1'}))
+        collection.close()
         

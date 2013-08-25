@@ -32,6 +32,8 @@ class BaseCollection(object):
                 'serializer': serializer_name,
                 'kvlite-version': kvlite.__version__,
             } 
+        else:
+            self._serializer = SERIALIZERS[self.meta['serializer']]
 
     @staticmethod
     def prepare_key(key):
@@ -109,7 +111,7 @@ class BaseCollection(object):
             raise RuntimeError('Incorrect criteria format')
         
         if '_key' in criteria:
-            if isinstance(criteria['_key'], (str, unicode)):
+            if isinstance(criteria['_key'], (int, str, unicode)):
                 return self._get_one(self.prepare_key(criteria['_key']))
             elif isinstance(criteria['_key'], (list, tuple)):
                 criteria['_key'] = map(self.prepare_key, criteria['_key'])
